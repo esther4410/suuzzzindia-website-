@@ -180,12 +180,7 @@
     }
     .bubble img { width:64px; height:64px; object-fit:contain; pointer-events:none; }
     .bubble-name { font-size:9px; font-weight:700; color:var(--purple); margin-top:2px; pointer-events:none; }
-    .bubble.popping { animation:pop 0.4s forwards; }
-    @keyframes pop {
-      0%   { transform:scale(1); opacity:1; }
-      50%  { transform:scale(1.5); opacity:0.8; }
-      100% { transform:scale(0); opacity:0; }
-    }
+    .bubble.popping { animation:pop 0.4s forwards !important; }
     @keyframes float-a {
       0%,100% { transform:translate(0,0) rotate(0deg); }
       25%     { transform:translate(18px,-22px) rotate(3deg); }
@@ -269,9 +264,13 @@
     .pm-box { flex-direction:column; max-height:88vh; }
     .pm-img-side { width:100%; height:52vw; flex-shrink:0; }
     .pm-info-side { padding:20px; }
-  }
     .hero h1 { font-size: 28px; }
     .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 10px 100px; }
+  }
+  @keyframes pop {
+    0%   { transform:scale(1);   opacity:1; }
+    50%  { transform:scale(1.6); opacity:0.7; }
+    100% { transform:scale(0);   opacity:0; }
   }
 </style>
 </head>
@@ -652,19 +651,17 @@ if (window.innerWidth <= 768) {
     el.className = 'bubble';
     el.style.cssText = `left:${a.left};top:${a.top};animation:${a.anim} ${a.dur}s ease-in-out infinite;`;
     el.innerHTML = `<img src="${a.img}" alt="${a.name}"><div class="bubble-name">${a.name}</div>`;
-    function popBubble() {
+    el.addEventListener('click', () => {
       if (el.classList.contains('popping')) return;
-      el.style.animation = 'none'; // stop float
+      el.style.animationPlayState = 'paused';
       el.classList.add('popping');
       setTimeout(() => {
         el.classList.remove('popping');
-        el.style.left = (10 + Math.random() * 70) + '%';
-        el.style.top  = (20 + Math.random() * 55) + '%';
-        el.style.animation = `${a.anim} ${a.dur}s ease-in-out infinite`;
-      }, 1800);
-    }
-    el.addEventListener('click', popBubble);
-    el.addEventListener('touchend', e => { e.preventDefault(); popBubble(); }, { passive: false });
+        el.style.animationPlayState = 'running';
+        el.style.left = (8 + Math.random() * 72) + '%';
+        el.style.top  = (15 + Math.random() * 60) + '%';
+      }, 1600);
+    });
     document.body.appendChild(el);
   });
 }
