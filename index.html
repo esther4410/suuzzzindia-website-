@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SUUZZZ India</title>
+<link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -82,6 +83,12 @@
     width: 100%; aspect-ratio: 1;
     display: flex; align-items: center; justify-content: center; font-size: 40px;
   }
+  .slideshow { position: relative; aspect-ratio: 1; overflow: hidden; }
+  .slideshow .slide { display: none; width: 100%; aspect-ratio: 1; }
+  .slideshow .slide.active { display: block; }
+  .slide-dots { position: absolute; bottom: 6px; left: 0; right: 0; display: flex; justify-content: center; gap: 5px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: background 0.2s; }
+  .dot.active { background: white; }
   .card-body { padding: 12px; }
   .card-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
   .card-sub { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
@@ -230,6 +237,13 @@ function renderFilters() {
 
 function setFilter(c) { activeFilter = c; renderFilters(); renderGrid(); }
 
+function driveUrl(url) {
+  if (!url) return '';
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w800`;
+  return url;
+}
+
 function renderGrid() {
   const list = activeFilter === 'All' ? products : products.filter(p => category(p) === activeFilter);
   const grid = document.getElementById('grid');
@@ -241,12 +255,26 @@ function renderGrid() {
     const disc     = Number(p['Discount price (INR)']) || 0;
     const final    = disc > 0 ? disc : price;
     const soldOut  = stock === 0;
-    const imgUrl   = p['Image URL'];
+    const imgUrl   = driveUrl(p['Image URL']);
+    const imgUrl2  = driveUrl(p['Image URL 2']);
     const ck       = (p.Color||'').toLowerCase();
+    const sid      = `sl-${p.SKU}`;
 
-    const thumb = imgUrl
-      ? `<img class="card-img" src="${imgUrl}" alt="${p['Product Name']}" loading="lazy">`
-      : `<div class="card-placeholder" style="background:${COLOR_BG[ck]||'#F0EDE8'}">${COLOR_EM[ck]||'✨'}</div>`;
+    let thumb;
+    if (imgUrl && imgUrl2) {
+      thumb = `<div class="slideshow" id="${sid}">
+        <img class="slide card-img active" src="${imgUrl}" alt="${p['Product Name']}" loading="lazy">
+        <img class="slide card-img" src="${imgUrl2}" alt="${p['Product Name']}" loading="lazy">
+        <div class="slide-dots">
+          <div class="dot active" onclick="goSlide('${sid}',0)"></div>
+          <div class="dot" onclick="goSlide('${sid}',1)"></div>
+        </div>
+      </div>`;
+    } else if (imgUrl) {
+      thumb = `<img class="card-img" src="${imgUrl}" alt="${p['Product Name']}" loading="lazy">`;
+    } else {
+      thumb = `<div class="card-placeholder" style="background:${COLOR_BG[ck]||'#F0EDE8'}">${COLOR_EM[ck]||'✨'}</div>`;
+    }
 
     const priceHtml = disc > 0
       ? `<span class="price">₹${disc}</span><span class="price-orig">₹${price}</span><span class="sale-badge">SALE</span>`
@@ -281,7 +309,7 @@ function addToCart(sku) {
     existing.qty++;
   } else {
     const disc = Number(p['Discount price (INR)']) || 0;
-    cart.push({ sku, name: p['Product Name'], color: p.Color, price: disc > 0 ? disc : Number(p['Price (INR)']), qty: 1, imgUrl: p['Image URL'] || '' });
+    cart.push({ sku, name: p['Product Name'], color: p.Color, price: disc > 0 ? disc : Number(p['Price (INR)']), qty: 1, imgUrl: driveUrl(p['Image URL']) || '' });
   }
   save(); updateCart(); openCart();
 }
@@ -340,6 +368,13 @@ function updateCart() {
         <button class="rm-btn" onclick="changeQty('${item.sku}',-999)">🗑</button>
       </div>`;
   }).join('');
+}
+
+function goSlide(sid, idx) {
+  const el = document.getElementById(sid);
+  if (!el) return;
+  el.querySelectorAll('.slide').forEach((s,i) => s.classList.toggle('active', i===idx));
+  el.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===idx));
 }
 
 function openCart()  { document.getElementById('cartDrawer').classList.add('open'); document.getElementById('overlay').classList.add('open'); }
