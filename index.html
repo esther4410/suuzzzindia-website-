@@ -635,27 +635,33 @@ init();
 // ── Mobile Bubbles ───────────────────────────────────────────
 if (window.innerWidth <= 768) {
   const ANIMALS = [
-    { img:'animal-pipa.png',  name:'Pipa 🐆',  anim:'float-a', dur:6,  left:'-28px', top:'28%' },
-    { img:'animal-kaa.png',   name:'Kaa 🐍',   anim:'float-b', dur:7,  left:'calc(100vw - 62px)', top:'44%' },
-    { img:'animal-eliza.png', name:'Eliza 🦓', anim:'float-c', dur:8,  left:'-28px', top:'62%' },
-    { img:'animal-amara.png', name:'Amara 🐘', anim:'float-d', dur:5,  left:'calc(100vw - 62px)', top:'24%' },
+    { img:'animal-pipa.png',  label:'catch',  anim:'float-a', dur:6, left:'-28px', top:'28%' },
+    { img:'animal-kaa.png',   label:'me',     anim:'float-b', dur:7, left:'calc(100vw - 62px)', top:'44%' },
+    { img:'animal-eliza.png', label:'if you', anim:'float-c', dur:8, left:'-28px', top:'62%' },
+    { img:'animal-amara.png', label:'can!',   anim:'float-d', dur:5, left:'calc(100vw - 62px)', top:'24%' },
   ];
+  let poppedCount = 0;
 
   ANIMALS.forEach(a => {
     const el = document.createElement('div');
     el.className = 'bubble';
     el.style.cssText = `left:${a.left};top:${a.top};animation:${a.anim} ${a.dur}s ease-in-out infinite;`;
-    el.innerHTML = `<img src="${a.img}" alt="${a.name}"><div class="bubble-name">${a.name}</div>`;
+    el.innerHTML = `<img src="${a.img}" alt="${a.label}"><div class="bubble-name">${a.label}</div>`;
     el.addEventListener('click', () => {
       if (el.classList.contains('popping')) return;
       el.style.animationPlayState = 'paused';
       el.classList.add('popping');
+      poppedCount++;
       setTimeout(() => {
-        el.classList.remove('popping');
-        el.style.animationPlayState = 'running';
-        const onLeft = Math.random() > 0.5;
-        el.style.left = onLeft ? '-28px' : 'calc(100vw - 62px)';
-        el.style.top  = (20 + Math.random() * 55) + '%';
+        if (poppedCount >= 4) {
+          el.style.display = 'none'; // all caught — disappear forever
+        } else {
+          el.classList.remove('popping');
+          el.style.animationPlayState = 'running';
+          const onLeft = Math.random() > 0.5;
+          el.style.left = onLeft ? '-28px' : 'calc(100vw - 62px)';
+          el.style.top  = (20 + Math.random() * 55) + '%';
+        }
       }, 1600);
     });
     document.body.appendChild(el);
