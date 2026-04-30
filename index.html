@@ -376,17 +376,45 @@ let cart = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
 let activeFilter = 'All';
 
 // ── Boot ──────────────────────────────────────────────────────
+const CACHE_KEY = 'suuzzz_products_v1';
+const CACHE_TTL = 5 * 60 * 1000; // 5 min
+
 async function init() {
-  try {
-    const res = await fetch(`${API_URL}?action=products`);
-    const data = await res.json();
-    products = data.products || [];
+  // Show cached products instantly (zero wait)
+  const cached = (() => {
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) return null;
+      const { ts, data } = JSON.parse(raw);
+      if (Date.now() - ts > CACHE_TTL) return null;
+      return data;
+    } catch { return null; }
+  })();
+
+  if (cached) {
+    products = cached;
     renderFilters();
     renderGrid();
     updateCart();
+  }
+
+  // Fetch fresh data in background (or foreground if no cache)
+  try {
+    const res = await fetch(`${API_URL}?action=products`);
+    const data = await res.json();
+    const fresh = data.products || [];
+    if (fresh.length) {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: fresh }));
+      products = fresh;
+      renderFilters();
+      renderGrid();
+      if (!cached) updateCart();
+    }
   } catch(e) {
-    document.getElementById('grid').innerHTML =
-      '<div class="loading">Could not load products. Please refresh.</div>';
+    if (!cached) {
+      document.getElementById('grid').innerHTML =
+        '<div class="loading">Could not load products. Please refresh.</div>';
+    }
   }
 }
 
