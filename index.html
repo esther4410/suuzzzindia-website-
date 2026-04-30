@@ -49,10 +49,10 @@
   }
 
   .hero {
-    background: var(--purple); color: white;
+    background: var(--white); color: var(--text);
     padding: 48px 24px; text-align: center;
   }
-  .hero h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+  .hero h1 { font-size: 44px; font-weight: 700; margin-bottom: 8px; color: var(--yellow); }
   .hero h1 span { color: var(--yellow); }
   .hero p { font-size: 15px; opacity: 0.8; max-width: 480px; margin: 0 auto; }
 
@@ -67,7 +67,7 @@
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 16px; padding: 16px 24px 100px;
     max-width: 900px; margin: 0 auto;
   }
@@ -174,6 +174,10 @@
   .pm-price { font-size:24px; font-weight:700; color:var(--purple); }
   .pm-orig { font-size:15px; color:var(--muted); text-decoration:line-through; }
   .pm-stock { font-size:12px; color:var(--muted); margin-bottom:24px; }
+  .pm-urgent { display:inline-flex; align-items:center; gap:6px; background:#FFF3CD; border:1.5px solid #F9D200; border-radius:8px; padding:8px 12px; font-size:13px; font-weight:700; color:#7B4F00; margin-bottom:20px; }
+  .pm-urgent-dot { width:8px; height:8px; border-radius:50%; background:#E53E3E; animation:pulse 1.2s infinite; flex-shrink:0; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+  .last-chance-badge { position:absolute; top:8px; left:8px; background:#E53E3E; color:white; font-size:10px; font-weight:700; padding:3px 8px; border-radius:5px; letter-spacing:0.3px; pointer-events:none; }
   .pm-add { width:100%; padding:14px; background:var(--yellow); color:var(--purple); border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; margin-top:auto; }
   .pm-add:hover { background:#e6c200; }
   .pm-sold { width:100%; padding:14px; background:var(--gray); color:var(--muted); border:none; border-radius:10px; font-size:15px; font-weight:600; margin-top:auto; }
@@ -186,8 +190,8 @@
     .pm-img-side { width:100%; height:52vw; flex-shrink:0; }
     .pm-info-side { padding:20px; }
   }
-    .hero h1 { font-size: 24px; }
-    .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 12px 12px 100px; }
+    .hero h1 { font-size: 30px; }
+    .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 10px 100px; }
   }
 </style>
 </head>
@@ -309,26 +313,29 @@ function renderGrid() {
     const price    = Number(p['Price (INR)']) || 0;
     const disc     = Number(p['Discount price (INR)']) || 0;
     const final    = disc > 0 ? disc : price;
-    const soldOut  = stock === 0;
+    const soldOut   = stock === 0;
+    const lastChance = !soldOut && stock <= 5;
     const imgUrl   = driveUrl(p['Image URL']);
     const imgUrl2  = driveUrl(p['Image URL 2']);
     const ck       = (p.Color||'').toLowerCase();
     const sid      = `sl-${p.SKU}`;
 
     let thumb;
+    const lcBadge = lastChance ? `<div class="last-chance-badge">🔥 Last Chance</div>` : '';
     if (imgUrl && imgUrl2) {
-      thumb = `<div class="slideshow" id="${sid}" onclick="openProduct('${p.SKU}')">
+      thumb = `<div class="slideshow" id="${sid}" onclick="openProduct('${p.SKU}')" style="position:relative">
         <img class="slide card-img active" src="${imgUrl}" alt="${p['Product Name']}" loading="lazy">
         <img class="slide card-img" src="${imgUrl2}" alt="${p['Product Name']}" loading="lazy">
         <div class="slide-dots">
           <div class="dot active" onclick="event.stopPropagation();goSlide('${sid}',0)"></div>
           <div class="dot" onclick="event.stopPropagation();goSlide('${sid}',1)"></div>
         </div>
+        ${lcBadge}
       </div>`;
     } else if (imgUrl) {
-      thumb = `<img class="card-img" src="${imgUrl}" alt="${p['Product Name']}" loading="lazy" onclick="openProduct('${p.SKU}')">`;
+      thumb = `<div style="position:relative"><img class="card-img" src="${imgUrl}" alt="${p['Product Name']}" loading="lazy" onclick="openProduct('${p.SKU}')">${lcBadge}</div>`;
     } else {
-      thumb = `<div class="card-placeholder" style="background:${COLOR_BG[ck]||'#F0EDE8'};cursor:pointer" onclick="openProduct('${p.SKU}')">${COLOR_EM[ck]||'✨'}</div>`;
+      thumb = `<div class="card-placeholder" style="background:${COLOR_BG[ck]||'#F0EDE8'};cursor:pointer;position:relative" onclick="openProduct('${p.SKU}')">${COLOR_EM[ck]||'✨'}${lcBadge}</div>`;
     }
 
     const priceHtml = disc > 0
@@ -460,7 +467,14 @@ function openProduct(sku) {
     : `<span class="pm-price">₹${price}</span>`;
 
   const stock = Number(p['Current Stock']) || 0;
-  document.getElementById('pmStock').textContent = stock > 0 ? `${stock} in stock` : 'Sold out';
+  const stockEl = document.getElementById('pmStock');
+  if (stock === 0) {
+    stockEl.textContent = 'Sold out';
+  } else if (stock <= 5) {
+    stockEl.innerHTML = `<span class="pm-urgent"><span class="pm-urgent-dot"></span>Last Chance! Only ${stock} left — grab it before it's gone 🔥</span>`;
+  } else {
+    stockEl.textContent = '';
+  }
 
   const addBtn = document.getElementById('pmAddBtn');
   if (stock === 0) {
