@@ -177,12 +177,14 @@
   }
   .animal-tip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:7px solid transparent; border-top-color:var(--purple); }
   .grid-animal:hover .animal-tip { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .animal-tl { left: 8px; top: 60px; }
-  .animal-tr { right: 8px; top: 60px; }
-  .animal-tr:hover { transform: scale(1.1) rotate(3deg); }
-  .animal-bl { left: 8px; top: 340px; }
-  .animal-br { right: 8px; top: 340px; }
-  .animal-br:hover { transform: scale(1.1) rotate(3deg); }
+  .animal-tl { left: 8px; top: 60px; transform: rotate(-4deg); }
+  .animal-tl:hover { transform: scale(1.1) rotate(-7deg); }
+  .animal-tr { right: -20px; top: 100px; transform: rotate(8deg); }
+  .animal-tr:hover { transform: scale(1.1) rotate(12deg); }
+  .animal-bl { left: -16px; top: 310px; transform: rotate(6deg); }
+  .animal-bl:hover { transform: scale(1.1) rotate(10deg); }
+  .animal-br { right: 8px; top: 370px; transform: rotate(-3deg); }
+  .animal-br:hover { transform: scale(1.1) rotate(-6deg); }
   @media (max-width: 1200px) { .grid-animal { display: none; } }
 
   /* Product Modal */
