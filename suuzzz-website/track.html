@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Order — SUUZZZ India</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --yellow:#F9D200; --purple:#553D69; --purple-light:#7B5A99; --bg:#FAFAFA; --white:#fff; --gray:#F0F0F0; --muted:#888; --error:#E53E3E; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter',sans-serif; background:var(--bg); color:#1A1A1A; }
+  header { background:var(--white); border-bottom:2px solid var(--yellow); padding:16px 24px; display:flex; align-items:center; gap:12px; }
+  .back { text-decoration:none; color:var(--muted); font-size:20px; }
+  .back:hover { color:var(--purple); }
+  .logo { font-size:18px; font-weight:700; color:var(--purple); letter-spacing:2px; }
+  .logo span { color:var(--yellow); }
+  .page { max-width:480px; margin:0 auto; padding:40px 16px 60px; }
+  h2 { font-size:22px; font-weight:700; color:var(--purple); margin-bottom:6px; }
+  .sub { color:var(--muted); font-size:14px; margin-bottom:28px; line-height:1.5; }
+  .card { background:var(--white); border-radius:14px; padding:24px; box-shadow:0 1px 6px rgba(0,0,0,0.07); margin-bottom:16px; }
+  .field { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  label { font-size:13px; font-weight:600; color:#444; }
+  input { padding:12px 14px; border:1.5px solid #DDD; border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; }
+  input:focus { outline:none; border-color:var(--purple); }
+  .track-btn { width:100%; padding:14px; background:var(--purple); color:white; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; margin-top:6px; }
+  .track-btn:hover { background:var(--purple-light); }
+  .track-btn:disabled { background:var(--gray); color:var(--muted); cursor:not-allowed; }
+  .result { display:none; }
+  .result.show { display:block; }
+  .status-bar { display:flex; align-items:center; gap:12px; background:var(--gray); border-radius:10px; padding:14px 16px; margin-bottom:20px; }
+  .s-icon { font-size:28px; }
+  .s-label { font-size:12px; color:var(--muted); margin-bottom:2px; }
+  .s-text { font-size:15px; font-weight:700; }
+  .detail-row { display:flex; justify-content:space-between; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--gray); font-size:14px; gap:12px; }
+  .detail-row:last-child { border-bottom:none; }
+  .d-label { color:var(--muted); font-weight:500; flex-shrink:0; }
+  .d-val { font-weight:600; text-align:right; word-break:break-all; }
+  .track-link-el { color:var(--purple); text-decoration:underline; font-weight:600; }
+  .error-box { background:#FFF5F5; border:1.5px solid #FED7D7; border-radius:10px; padding:18px; text-align:center; color:var(--error); font-size:14px; line-height:1.6; }
+  .shop-link { display:block; text-align:center; margin-top:20px; color:var(--purple); font-size:14px; font-weight:600; text-decoration:underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="index.html">←</a>
+  <div class="logo">SUUZZ<span>Z</span></div>
+</header>
+
+<div class="page">
+  <h2>Track Your Order</h2>
+  <p class="sub">Enter your email and the order code you received after checkout (looks like SUZ-AB1234).</p>
+
+  <div class="card">
+    <div class="field">
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="you@email.com">
+    </div>
+    <div class="field" style="margin-bottom:4px">
+      <label>Order Code</label>
+      <input type="text" id="code" placeholder="SUZ-AB1234"
+        style="text-transform:uppercase;letter-spacing:1px"
+        oninput="this.value=this.value.toUpperCase()">
+    </div>
+    <button class="track-btn" id="trackBtn" onclick="doTrack()">Track Order →</button>
+  </div>
+
+  <div class="result" id="result"></div>
+  <a class="shop-link" href="index.html">← Back to Shop</a>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbx-w6hDRFn2KHhIODytmzNhNsw4nHPaxz-p4FNI2yIUEeHlrMCAnySdtVLbKzwKjU-WoA/exec';
+
+const STATUS = {
+  PENDING_PAYMENT: { icon:'⏳', text:'Waiting for payment',      color:'#888' },
+  CONFIRMED:       { icon:'✅', text:'Order confirmed',           color:'#2E7D32' },
+  PACKING:         { icon:'📦', text:'Packing with love...',      color:'#553D69' },
+  SHIPPED:         { icon:'🚚', text:'On the way!',               color:'#1565C0' },
+  DELIVERED:       { icon:'🎉', text:'Delivered — enjoy the joy!',color:'#2E7D32' },
+  CANCELLED:       { icon:'❌', text:'Order cancelled',           color:'#E53E3E' },
+};
+
+async function doTrack() {
+  const email = document.getElementById('email').value.trim();
+  const code  = document.getElementById('code').value.trim().toUpperCase();
+  if (!email || !code) { alert('Please enter both email and order code.'); return; }
+
+  const btn = document.getElementById('trackBtn');
+  btn.disabled = true; btn.textContent = 'Searching...';
+
+  const resultEl = document.getElementById('result');
+  resultEl.className = 'result';
+  resultEl.innerHTML = '';
+
+  try {
+    const res  = await fetch(`${API_URL}?action=track&email=${encodeURIComponent(email)}&code=${encodeURIComponent(code)}`);
+    const data = await res.json();
+
+    if (data.found && data.order) {
+      renderOrder(data.order);
+    } else {
+      resultEl.innerHTML = `
+        <div class="error-box">
+          😕 Order not found.<br><br>
+          Double-check your email and order code.<br>
+          <small style="color:#aaa;display:block;margin-top:6px">Example code: SUZ-AB1234</small>
+        </div>`;
+      resultEl.classList.add('show');
+    }
+  } catch(e) {
+    resultEl.innerHTML = `<div class="error-box">Connection error. Please try again.</div>`;
+    resultEl.classList.add('show');
+  }
+
+  btn.disabled = false; btn.textContent = 'Track Order →';
+}
+
+function renderOrder(o) {
+  const s = STATUS[o.Status] || STATUS.PENDING_PAYMENT;
+  const tracking = o.TrackingNumber
+    ? `<a class="track-link-el" href="https://shiprocket.co/tracking/${o.TrackingNumber}" target="_blank">${o.TrackingNumber} →</a>`
+    : `<span style="color:var(--muted)">Not shipped yet</span>`;
+
+  document.getElementById('result').innerHTML = `
+    <div class="card">
+      <div class="status-bar">
+        <div class="s-icon">${s.icon}</div>
+        <div>
+          <div class="s-label">Order Status</div>
+          <div class="s-text" style="color:${s.color}">${s.text}</div>
+        </div>
+      </div>
+      <div class="detail-row"><span class="d-label">Order Code</span><span class="d-val">${o.OrderCode}</span></div>
+      <div class="detail-row"><span class="d-label">Date</span><span class="d-val">${o.Date}</span></div>
+      <div class="detail-row"><span class="d-label">Items</span><span class="d-val">${o.Items}</span></div>
+      <div class="detail-row"><span class="d-label">Total</span><span class="d-val" style="color:var(--purple)">₹${o.Total}</span></div>
+      <div class="detail-row"><span class="d-label">Ship To</span><span class="d-val">${o.City}, ${o.Pincode}</span></div>
+      <div class="detail-row"><span class="d-label">Tracking</span><span class="d-val">${tracking}</span></div>
+    </div>`;
+  document.getElementById('result').classList.add('show');
+}
+
+// Auto-fill + auto-search from URL params
+const p = new URLSearchParams(window.location.search);
+if (p.get('email')) document.getElementById('email').value = p.get('email');
+if (p.get('code'))  document.getElementById('code').value  = p.get('code').toUpperCase();
+if (p.get('email') && p.get('code')) doTrack();
+</script>
+</body>
+</html>

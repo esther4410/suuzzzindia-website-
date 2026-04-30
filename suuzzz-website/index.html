@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUUZZZ India</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #F9D200;
+    --purple: #553D69;
+    --purple-light: #7B5A99;
+    --bg: #FAFAFA;
+    --white: #FFFFFF;
+    --gray: #F0F0F0;
+    --text: #1A1A1A;
+    --muted: #888;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+
+  header {
+    background: var(--white);
+    border-bottom: 2px solid var(--yellow);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 22px; font-weight: 700; color: var(--purple); letter-spacing: 2px; }
+  .logo span { color: var(--yellow); }
+  .nav-links a { text-decoration: none; color: var(--muted); font-size: 14px; font-weight: 500; }
+  .nav-links a:hover { color: var(--purple); }
+  .cart-btn {
+    background: var(--purple); color: white; border: none;
+    padding: 10px 18px; border-radius: 24px; cursor: pointer;
+    font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .cart-btn:hover { background: var(--purple-light); }
+  .cart-count {
+    background: var(--yellow); color: var(--purple);
+    border-radius: 50%; width: 20px; height: 20px;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .hero {
+    background: var(--purple); color: white;
+    padding: 48px 24px; text-align: center;
+  }
+  .hero h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+  .hero h1 span { color: var(--yellow); }
+  .hero p { font-size: 15px; opacity: 0.8; max-width: 480px; margin: 0 auto; }
+
+  .filters { padding: 20px 24px 8px; display: flex; gap: 10px; flex-wrap: wrap; max-width: 900px; margin: 0 auto; }
+  .filter-btn {
+    padding: 8px 18px; border-radius: 20px;
+    border: 1.5px solid var(--purple);
+    background: transparent; color: var(--purple);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+  }
+  .filter-btn.active, .filter-btn:hover { background: var(--purple); color: white; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px; padding: 16px 24px 100px;
+    max-width: 900px; margin: 0 auto;
+  }
+  .card {
+    background: var(--white); border-radius: 12px; overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .card.sold-out { opacity: 0.6; }
+  .card-img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+  .card-placeholder {
+    width: 100%; aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center; font-size: 40px;
+  }
+  .card-body { padding: 12px; }
+  .card-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .card-sub { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  .price-row { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .price { font-size: 15px; font-weight: 700; color: var(--purple); }
+  .price-orig { font-size: 12px; color: var(--muted); text-decoration: line-through; }
+  .sale-badge { background: var(--yellow); color: var(--purple); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+  .add-btn {
+    width: 100%; padding: 9px; background: var(--yellow); color: var(--purple);
+    border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  .add-btn:hover { background: #e6c200; }
+  .sold-badge { text-align: center; padding: 9px; background: var(--gray); color: var(--muted); border-radius: 8px; font-size: 12px; font-weight: 600; }
+
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; }
+  .overlay.open { display: block; }
+  .cart-drawer {
+    position: fixed; top: 0; right: -100%;
+    width: min(380px, 100vw); height: 100vh;
+    background: var(--white); z-index: 201;
+    display: flex; flex-direction: column;
+    transition: right 0.3s ease;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+  }
+  .cart-drawer.open { right: 0; }
+  .cart-head {
+    padding: 20px; border-bottom: 1px solid var(--gray);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .cart-head h2 { font-size: 18px; font-weight: 700; color: var(--purple); }
+  .close-btn { background: none; border: none; font-size: 26px; cursor: pointer; color: var(--muted); line-height: 1; }
+  .cart-body { flex: 1; overflow-y: auto; padding: 16px; }
+  .cart-empty { text-align: center; padding: 40px 20px; color: var(--muted); }
+  .cart-item {
+    display: flex; gap: 12px; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid var(--gray);
+  }
+  .item-thumb {
+    width: 48px; height: 48px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+    object-fit: cover;
+  }
+  .item-info { flex: 1; }
+  .item-name { font-size: 13px; font-weight: 600; }
+  .item-price { font-size: 12px; color: var(--purple); font-weight: 700; margin-top: 2px; }
+  .qty-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .qty-btn {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 1.5px solid var(--purple); background: none; color: var(--purple);
+    font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .qty-btn:hover { background: var(--purple); color: white; }
+  .qty-n { font-size: 14px; font-weight: 600; min-width: 18px; text-align: center; }
+  .rm-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: var(--muted); }
+  .cart-foot { padding: 16px 20px; border-top: 1px solid var(--gray); }
+  .ship-note { font-size: 12px; color: var(--muted); text-align: center; margin-bottom: 10px; min-height: 18px; }
+  .total-row { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+  .go-btn {
+    width: 100%; padding: 14px; background: var(--purple); color: white;
+    border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  .go-btn:hover { background: var(--purple-light); }
+  .go-btn:disabled { background: var(--gray); color: var(--muted); cursor: not-allowed; }
+
+  .loading { text-align: center; padding: 60px; color: var(--muted); }
+
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 24px; }
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 12px 12px 100px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">SUUZZ<span>Z</span></div>
+  <div class="nav-links"><a href="track.html">Track Order</a></div>
+  <button class="cart-btn" onclick="openCart()">
+    🛒 Cart <span class="cart-count" id="cartCount">0</span>
+  </button>
+</header>
+
+<div class="hero">
+  <h1>Bring <span>Joy</span> Home</h1>
+  <p>European design × Indian craftsmanship. Handcrafted home decor that sparks joy every day.</p>
+</div>
+
+<div class="filters" id="filters"></div>
+<div class="grid" id="grid"><div class="loading">Loading products...</div></div>
+
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-head">
+    <h2>Your Cart 🛒</h2>
+    <button class="close-btn" onclick="closeCart()">×</button>
+  </div>
+  <div class="cart-body" id="cartBody"></div>
+  <div class="cart-foot">
+    <div class="ship-note" id="shipNote"></div>
+    <div class="total-row"><span>Total</span><span id="cartTotal">₹0</span></div>
+    <button class="go-btn" id="goBtn" onclick="goCheckout()" disabled>Proceed to Checkout →</button>
+  </div>
+</div>
+
+<script>
+// ── CONFIG — replace after Apps Script deploy ─────────────────
+const API_URL = 'https://script.google.com/macros/s/AKfycbx-w6hDRFn2KHhIODytmzNhNsw4nHPaxz-p4FNI2yIUEeHlrMCAnySdtVLbKzwKjU-WoA/exec';
+
+const COLOR_BG = { pink:'#F8BBD9', mint:'#B2EBE0', blue:'#BBDEFB', green:'#C8E6C9', purple:'#E1BEE7' };
+const COLOR_EM = { pink:'🌸', mint:'🌿', blue:'💙', green:'🍃', purple:'💜' };
+
+let products = [];
+let cart = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
+let activeFilter = 'All';
+
+// ── Boot ──────────────────────────────────────────────────────
+async function init() {
+  try {
+    const res = await fetch(`${API_URL}?action=products`);
+    const data = await res.json();
+    products = data.products || [];
+    renderFilters();
+    renderGrid();
+    updateCart();
+  } catch(e) {
+    document.getElementById('grid').innerHTML =
+      '<div class="loading">Could not load products. Please refresh.</div>';
+  }
+}
+
+function category(p) {
+  const s = p.SKU || '';
+  if (s.startsWith('01P')) return 'Pouches';
+  if (s.startsWith('01B')) return 'Bags';
+  if (s.startsWith('01C')) return 'Cushions';
+  if (s.startsWith('01M')) return 'Metal';
+  return 'Other';
+}
+
+function renderFilters() {
+  const cats = ['All', ...new Set(products.map(category))];
+  document.getElementById('filters').innerHTML = cats.map(c =>
+    `<button class="filter-btn ${c===activeFilter?'active':''}" onclick="setFilter('${c}')">${c}</button>`
+  ).join('');
+}
+
+function setFilter(c) { activeFilter = c; renderFilters(); renderGrid(); }
+
+function renderGrid() {
+  const list = activeFilter === 'All' ? products : products.filter(p => category(p) === activeFilter);
+  const grid = document.getElementById('grid');
+  if (!list.length) { grid.innerHTML = '<div class="loading">No products found.</div>'; return; }
+
+  grid.innerHTML = list.map(p => {
+    const stock    = Number(p['Current Stock']) || 0;
+    const price    = Number(p['Price (INR)']) || 0;
+    const disc     = Number(p['Discount price (INR)']) || 0;
+    const final    = disc > 0 ? disc : price;
+    const soldOut  = stock === 0;
+    const imgUrl   = p['Image URL'];
+    const ck       = (p.Color||'').toLowerCase();
+
+    const thumb = imgUrl
+      ? `<img class="card-img" src="${imgUrl}" alt="${p['Product Name']}" loading="lazy">`
+      : `<div class="card-placeholder" style="background:${COLOR_BG[ck]||'#F0EDE8'}">${COLOR_EM[ck]||'✨'}</div>`;
+
+    const priceHtml = disc > 0
+      ? `<span class="price">₹${disc}</span><span class="price-orig">₹${price}</span><span class="sale-badge">SALE</span>`
+      : `<span class="price">₹${price}</span>`;
+
+    const action = soldOut
+      ? `<div class="sold-badge">Sold Out</div>`
+      : `<button class="add-btn" onclick="addToCart('${p.SKU}')">Add to Cart</button>`;
+
+    return `
+      <div class="card${soldOut?' sold-out':''}">
+        ${thumb}
+        <div class="card-body">
+          <div class="card-name">${p['Product Name']}</div>
+          <div class="card-sub">${p.Design} · ${p.Color}</div>
+          <div class="price-row">${priceHtml}</div>
+          ${action}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Cart ──────────────────────────────────────────────────────
+function addToCart(sku) {
+  const p = products.find(x => x.SKU === sku);
+  if (!p) return;
+  const stock = Number(p['Current Stock']) || 0;
+  const existing = cart.find(x => x.sku === sku);
+  if ((existing ? existing.qty : 0) >= stock) { alert(`Only ${stock} left in stock!`); return; }
+
+  if (existing) {
+    existing.qty++;
+  } else {
+    const disc = Number(p['Discount price (INR)']) || 0;
+    cart.push({ sku, name: p['Product Name'], color: p.Color, price: disc > 0 ? disc : Number(p['Price (INR)']), qty: 1, imgUrl: p['Image URL'] || '' });
+  }
+  save(); updateCart(); openCart();
+}
+
+function changeQty(sku, d) {
+  const item = cart.find(x => x.sku === sku);
+  if (!item) return;
+  const p = products.find(x => x.SKU === sku);
+  const stock = p ? Number(p['Current Stock']) : 99;
+  item.qty += d;
+  if (item.qty <= 0) cart = cart.filter(x => x.sku !== sku);
+  else if (item.qty > stock) { item.qty = stock; alert(`Only ${stock} left!`); }
+  save(); updateCart();
+}
+
+function save() { localStorage.setItem('suuzzz_cart', JSON.stringify(cart)); }
+
+function subtotal() { return cart.reduce((s, i) => s + i.price * i.qty, 0); }
+
+function updateCart() {
+  const count = cart.reduce((s, i) => s + i.qty, 0);
+  document.getElementById('cartCount').textContent = count;
+
+  const sub      = subtotal();
+  const shipping = sub >= 2000 ? 0 : (sub > 0 ? 80 : 0);
+  const total    = sub + shipping;
+
+  document.getElementById('cartTotal').textContent = `₹${total}`;
+  document.getElementById('goBtn').disabled = cart.length === 0;
+
+  const note = document.getElementById('shipNote');
+  if (sub === 0) note.textContent = '';
+  else if (shipping === 0) note.textContent = '🎉 Free shipping!';
+  else note.textContent = `Add ₹${2000 - sub} more for free shipping`;
+
+  const body = document.getElementById('cartBody');
+  if (!cart.length) { body.innerHTML = '<div class="cart-empty">Your cart is empty 💛</div>'; return; }
+
+  body.innerHTML = cart.map(item => {
+    const ck = (item.color||'').toLowerCase();
+    const thumb = item.imgUrl
+      ? `<img class="item-thumb" src="${item.imgUrl}" style="border-radius:8px">`
+      : `<div class="item-thumb" style="background:${COLOR_BG[ck]||'#F0EDE8'}">${COLOR_EM[ck]||'✨'}</div>`;
+    return `
+      <div class="cart-item">
+        ${thumb}
+        <div class="item-info">
+          <div class="item-name">${item.name}</div>
+          <div class="item-price">₹${item.price * item.qty}</div>
+          <div class="qty-row">
+            <button class="qty-btn" onclick="changeQty('${item.sku}',-1)">−</button>
+            <span class="qty-n">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty('${item.sku}',1)">+</button>
+          </div>
+        </div>
+        <button class="rm-btn" onclick="changeQty('${item.sku}',-999)">🗑</button>
+      </div>`;
+  }).join('');
+}
+
+function openCart()  { document.getElementById('cartDrawer').classList.add('open'); document.getElementById('overlay').classList.add('open'); }
+function closeCart() { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+function goCheckout() { if (cart.length) window.location.href = 'checkout.html'; }
+
+init();
+</script>
+</body>
+</html>

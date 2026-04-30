@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — SUUZZZ India</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --yellow:#F9D200; --purple:#553D69; --purple-light:#7B5A99; --bg:#FAFAFA; --white:#fff; --gray:#F0F0F0; --muted:#888; --error:#E53E3E; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter',sans-serif; background:var(--bg); color:#1A1A1A; }
+
+  header { background:var(--white); border-bottom:2px solid var(--yellow); padding:16px 24px; display:flex; align-items:center; gap:12px; }
+  .back { text-decoration:none; color:var(--muted); font-size:20px; }
+  .back:hover { color:var(--purple); }
+  .logo { font-size:18px; font-weight:700; color:var(--purple); letter-spacing:2px; }
+  .logo span { color:var(--yellow); }
+
+  .page { max-width:700px; margin:0 auto; padding:24px 16px 80px; }
+  h2 { font-size:22px; font-weight:700; color:var(--purple); margin-bottom:20px; }
+
+  .section { background:var(--white); border-radius:12px; padding:20px; margin-bottom:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+  .section h3 { font-size:15px; font-weight:700; color:var(--purple); margin-bottom:16px; border-bottom:1px solid var(--gray); padding-bottom:10px; }
+
+  .order-item { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--gray); font-size:14px; }
+  .order-item:last-child { border-bottom:none; }
+  .order-item-name { font-weight:500; }
+  .order-item-price { font-weight:700; color:var(--purple); }
+  .summary-row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; color:var(--muted); }
+  .summary-row.total { font-size:17px; font-weight:700; color:var(--purple); border-top:2px solid var(--gray); margin-top:8px; padding-top:12px; }
+  .free-ship { color:#2E7D32; font-weight:600; }
+
+  .form-row { display:grid; gap:14px; }
+  .form-row.two { grid-template-columns:1fr 1fr; }
+  .field { display:flex; flex-direction:column; gap:6px; }
+  label { font-size:13px; font-weight:600; color:#444; }
+  input { padding:11px 14px; border:1.5px solid #DDD; border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; transition:border-color 0.15s; }
+  input:focus { outline:none; border-color:var(--purple); }
+  input.err { border-color:var(--error); }
+  .err-msg { font-size:11px; color:var(--error); min-height:14px; }
+
+  .submit-btn { width:100%; padding:16px; background:var(--purple); color:white; border:none; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; }
+  .submit-btn:hover { background:var(--purple-light); }
+  .submit-btn:disabled { background:var(--gray); color:var(--muted); cursor:not-allowed; }
+
+  /* Confirmation */
+  .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; padding:20px; }
+  .overlay.show { display:flex; }
+  .confirm-box { background:var(--white); border-radius:16px; padding:32px 24px; max-width:360px; width:100%; text-align:center; }
+  .confirm-icon { font-size:56px; margin-bottom:12px; }
+  .confirm-box h2 { color:var(--purple); font-size:22px; margin-bottom:8px; }
+  .confirm-box p { color:var(--muted); font-size:13px; line-height:1.6; margin-bottom:12px; }
+  .code-box { background:var(--yellow); border-radius:10px; padding:14px; margin:14px 0; }
+  .code-box small { display:block; font-size:11px; font-weight:600; color:var(--purple); opacity:0.7; margin-bottom:4px; }
+  .code-box strong { font-size:22px; font-weight:700; color:var(--purple); letter-spacing:3px; }
+  .upi-btn { display:block; width:100%; padding:14px; background:var(--purple); color:white; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; text-decoration:none; margin-bottom:10px; }
+  .upi-btn:hover { background:var(--purple-light); }
+  .upi-note { font-size:11px; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+  .track-link { font-size:13px; color:var(--purple); font-weight:600; text-decoration:underline; cursor:pointer; }
+
+  @media (max-width:480px) { .form-row.two { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="index.html">←</a>
+  <div class="logo">SUUZZ<span>Z</span></div>
+</header>
+
+<div class="page">
+  <h2>Checkout</h2>
+
+  <div class="section">
+    <h3>Your Order</h3>
+    <div id="orderItems"></div>
+    <div style="margin-top:12px">
+      <div class="summary-row"><span>Subtotal</span><span id="subVal"></span></div>
+      <div class="summary-row"><span>Shipping</span><span id="shipVal"></span></div>
+      <div class="summary-row total"><span>Total</span><span id="totalVal"></span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Your Details</h3>
+    <div class="form-row">
+      <div class="field">
+        <label>Full Name *</label>
+        <input type="text" id="name" placeholder="Your full name">
+        <span class="err-msg" id="nameErr"></span>
+      </div>
+      <div class="field">
+        <label>Email Address *</label>
+        <input type="email" id="email" placeholder="you@email.com">
+        <span class="err-msg" id="emailErr"></span>
+      </div>
+      <div class="field">
+        <label>Phone Number *</label>
+        <input type="tel" id="phone" placeholder="+91 98765 43210">
+        <span class="err-msg" id="phoneErr"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Shipping Address</h3>
+    <div class="form-row">
+      <div class="field">
+        <label>Address *</label>
+        <input type="text" id="address" placeholder="Street, building, area">
+        <span class="err-msg" id="addressErr"></span>
+      </div>
+      <div class="form-row two">
+        <div class="field">
+          <label>City *</label>
+          <input type="text" id="city" placeholder="Mumbai">
+          <span class="err-msg" id="cityErr"></span>
+        </div>
+        <div class="field">
+          <label>Pincode *</label>
+          <input type="text" id="pincode" placeholder="400001" maxlength="6">
+          <span class="err-msg" id="pincodeErr"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="placeOrder()">Place Order & Pay via UPI →</button>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">🎉</div>
+    <h2>Order Placed!</h2>
+    <p>Save your order code below — you'll need it to track your order.</p>
+    <div class="code-box">
+      <small>YOUR ORDER CODE</small>
+      <strong id="displayCode">SUZ-XXXXXX</strong>
+    </div>
+    <p>Tap below to complete payment via UPI. Your order ships once payment is confirmed.</p>
+    <a id="upiBtn" class="upi-btn" href="#">Pay Now via UPI 💛</a>
+    <div class="upi-note">Opens GPay / PhonePe / Paytm with amount pre-filled.<br>On desktop: use UPI app and enter the amount manually.</div>
+    <a class="track-link" href="track.html">Track my order →</a>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbx-w6hDRFn2KHhIODytmzNhNsw4nHPaxz-p4FNI2yIUEeHlrMCAnySdtVLbKzwKjU-WoA/exec';
+
+const cart = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
+if (!cart.length) window.location.href = 'index.html';
+
+const sub      = cart.reduce((s, i) => s + i.price * i.qty, 0);
+const shipping = sub >= 2000 ? 0 : 80;
+const total    = sub + shipping;
+
+document.getElementById('orderItems').innerHTML = cart.map(i =>
+  `<div class="order-item">
+    <span class="order-item-name">${i.name} × ${i.qty}</span>
+    <span class="order-item-price">₹${i.price * i.qty}</span>
+  </div>`
+).join('');
+document.getElementById('subVal').textContent   = `₹${sub}`;
+document.getElementById('shipVal').innerHTML    = shipping === 0 ? '<span class="free-ship">FREE 🎉</span>' : `₹${shipping}`;
+document.getElementById('totalVal').textContent = `₹${total}`;
+
+const rules = [
+  { id:'name',    err:'nameErr',    test: v => v.length >= 2,                  msg:'Name required' },
+  { id:'email',   err:'emailErr',   test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), msg:'Valid email required' },
+  { id:'phone',   err:'phoneErr',   test: v => /[\d]{7,}/.test(v),             msg:'Phone required' },
+  { id:'address', err:'addressErr', test: v => v.length >= 5,                  msg:'Address required' },
+  { id:'city',    err:'cityErr',    test: v => v.length >= 2,                  msg:'City required' },
+  { id:'pincode', err:'pincodeErr', test: v => /^\d{6}$/.test(v),              msg:'6-digit pincode required' },
+];
+
+rules.forEach(r => {
+  document.getElementById(r.id).addEventListener('input', () => {
+    document.getElementById(r.id).classList.remove('err');
+    document.getElementById(r.err).textContent = '';
+  });
+});
+
+function validate() {
+  let ok = true;
+  rules.forEach(r => {
+    const val = document.getElementById(r.id).value.trim();
+    if (!r.test(val)) {
+      document.getElementById(r.id).classList.add('err');
+      document.getElementById(r.err).textContent = r.msg;
+      ok = false;
+    }
+  });
+  return ok;
+}
+
+async function placeOrder() {
+  if (!validate()) return;
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Placing order...';
+
+  try {
+    const res  = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action:   'order',
+        name:     document.getElementById('name').value.trim(),
+        email:    document.getElementById('email').value.trim(),
+        phone:    document.getElementById('phone').value.trim(),
+        address:  document.getElementById('address').value.trim(),
+        city:     document.getElementById('city').value.trim(),
+        pincode:  document.getElementById('pincode').value.trim(),
+        items:    cart.map(i => ({ sku: i.sku, qty: i.qty })),
+        subtotal: sub,
+      }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.removeItem('suuzzz_cart');
+      document.getElementById('displayCode').textContent = data.orderCode;
+      document.getElementById('upiBtn').href = data.upiLink;
+      document.getElementById('confirmOverlay').classList.add('show');
+    } else {
+      throw new Error(data.error || 'Unknown error');
+    }
+  } catch(e) {
+    alert('Error: ' + e.message + '\nPlease try again.');
+    btn.disabled = false;
+    btn.textContent = 'Place Order & Pay via UPI →';
+  }
+}
+</script>
+</body>
+</html>
