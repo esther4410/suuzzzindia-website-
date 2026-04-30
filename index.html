@@ -56,7 +56,7 @@
 
   .hero {
     background: var(--purple); color: white;
-    padding: 48px 24px; text-align: center;
+    padding: 48px 24px 90px; text-align: center;
   }
   .hero h1 { font-size: 44px; font-weight: 700; margin-bottom: 8px; color: white; }
   .hero h1 span { color: var(--yellow); }
@@ -166,7 +166,48 @@
     background: #F5F5F5;
     position: relative;
   }
-  .grass-divider { display:block; width:100%; margin-bottom:-4px; }
+  .grass-divider { display:block; width:100%; position:relative; z-index:5; margin-top:-78px; margin-bottom:-4px; }
+  /* Mobile bubbles */
+  .bubble { display:none; }
+  @media (max-width:768px) {
+    .bubble {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      position:fixed; width:90px; height:90px; border-radius:50%;
+      background:rgba(255,255,255,0.25); border:2.5px solid rgba(255,255,255,0.7);
+      backdrop-filter:blur(4px); box-shadow:0 4px 20px rgba(85,61,105,0.2);
+      cursor:pointer; z-index:500; user-select:none; touch-action:manipulation;
+      transition:transform 0.15s;
+    }
+    .bubble img { width:64px; height:64px; object-fit:contain; pointer-events:none; }
+    .bubble-name { font-size:9px; font-weight:700; color:var(--purple); margin-top:2px; pointer-events:none; }
+    .bubble.popping { animation:pop 0.4s forwards; }
+    @keyframes pop {
+      0%   { transform:scale(1); opacity:1; }
+      50%  { transform:scale(1.5); opacity:0.8; }
+      100% { transform:scale(0); opacity:0; }
+    }
+    @keyframes float-a {
+      0%,100% { transform:translate(0,0) rotate(0deg); }
+      25%     { transform:translate(18px,-22px) rotate(3deg); }
+      50%     { transform:translate(-12px,-38px) rotate(-2deg); }
+      75%     { transform:translate(24px,-18px) rotate(4deg); }
+    }
+    @keyframes float-b {
+      0%,100% { transform:translate(0,0) rotate(0deg); }
+      33%     { transform:translate(-20px,-28px) rotate(-4deg); }
+      66%     { transform:translate(14px,-40px) rotate(2deg); }
+    }
+    @keyframes float-c {
+      0%,100% { transform:translate(0,0) rotate(0deg); }
+      40%     { transform:translate(22px,-30px) rotate(5deg); }
+      80%     { transform:translate(-16px,-20px) rotate(-3deg); }
+    }
+    @keyframes float-d {
+      0%,100% { transform:translate(0,0) rotate(0deg); }
+      30%     { transform:translate(-24px,-34px) rotate(-5deg); }
+      60%     { transform:translate(18px,-24px) rotate(3deg); }
+    }
+  }
   .grid-scene { position: relative; background: transparent; }
 
   /* Animal decorations */
@@ -251,7 +292,6 @@
   <p>European design × Indian craftsmanship. Handcrafted home decor that sparks joy every day.</p>
 </div>
 
-<div class="meadow-wrap">
 <!-- SVG grass strip -->
 <svg class="grass-divider" viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M0,80 L0,55 Q10,30 20,50 Q30,20 40,45 Q50,10 60,40 Q70,25 80,50 Q90,35 100,55 Q110,20 120,45 Q130,30 140,52 Q150,15 160,42 Q170,28 180,50 Q190,38 200,55 Q210,22 220,48 Q230,32 240,50 Q250,18 260,44 Q270,26 280,52 Q290,36 300,54 Q310,20 320,46 Q330,30 340,50 Q350,14 360,42 Q370,28 380,52 Q390,36 400,54 Q410,20 420,46 Q430,32 440,50 Q450,16 460,44 Q470,28 480,52 Q490,36 500,54 Q510,20 520,46 Q530,30 540,50 Q550,14 560,42 Q570,26 580,50 Q590,34 600,54 Q610,20 620,46 Q630,30 640,52 Q650,16 660,44 Q670,28 680,50 Q690,36 700,54 Q710,20 720,46 Q730,32 740,50 Q750,14 760,42 Q770,26 780,50 Q790,34 800,52 Q810,18 820,44 Q830,28 840,50 Q850,34 860,52 Q870,18 880,44 Q890,28 900,50 Q910,34 920,52 Q930,18 940,44 Q950,28 960,50 Q970,36 980,54 Q990,20 1000,46 Q1010,30 1020,50 Q1030,14 1040,42 Q1050,26 1060,50 Q1070,34 1080,52 Q1090,18 1100,44 Q1110,28 1120,50 Q1130,34 1140,52 Q1150,16 1160,44 Q1170,28 1180,50 Q1190,36 1200,54 Q1210,20 1220,46 Q1230,30 1240,50 Q1250,14 1260,42 Q1270,26 1280,50 Q1290,34 1300,52 Q1310,18 1320,44 Q1330,28 1340,50 Q1350,34 1360,52 Q1370,16 1380,44 Q1390,28 1400,50 Q1410,34 1420,52 Q1430,18 1440,44 L1440,80 Z" fill="#D4EAC8"/>
@@ -259,6 +299,7 @@
   <path d="M0,80 L0,72 Q12,58 22,72 Q35,54 48,70 Q58,56 70,72 Q85,54 98,70 Q108,58 120,72 Q135,52 148,70 Q158,56 170,72 Q185,52 198,70 Q208,58 220,72 Q235,54 248,70 Q258,58 270,72 Q285,52 298,70 Q308,58 320,72 Q335,52 350,70 Q362,56 375,72 Q388,52 402,70 Q412,58 425,72 Q440,54 453,70 Q463,58 475,72 Q490,52 505,70 Q515,58 528,72 Q540,54 555,70 Q565,58 578,72 Q592,52 607,70 Q617,58 630,72 Q645,52 658,70 Q668,58 680,72 Q695,54 708,70 Q718,58 730,72 Q745,52 758,70 Q768,58 780,72 Q795,52 808,70 Q818,58 830,72 Q845,54 858,70 Q868,58 880,72 Q895,52 908,70 Q918,58 930,72 Q945,54 958,70 Q968,58 980,72 Q995,54 1008,70 Q1018,58 1030,72 Q1045,52 1058,70 Q1068,58 1080,72 Q1095,52 1108,70 Q1118,58 1130,72 Q1145,52 1158,70 Q1168,58 1180,72 Q1195,54 1208,70 Q1218,58 1230,72 Q1245,52 1258,70 Q1268,58 1280,72 Q1295,52 1308,70 Q1320,58 1333,72 Q1348,52 1360,70 Q1370,58 1382,72 Q1397,52 1412,70 Q1422,58 1435,72 L1440,72 L1440,80 Z" fill="#3D8A20"/>
 </svg>
 
+<div class="meadow-wrap">
 <div class="grid-scene">
   <div class="filters" id="filters"></div>
   <div class="grid" id="grid"><div class="loading">Loading products...</div></div>
@@ -596,6 +637,34 @@ function closePmIfBg(e) {
 }
 
 init();
+
+// ── Mobile Bubbles ───────────────────────────────────────────
+if (window.innerWidth <= 768) {
+  const ANIMALS = [
+    { img:'animal-pipa.png',  name:'Pipa 🐆',  anim:'float-a', dur:6,  left:'8%',  top:'30%' },
+    { img:'animal-kaa.png',   name:'Kaa 🐍',   anim:'float-b', dur:7,  left:'72%', top:'42%' },
+    { img:'animal-eliza.png', name:'Eliza 🦓', anim:'float-c', dur:8,  left:'18%', top:'60%' },
+    { img:'animal-amara.png', name:'Amara 🐘', anim:'float-d', dur:5,  left:'62%', top:'22%' },
+  ];
+
+  ANIMALS.forEach(a => {
+    const el = document.createElement('div');
+    el.className = 'bubble';
+    el.style.cssText = `left:${a.left};top:${a.top};animation:${a.anim} ${a.dur}s ease-in-out infinite;`;
+    el.innerHTML = `<img src="${a.img}" alt="${a.name}"><div class="bubble-name">${a.name}</div>`;
+    el.addEventListener('touchstart', e => {
+      e.preventDefault();
+      el.classList.add('popping');
+      // respawn after pop
+      setTimeout(() => {
+        el.classList.remove('popping');
+        el.style.left = (10 + Math.random() * 70) + '%';
+        el.style.top  = (20 + Math.random() * 55) + '%';
+      }, 1800);
+    }, { passive: false });
+    document.body.appendChild(el);
+  });
+}
 </script>
 </body>
 </html>
