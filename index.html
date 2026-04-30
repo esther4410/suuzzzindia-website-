@@ -173,7 +173,7 @@
     .bubble {
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       position:fixed; width:90px; height:90px; border-radius:50%;
-      background:rgba(255,255,255,0.25); border:2.5px solid rgba(255,255,255,0.7);
+      background:rgba(255,255,255,0.25); border:1px solid rgba(255,255,255,0.45);
       backdrop-filter:blur(4px); box-shadow:0 4px 20px rgba(85,61,105,0.2);
       cursor:pointer; z-index:500; user-select:none; touch-action:manipulation;
       transition:transform 0.15s;
@@ -652,16 +652,19 @@ if (window.innerWidth <= 768) {
     el.className = 'bubble';
     el.style.cssText = `left:${a.left};top:${a.top};animation:${a.anim} ${a.dur}s ease-in-out infinite;`;
     el.innerHTML = `<img src="${a.img}" alt="${a.name}"><div class="bubble-name">${a.name}</div>`;
-    el.addEventListener('touchstart', e => {
-      e.preventDefault();
+    function popBubble() {
+      if (el.classList.contains('popping')) return;
+      el.style.animation = 'none'; // stop float
       el.classList.add('popping');
-      // respawn after pop
       setTimeout(() => {
         el.classList.remove('popping');
         el.style.left = (10 + Math.random() * 70) + '%';
         el.style.top  = (20 + Math.random() * 55) + '%';
+        el.style.animation = `${a.anim} ${a.dur}s ease-in-out infinite`;
       }, 1800);
-    }, { passive: false });
+    }
+    el.addEventListener('click', popBubble);
+    el.addEventListener('touchend', e => { e.preventDefault(); popBubble(); }, { passive: false });
     document.body.appendChild(el);
   });
 }
