@@ -6,7 +6,7 @@
 <title>SUUZZZ India</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --yellow: #F9D200;
@@ -19,7 +19,7 @@
     --muted: #888;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+  body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); }
 
   header {
     background: var(--white);
@@ -165,14 +165,16 @@
 
 <header>
   <div class="logo">SUUZZ<span>Z</span></div>
-  <div class="nav-links"><a href="track.html">Track Order</a></div>
-  <button class="cart-btn" onclick="openCart()">
-    🛒 Cart <span class="cart-count" id="cartCount">0</span>
-  </button>
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="track.html" style="text-decoration:none;color:var(--muted);font-size:14px;font-weight:500">Track Order</a>
+    <button class="cart-btn" onclick="openCart()">
+      🛒 Cart <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
 </header>
 
 <div class="hero">
-  <h1>Bring <span>Joy</span> Home</h1>
+  <h1>Brings <span>Joy</span> in Your Life</h1>
   <p>European design × Indian craftsmanship. Handcrafted home decor that sparks joy every day.</p>
 </div>
 
