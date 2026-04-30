@@ -155,7 +155,37 @@
 
   .loading { text-align: center; padding: 60px; color: var(--muted); }
 
+  /* Product Modal */
+  .pm-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:300; align-items:center; justify-content:center; padding:16px; }
+  .pm-overlay.open { display:flex; }
+  .pm-box { background:var(--white); border-radius:18px; max-width:780px; width:100%; max-height:92vh; overflow:hidden; display:flex; position:relative; }
+  .pm-close { position:absolute; top:14px; right:16px; background:none; border:none; font-size:26px; cursor:pointer; color:var(--muted); z-index:10; line-height:1; }
+  .pm-close:hover { color:var(--purple); }
+  .pm-img-side { width:50%; flex-shrink:0; position:relative; background:#F5F5F5; }
+  .pm-img-side img { width:100%; height:100%; object-fit:cover; display:block; }
+  .pm-arrows { position:absolute; inset:0; display:flex; align-items:center; justify-content:space-between; padding:0 10px; pointer-events:none; }
+  .pm-arrow { pointer-events:all; background:rgba(255,255,255,0.85); border:none; border-radius:50%; width:34px; height:34px; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,0.15); }
+  .pm-arrow:hover { background:white; }
+  .pm-dots { position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; gap:5px; }
+  .pm-info-side { flex:1; padding:32px 28px; overflow-y:auto; display:flex; flex-direction:column; }
+  .pm-name { font-size:20px; font-weight:700; color:var(--purple); margin-bottom:6px; }
+  .pm-sub { font-size:13px; color:var(--muted); margin-bottom:20px; }
+  .pm-price-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .pm-price { font-size:24px; font-weight:700; color:var(--purple); }
+  .pm-orig { font-size:15px; color:var(--muted); text-decoration:line-through; }
+  .pm-stock { font-size:12px; color:var(--muted); margin-bottom:24px; }
+  .pm-add { width:100%; padding:14px; background:var(--yellow); color:var(--purple); border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; margin-top:auto; }
+  .pm-add:hover { background:#e6c200; }
+  .pm-sold { width:100%; padding:14px; background:var(--gray); color:var(--muted); border:none; border-radius:10px; font-size:15px; font-weight:600; margin-top:auto; }
+  .pm-spacer { flex:1; }
+  .card-img { cursor:pointer; }
+  .slideshow { cursor:pointer; }
+
   @media (max-width: 480px) {
+    .pm-box { flex-direction:column; max-height:88vh; }
+    .pm-img-side { width:100%; height:52vw; flex-shrink:0; }
+    .pm-info-side { padding:20px; }
+  }
     .hero h1 { font-size: 24px; }
     .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 12px 12px 100px; }
   }
@@ -174,7 +204,7 @@
 </header>
 
 <div class="hero">
-  <h1>Brings <span>Joy</span> in Your Life</h1>
+  <h1>Brings Joy in Your Life</h1>
   <p>European design × Indian craftsmanship. Handcrafted home decor that sparks joy every day.</p>
 </div>
 
@@ -182,6 +212,29 @@
 <div class="grid" id="grid"><div class="loading">Loading products...</div></div>
 
 <div class="overlay" id="overlay" onclick="closeCart()"></div>
+
+<!-- Product Modal -->
+<div class="pm-overlay" id="pmOverlay" onclick="closePmIfBg(event)">
+  <div class="pm-box" id="pmBox">
+    <button class="pm-close" onclick="closeProduct()">×</button>
+    <div class="pm-img-side" id="pmImgSide">
+      <img id="pmImg" src="" alt="">
+      <div class="pm-arrows" id="pmArrows" style="display:none">
+        <button class="pm-arrow" onclick="pmSlide(-1)">‹</button>
+        <button class="pm-arrow" onclick="pmSlide(1)">›</button>
+      </div>
+      <div class="pm-dots" id="pmDots"></div>
+    </div>
+    <div class="pm-info-side">
+      <div class="pm-name" id="pmName"></div>
+      <div class="pm-sub" id="pmSub"></div>
+      <div class="pm-price-row" id="pmPriceRow"></div>
+      <div class="pm-stock" id="pmStock"></div>
+      <div class="pm-spacer"></div>
+      <button class="pm-add" id="pmAddBtn" onclick="pmAddToCart()">Add to Cart</button>
+    </div>
+  </div>
+</div>
 <div class="cart-drawer" id="cartDrawer">
   <div class="cart-head">
     <h2>Your Cart 🛒</h2>
@@ -264,18 +317,18 @@ function renderGrid() {
 
     let thumb;
     if (imgUrl && imgUrl2) {
-      thumb = `<div class="slideshow" id="${sid}">
+      thumb = `<div class="slideshow" id="${sid}" onclick="openProduct('${p.SKU}')">
         <img class="slide card-img active" src="${imgUrl}" alt="${p['Product Name']}" loading="lazy">
         <img class="slide card-img" src="${imgUrl2}" alt="${p['Product Name']}" loading="lazy">
         <div class="slide-dots">
-          <div class="dot active" onclick="goSlide('${sid}',0)"></div>
-          <div class="dot" onclick="goSlide('${sid}',1)"></div>
+          <div class="dot active" onclick="event.stopPropagation();goSlide('${sid}',0)"></div>
+          <div class="dot" onclick="event.stopPropagation();goSlide('${sid}',1)"></div>
         </div>
       </div>`;
     } else if (imgUrl) {
-      thumb = `<img class="card-img" src="${imgUrl}" alt="${p['Product Name']}" loading="lazy">`;
+      thumb = `<img class="card-img" src="${imgUrl}" alt="${p['Product Name']}" loading="lazy" onclick="openProduct('${p.SKU}')">`;
     } else {
-      thumb = `<div class="card-placeholder" style="background:${COLOR_BG[ck]||'#F0EDE8'}">${COLOR_EM[ck]||'✨'}</div>`;
+      thumb = `<div class="card-placeholder" style="background:${COLOR_BG[ck]||'#F0EDE8'};cursor:pointer" onclick="openProduct('${p.SKU}')">${COLOR_EM[ck]||'✨'}</div>`;
     }
 
     const priceHtml = disc > 0
@@ -382,6 +435,84 @@ function goSlide(sid, idx) {
 function openCart()  { document.getElementById('cartDrawer').classList.add('open'); document.getElementById('overlay').classList.add('open'); }
 function closeCart() { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
 function goCheckout() { if (cart.length) window.location.href = 'checkout.html'; }
+
+// ── Product Modal ───────────────────────────────────────────
+let pmSku = null;
+let pmImgs = [];
+let pmIdx  = 0;
+
+function openProduct(sku) {
+  const p = products.find(x => x.SKU === sku);
+  if (!p) return;
+  pmSku  = sku;
+  pmImgs = [driveUrl(p['Image URL']), driveUrl(p['Image URL 2'])].filter(Boolean);
+  pmIdx  = 0;
+
+  document.getElementById('pmImg').src = pmImgs[0] || '';
+  document.getElementById('pmName').textContent = p['Product Name'];
+  document.getElementById('pmSub').textContent  = `${p.Design} · ${p.Color}`;
+
+  const price = Number(p['Price (INR)']) || 0;
+  const disc  = Number(p['Discount price (INR)']) || 0;
+  const final = disc > 0 ? disc : price;
+  document.getElementById('pmPriceRow').innerHTML = disc > 0
+    ? `<span class="pm-price">₹${disc}</span><span class="pm-orig">₹${price}</span><span class="sale-badge">SALE</span>`
+    : `<span class="pm-price">₹${price}</span>`;
+
+  const stock = Number(p['Current Stock']) || 0;
+  document.getElementById('pmStock').textContent = stock > 0 ? `${stock} in stock` : 'Sold out';
+
+  const addBtn = document.getElementById('pmAddBtn');
+  if (stock === 0) {
+    addBtn.textContent = 'Sold Out';
+    addBtn.className = 'pm-sold';
+    addBtn.onclick = null;
+  } else {
+    addBtn.textContent = 'Add to Cart';
+    addBtn.className = 'pm-add';
+    addBtn.onclick = pmAddToCart;
+  }
+
+  const arrows = document.getElementById('pmArrows');
+  const dots   = document.getElementById('pmDots');
+  if (pmImgs.length > 1) {
+    arrows.style.display = 'flex';
+    dots.innerHTML = pmImgs.map((_,i) =>
+      `<div class="dot${i===0?' active':''}" style="cursor:pointer" onclick="pmGoTo(${i})"></div>`
+    ).join('');
+  } else {
+    arrows.style.display = 'none';
+    dots.innerHTML = '';
+  }
+
+  document.getElementById('pmOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function pmGoTo(idx) {
+  pmIdx = idx;
+  document.getElementById('pmImg').src = pmImgs[idx];
+  document.getElementById('pmDots').querySelectorAll('.dot')
+    .forEach((d,i) => d.classList.toggle('active', i===idx));
+}
+
+function pmSlide(dir) {
+  pmGoTo((pmIdx + dir + pmImgs.length) % pmImgs.length);
+}
+
+function pmAddToCart() {
+  closeProduct();
+  addToCart(pmSku);
+}
+
+function closeProduct() {
+  document.getElementById('pmOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closePmIfBg(e) {
+  if (e.target === document.getElementById('pmOverlay')) closeProduct();
+}
 
 init();
 </script>
