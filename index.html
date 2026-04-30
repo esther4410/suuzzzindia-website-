@@ -259,21 +259,31 @@
     .pm-box { flex-direction:column; max-height:88vh; }
     .pm-img-side { width:100%; height:52vw; flex-shrink:0; }
     .pm-info-side { padding:20px; }
-    .hero h1 { font-size: 28px; }
+    .hero h1 { font-size: 26px; }
+    .hero p { font-size: 13px; }
     .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px 10px 100px; }
+    .mobile-nav { gap: 8px !important; }
+    .cart-btn { padding: 8px 12px !important; font-size: 13px !important; }
   }
   @keyframes pop {
-    0%   { transform:scale(1);   opacity:1; }
-    50%  { transform:scale(1.6); opacity:0.7; }
-    100% { transform:scale(0);   opacity:0; }
+    0%   { transform:scale(1) rotate(0deg);    opacity:1; }
+    20%  { transform:scale(1.3) rotate(-8deg); opacity:1; }
+    40%  { transform:scale(1.7) rotate(6deg);  opacity:0.9; }
+    70%  { transform:scale(2.2) rotate(-4deg); opacity:0.4; }
+    100% { transform:scale(0)   rotate(10deg); opacity:0; }
   }
+  @keyframes spark {
+    0%   { transform:translate(0,0) scale(1); opacity:1; }
+    100% { transform:translate(var(--sx),var(--sy)) scale(0); opacity:0; }
+  }
+  .spark { position:fixed; width:8px; height:8px; border-radius:50%; pointer-events:none; z-index:600; animation:spark 0.6s ease-out forwards; }
 </style>
 </head>
 <body>
 
 <header>
   <a href="index.html"><img src="logo.png" alt="SUUZZZ" style="height:42px;display:block"></a>
-  <div style="display:flex;align-items:center;gap:12px">
+  <div class="mobile-nav" style="display:flex;align-items:center;gap:12px">
     <a href="track.html" style="text-decoration:none;color:var(--muted);font-size:14px;font-weight:500">Track Order</a>
     <button class="cart-btn" onclick="openCart()">
       🛒 Cart <span class="cart-count" id="cartCount">0</span>
@@ -283,7 +293,7 @@
 
 <div class="hero">
   <h1>Brings Joy in Your Life</h1>
-  <p>European design × Indian craftsmanship. Handcrafted home decor that sparks joy every day.</p>
+  <p>European design × Indian craftsmanship.<br>Handcrafted home decor that sparks joy every day.</p>
 </div>
 
 <!-- SVG grass strip -->
@@ -651,7 +661,21 @@ if (window.innerWidth <= 768) {
       if (el.classList.contains('popping')) return;
       el.style.animationPlayState = 'paused';
       el.classList.add('popping');
-      setTimeout(() => { el.remove(); }, 400);
+      // sparks
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+      const colors = ['#F9D200','#553D69','#ff6b6b','#fff','#7B5A99','#ffdd57'];
+      for (let i = 0; i < 10; i++) {
+        const s = document.createElement('div');
+        s.className = 'spark';
+        const angle = (i / 10) * Math.PI * 2;
+        const dist = 40 + Math.random() * 50;
+        s.style.cssText = `left:${cx-4}px;top:${cy-4}px;background:${colors[i%colors.length]};--sx:${Math.cos(angle)*dist}px;--sy:${Math.sin(angle)*dist}px;animation-delay:${Math.random()*0.1}s`;
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 700);
+      }
+      setTimeout(() => { el.remove(); }, 500);
     });
     document.body.appendChild(el);
   });
