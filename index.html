@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SUUZZZ India</title>
 <link rel="icon" type="image/png" href="favicon.png">
+<meta property="og:title" content="SUUZZZ India">
+<meta property="og:description" content="European design × Indian craftsmanship. Handcrafted home decor that brings joy in your life.">
+<meta property="og:image" content="https://suuzzzindia-website.vercel.app/logo.png">
+<meta property="og:url" content="https://suuzzzindia-website.vercel.app">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -49,10 +55,10 @@
   }
 
   .hero {
-    background: var(--white); color: var(--text);
+    background: var(--purple); color: white;
     padding: 48px 24px; text-align: center;
   }
-  .hero h1 { font-size: 44px; font-weight: 700; margin-bottom: 8px; color: var(--yellow); }
+  .hero h1 { font-size: 44px; font-weight: 700; margin-bottom: 8px; color: white; }
   .hero h1 span { color: var(--yellow); }
   .hero p { font-size: 15px; opacity: 0.8; max-width: 480px; margin: 0 auto; }
 
@@ -155,6 +161,30 @@
 
   .loading { text-align: center; padding: 60px; color: var(--muted); }
 
+  /* Animal decorations */
+  .grid-scene { position: relative; }
+  .grid-animal { position: absolute; width: 140px; cursor: pointer; z-index: 10; transition: transform 0.3s ease; }
+  .grid-animal:hover { transform: scale(1.1) rotate(-3deg); }
+  .grid-animal img { width: 100%; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15)); }
+  .animal-tip {
+    position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%);
+    background: var(--purple); color: white;
+    padding: 7px 16px; border-radius: 20px;
+    font-size: 13px; font-weight: 700; white-space: nowrap;
+    opacity: 0; transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none; transform: translateX(-50%) translateY(4px);
+    box-shadow: 0 3px 10px rgba(85,61,105,0.3);
+  }
+  .animal-tip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:7px solid transparent; border-top-color:var(--purple); }
+  .grid-animal:hover .animal-tip { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .animal-tl { left: 12px; top: 20px; }
+  .animal-tr { right: 12px; top: 20px; transform-origin: right center; }
+  .animal-tr:hover { transform: scale(1.1) rotate(3deg); }
+  .animal-bl { left: 12px; bottom: 140px; }
+  .animal-br { right: 12px; bottom: 140px; transform-origin: right center; }
+  .animal-br:hover { transform: scale(1.1) rotate(3deg); }
+  @media (max-width: 1160px) { .grid-animal { display: none; } }
+
   /* Product Modal */
   .pm-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:300; align-items:center; justify-content:center; padding:16px; }
   .pm-overlay.open { display:flex; }
@@ -190,7 +220,7 @@
     .pm-img-side { width:100%; height:52vw; flex-shrink:0; }
     .pm-info-side { padding:20px; }
   }
-    .hero h1 { font-size: 30px; }
+    .hero h1 { font-size: 28px; }
     .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 10px 100px; }
   }
 </style>
@@ -212,8 +242,27 @@
   <p>European design × Indian craftsmanship. Handcrafted home decor that sparks joy every day.</p>
 </div>
 
-<div class="filters" id="filters"></div>
-<div class="grid" id="grid"><div class="loading">Loading products...</div></div>
+<div class="grid-scene">
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid"><div class="loading">Loading products...</div></div>
+
+  <div class="grid-animal animal-tl">
+    <img src="animal-eliza.png" alt="Eliza">
+    <div class="animal-tip">I'm Eliza 🦓</div>
+  </div>
+  <div class="grid-animal animal-tr">
+    <img src="animal-pipa.png" alt="Pipa">
+    <div class="animal-tip">I'm Pipa 🐆</div>
+  </div>
+  <div class="grid-animal animal-bl">
+    <img src="animal-kaa.png" alt="Kaa">
+    <div class="animal-tip">I'm Kaa 🐍</div>
+  </div>
+  <div class="grid-animal animal-br">
+    <img src="animal-amara.png" alt="Amara">
+    <div class="animal-tip">I'm Amara 🐘</div>
+  </div>
+</div>
 
 <div class="overlay" id="overlay" onclick="closeCart()"></div>
 
