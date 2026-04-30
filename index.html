@@ -163,11 +163,11 @@
 
   /* Animal decorations */
   .grid-scene { position: relative; }
-  .grid-animal { position: absolute; width: 140px; cursor: pointer; z-index: 10; transition: transform 0.3s ease; }
+  .grid-animal { position: absolute; width: 182px; cursor: pointer; z-index: 10; transition: transform 0.3s ease; }
   .grid-animal:hover { transform: scale(1.1) rotate(-3deg); }
   .grid-animal img { width: 100%; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15)); }
   .animal-tip {
-    position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%);
+    position: absolute; bottom: calc(100% + 10px); left: 50%;
     background: var(--purple); color: white;
     padding: 7px 16px; border-radius: 20px;
     font-size: 13px; font-weight: 700; white-space: nowrap;
@@ -177,13 +177,13 @@
   }
   .animal-tip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:7px solid transparent; border-top-color:var(--purple); }
   .grid-animal:hover .animal-tip { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .animal-tl { left: 12px; top: 20px; }
-  .animal-tr { right: 12px; top: 20px; transform-origin: right center; }
+  .animal-tl { left: 8px; top: 60px; }
+  .animal-tr { right: 8px; top: 60px; }
   .animal-tr:hover { transform: scale(1.1) rotate(3deg); }
-  .animal-bl { left: 12px; bottom: 140px; }
-  .animal-br { right: 12px; bottom: 140px; transform-origin: right center; }
+  .animal-bl { left: 8px; top: 340px; }
+  .animal-br { right: 8px; top: 340px; }
   .animal-br:hover { transform: scale(1.1) rotate(3deg); }
-  @media (max-width: 1160px) { .grid-animal { display: none; } }
+  @media (max-width: 1200px) { .grid-animal { display: none; } }
 
   /* Product Modal */
   .pm-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:300; align-items:center; justify-content:center; padding:16px; }
