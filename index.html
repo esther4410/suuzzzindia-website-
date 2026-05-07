@@ -10,7 +10,7 @@
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
 <style>
   :root {
@@ -857,9 +857,161 @@
     /* extra space at bottom of grid so the sticky bar doesn't cover the last row */
     body.has-cart .grid { padding-bottom: 140px; }
   }
+  /* ── GRAND OPENING BANNER (hanging cloth) ─────────────────── */
+  .gob-overlay {
+    position: fixed; inset: 0;
+    background: rgba(31,20,40,0.22);
+    backdrop-filter: blur(1.5px);
+    z-index: 500;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 50px 20px 100px;
+    animation: gobFade .35s ease;
+    overflow-y: auto;
+    position: relative;
+  }
+  .gob-overlay { position: fixed; }
+  .gob-banner-wrap {
+    position: relative;
+    margin-top: 78px;
+    width: min(760px, 100%);
+  }
+  /* eyelets stay fixed; only the banner sways with subtle skew + sway */
+  .gob-banner {
+    transform-origin: 50% 0;
+    animation: gobSway 7s ease-in-out infinite;
+    filter: drop-shadow(0 14px 22px rgba(31,20,40,0.28))
+            drop-shadow(0 4px 8px rgba(31,20,40,0.16));
+  }
+  @keyframes gobSway {
+    0%, 100% { transform: rotate(-0.5deg) skewX(0.3deg); }
+    25%      { transform: rotate(0.2deg) skewX(-0.4deg); }
+    50%      { transform: rotate(0.5deg) skewX(0.2deg); }
+    75%      { transform: rotate(0.1deg) skewX(-0.2deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gob-banner { animation: none; }
+  }
+  .gob-overlay.closed { display: none; }
+  @keyframes gobFade { from { opacity: 0 } to { opacity: 1 } }
+
+  /* the banner itself */
+  .gob-banner {
+    position: relative;
+    margin-top: 0;
+    width: 100%;
+    background: rgba(249, 210, 0, 0.86);
+    color: var(--purple-deep);
+    padding: 90px 110px 100px;
+    text-align: center;
+    box-shadow: inset 0 -10px 30px rgba(85,61,105,0.08);
+    /* concave four-sided "sagging banner" via SVG mask — path morphs for natural breeze motion */
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' preserveAspectRatio='none'><path fill='black'><animate attributeName='d' dur='7s' repeatCount='indefinite' calcMode='spline' keySplines='0.42 0 0.58 1; 0.42 0 0.58 1; 0.42 0 0.58 1; 0.42 0 0.58 1' keyTimes='0; 0.25; 0.5; 0.75; 1' values='M 3 0 Q 50 9 97 0 Q 92 25 97 50 Q 50 41 3 50 Q 8 25 3 0 Z; M 4 1 Q 52 7 96 -1 Q 91 23 96 51 Q 48 43 2 49 Q 9 25 4 1 Z; M 2 -1 Q 48 11 98 1 Q 93 27 98 49 Q 52 39 4 51 Q 7 25 2 -1 Z; M 4 1 Q 52 8 96 0 Q 91 24 95 51 Q 48 42 2 49 Q 9 26 4 1 Z; M 3 0 Q 50 9 97 0 Q 92 25 97 50 Q 50 41 3 50 Q 8 25 3 0 Z'/></path></svg>");
+            mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' preserveAspectRatio='none'><path fill='black'><animate attributeName='d' dur='7s' repeatCount='indefinite' calcMode='spline' keySplines='0.42 0 0.58 1; 0.42 0 0.58 1; 0.42 0 0.58 1; 0.42 0 0.58 1' keyTimes='0; 0.25; 0.5; 0.75; 1' values='M 3 0 Q 50 9 97 0 Q 92 25 97 50 Q 50 41 3 50 Q 8 25 3 0 Z; M 4 1 Q 52 7 96 -1 Q 91 23 96 51 Q 48 43 2 49 Q 9 25 4 1 Z; M 2 -1 Q 48 11 98 1 Q 93 27 98 49 Q 52 39 4 51 Q 7 25 2 -1 Z; M 4 1 Q 52 8 96 0 Q 91 24 95 51 Q 48 42 2 49 Q 9 26 4 1 Z; M 3 0 Q 50 9 97 0 Q 92 25 97 50 Q 50 41 3 50 Q 8 25 3 0 Z'/></path></svg>");
+    -webkit-mask-size: 100% 100%;
+            mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+  }
+
+  /* fabric texture overlay */
+  .gob-banner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgba(85,61,105,0.04) 0 1px, transparent 1px 3px);
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* eyelets — 4 corners, positioned at the inner rectangle's corners (after the concave curve cuts in) */
+  .gob-eyelet {
+    position: absolute;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #6B5234, #1F1408);
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.5), inset 0 1px 3px rgba(0,0,0,0.7);
+    z-index: 3;
+  }
+  .gob-eyelet.tl { top: 26px;    left: 56px; }
+  .gob-eyelet.tr { top: 26px;    right: 56px; }
+  .gob-eyelet.bl { bottom: 26px; left: 56px; }
+  .gob-eyelet.br { bottom: 26px; right: 56px; }
+
+  .gob-eyebrow {
+    display: inline-block;
+    font-size: 13px; font-weight: 900; letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: #FFF8E0;
+    background: var(--purple-deep);
+    padding: 8px 20px; border-radius: 999px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 12px rgba(31,20,40,0.25);
+  }
+  .gob-title {
+    font-size: clamp(28px, 5vw, 38px);
+    font-weight: 900; letter-spacing: -0.02em;
+    line-height: 1.1; color: var(--purple-deep);
+    margin-bottom: 12px;
+  }
+  .gob-desc {
+    font-size: 14px; line-height: 1.6;
+    color: var(--purple-deep);
+    opacity: 0.85;
+    max-width: 380px; margin: 0 auto;
+  }
+  .gob-close {
+    position: absolute;
+    bottom: -56px; right: 8px;
+    background: rgba(255,255,255,0.35);
+    color: rgba(255,255,255,0.85);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 7px 14px; border-radius: 999px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all .15s;
+    backdrop-filter: blur(4px);
+    z-index: 10;
+  }
+  .gob-close:hover { background: rgba(255,255,255,0.55); color: white; }
+
+  @media (max-width: 600px) {
+    .gob-overlay { padding: 40px 14px 50px; }
+    .gob-banner { padding: 70px 60px 80px; margin-top: 0; }
+    .gob-title { font-size: 26px; }
+    .gob-desc { font-size: 13px; }
+    .gob-close { bottom: -48px; right: 4px; padding: 8px 14px; font-size: 11px; }
+    .gob-eyelet { width: 12px; height: 12px; }
+    .gob-eyelet.tl { top: 18px;    left: 38px; }
+    .gob-eyelet.tr { top: 18px;    right: 38px; }
+    .gob-eyelet.bl { bottom: 18px; left: 38px; }
+    .gob-eyelet.br { bottom: 18px; right: 38px; }
+  }
 </style>
 </head>
 <body>
+
+<!-- Grand-opening hanging-banner popup -->
+<div class="gob-overlay" id="gobOverlay">
+  <div class="gob-banner-wrap">
+    <span class="gob-eyelet tl"></span>
+    <span class="gob-eyelet tr"></span>
+    <span class="gob-eyelet bl"></span>
+    <span class="gob-eyelet br"></span>
+  <div class="gob-banner">
+    <div class="gob-eyebrow">First Drop · May 2026</div>
+    <h2 class="gob-title">Handcrafted joy,<br>almost here.</h2>
+    <p class="gob-desc">Our very first collection drops mid-May.<br>Want early access? DM us on Instagram — <strong>@suuzzz.india</strong></p>
+  </div>
+
+  <button class="gob-close" onclick="document.getElementById('gobOverlay').classList.add('closed')" aria-label="Close">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    Close
+  </button>
+  </div>
+</div>
 
 <div class="announce-bar">
   <span class="pill">Season Special</span>
