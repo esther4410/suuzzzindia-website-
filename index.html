@@ -1362,12 +1362,18 @@ function renderGrid() {
       ? `<span class="price on-sale">₹${disc}</span><span class="price-orig">₹${price}</span><span class="price-save">SAVE ₹${price - disc}</span>`
       : `<span class="price">₹${price}</span>`;
 
+    const hasVariant = !!(p['Variant 1 Name']);
     const action = soldOut
       ? `<div class="sold-badge">Sold Out</div>`
-      : `<button class="add-btn" data-sku="${p.SKU}" onclick="addToCart('${p.SKU}', event)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add to cart
-        </button>`;
+      : hasVariant
+        ? `<button class="add-btn" data-sku="${p.SKU}" onclick="event.stopPropagation();openProduct('${p.SKU}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Choose option
+          </button>`
+        : `<button class="add-btn" data-sku="${p.SKU}" onclick="addToCart('${p.SKU}', event)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add to cart
+          </button>`;
 
     return `
       <article class="card${soldOut ? ' sold-out' : ''}">
@@ -1492,7 +1498,16 @@ function ensureGift() {
 
 function save() { localStorage.setItem('suuzzz_cart', JSON.stringify(cart)); }
 
-function subtotal() { return cart.reduce((s, i) => s + i.price * i.qty, 0); }
+function livePrice(item) {
+  if (item.isGift) return 0;
+  if (item.sku.includes('|')) return item.price; // variant — price stored at add-time
+  const p = products.find(x => x.SKU === item.sku);
+  if (!p) return item.price;
+  const disc = Number(p['Discount price (INR)']) || 0;
+  const base = Number(p['Price (INR)']) || 0;
+  return disc > 0 ? disc : base;
+}
+function subtotal() { return cart.reduce((s, i) => s + livePrice(i) * i.qty, 0); }
 
 function updateCart() {
   const count = cart.reduce((s, i) => s + (i.isGift ? 0 : i.qty), 0);
@@ -1581,7 +1596,7 @@ function updateCart() {
           </div>
         </div>
         <div class="item-right">
-          <div class="item-price">₹${(item.price * item.qty).toLocaleString('en-IN')}</div>
+          <div class="item-price">₹${(livePrice(item) * item.qty).toLocaleString('en-IN')}</div>
           <button class="rm-btn" onclick="removeItem('${item.sku}')">Remove</button>
         </div>
       </div>`;
