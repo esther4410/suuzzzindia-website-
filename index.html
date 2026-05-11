@@ -634,6 +634,7 @@
   }
   .pm-feature svg { width: 16px; height: 16px; color: var(--purple); flex-shrink: 0; }
 
+  #pmVariantSelect:focus { outline: none; border-color: var(--purple); }
   .pm-actions { margin-top: auto; padding-top: 24px; display: flex; gap: 10px; }
   .pm-add {
     flex: 1; padding: 16px;
@@ -1124,6 +1125,10 @@
       <div class="pm-sub" id="pmSub"></div>
       <div class="pm-price-row" id="pmPriceRow"></div>
       <div id="pmStockWrap"></div>
+      <div id="pmVariantWrap" style="display:none;margin:14px 0 4px;">
+        <label style="font-size:12px;font-weight:700;color:#4A3C58;display:block;margin-bottom:6px;">Option</label>
+        <select id="pmVariantSelect" style="width:100%;padding:10px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:14px;font-family:inherit;color:#1A1A1A;background:#fff;cursor:pointer;" onchange="onVariantChange()"></select>
+      </div>
       <div class="pm-features">
         <div class="pm-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg> Handmade in India</div>
         <div class="pm-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h2a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v5a3 3 0 003 3h2"></path><circle cx="12" cy="17" r="3"></circle></svg> Free ship over ₹2000</div>
@@ -1420,6 +1425,32 @@ function addToCart(sku, ev) {
   showToast(`Added — ${p['Product Name']}`);
 }
 
+function addToCartWithVariant(sku, variantName, variantPrice) {
+  const p = products.find(x => x.SKU === sku);
+  if (!p) return;
+  const stock = Number(p['Current Stock']) || 0;
+  const variantSku = `${sku}|${variantName}`;
+  const existing = cart.find(x => x.sku === variantSku);
+  if ((existing ? existing.qty : 0) >= stock) {
+    showToast(`Only ${stock} left in stock`);
+    return;
+  }
+  if (existing) existing.qty++;
+  else {
+    cart.push({
+      sku: variantSku,
+      name: `${p['Product Name']} — ${variantName}`,
+      color: p.Color,
+      price: variantPrice,
+      qty: 1,
+      imgUrl: driveUrl(p['Image URL']) || '',
+    });
+  }
+  ensureGift();
+  save(); updateCart();
+  showToast(`Added — ${p['Product Name']} (${variantName})`);
+}
+
 function changeQty(sku, d) {
   if (sku === 'GIFT-POSTCARD') return; // gift qty locked at 1
   const item = cart.find(x => x.sku === sku);
@@ -1622,6 +1653,24 @@ function openProduct(sku) {
     stockWrap.innerHTML = `<div class="pm-stock-line"><span class="dot-stock"></span>In stock — ships in 2–3 days</div>`;
   }
 
+  // Variants
+  const v1n = p['Variant 1 Name'] || '';
+  const v1p = Number(p['Variant 1 Price']) || 0;
+  const v2n = p['Variant 2 Name'] || '';
+  const v2p = Number(p['Variant 2 Price']) || 0;
+  const variantWrap = document.getElementById('pmVariantWrap');
+  const variantSel  = document.getElementById('pmVariantSelect');
+  if (v1n) {
+    variantSel.innerHTML = '';
+    variantSel.appendChild(Object.assign(document.createElement('option'), { value: `${v1n}|${v1p || (onSale ? disc : price)}`, textContent: v1p ? `${v1n} — ₹${v1p}` : v1n }));
+    if (v2n) variantSel.appendChild(Object.assign(document.createElement('option'), { value: `${v2n}|${v2p || (onSale ? disc : price)}`, textContent: v2p ? `${v2n} — ₹${v2p}` : v2n }));
+    variantWrap.style.display = 'block';
+    // Set initial price to first variant
+    onVariantChange();
+  } else {
+    variantWrap.style.display = 'none';
+  }
+
   const addBtn = document.getElementById('pmAddBtn');
   if (stock === 0) {
     addBtn.textContent = 'Sold Out';
@@ -1649,6 +1698,14 @@ function openProduct(sku) {
   document.body.style.overflow = 'hidden';
 }
 
+function onVariantChange() {
+  const sel = document.getElementById('pmVariantSelect');
+  if (!sel || !sel.value) return;
+  const variantPrice = Number(sel.value.split('|')[1]);
+  if (!variantPrice) return;
+  document.getElementById('pmPriceRow').innerHTML = `<span class="pm-price">₹${variantPrice}</span>`;
+}
+
 function pmGoTo(idx) {
   pmIdx = idx;
   document.getElementById('pmImg').src = pmImgs[idx];
@@ -1656,7 +1713,19 @@ function pmGoTo(idx) {
     .forEach((d, i) => d.classList.toggle('active', i === idx));
 }
 function pmSlide(dir) { pmGoTo((pmIdx + dir + pmImgs.length) % pmImgs.length); }
-function pmAddToCart() { closeProduct(); addToCart(pmSku); }
+function pmAddToCart() {
+  const sel = document.getElementById('pmVariantSelect');
+  const variantWrap = document.getElementById('pmVariantWrap');
+  if (variantWrap.style.display !== 'none' && sel && sel.value) {
+    const [variantName, variantPriceStr] = sel.value.split('|');
+    const variantPrice = Number(variantPriceStr);
+    closeProduct();
+    addToCartWithVariant(pmSku, variantName, variantPrice);
+  } else {
+    closeProduct();
+    addToCart(pmSku);
+  }
+}
 function closeProduct() {
   document.getElementById('pmOverlay').classList.remove('open');
   document.body.style.overflow = '';
