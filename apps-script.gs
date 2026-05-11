@@ -114,8 +114,8 @@ function sendOrderConfirmation(data, code, total, shipping, upiLink) {
   const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#FBF8F3;font-family:'Helvetica Neue',Arial,sans-serif;">
-<div style="max-width:520px;margin:32px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(31,20,40,0.08);">
+<body style="margin:0;padding:0;background:#ffffff;font-family:'Helvetica Neue',Arial,sans-serif;">
+<div style="max-width:520px;margin:48px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 48px rgba(31,20,40,0.13);">
   <div style="background:#553D69;padding:32px 32px 24px;text-align:center;">
     <p style="margin:0 0 6px;color:#F9D200;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">SUUZZZ India</p>
     <h1 style="margin:0;color:#fff;font-size:24px;font-weight:700;">Order Confirmed! 🎉</h1>
@@ -172,8 +172,8 @@ function sendPaymentConfirmedEmail(order) {
   const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#FBF8F3;font-family:'Helvetica Neue',Arial,sans-serif;">
-<div style="max-width:520px;margin:32px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(31,20,40,0.08);">
+<body style="margin:0;padding:0;background:#ffffff;font-family:'Helvetica Neue',Arial,sans-serif;">
+<div style="max-width:520px;margin:48px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 48px rgba(31,20,40,0.13);">
   <div style="background:#553D69;padding:32px 32px 24px;text-align:center;">
     <p style="margin:0 0 6px;color:#F9D200;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">SUUZZZ India</p>
     <h1 style="margin:0;color:#fff;font-size:24px;font-weight:700;">Payment Confirmed! ✅</h1>
@@ -212,8 +212,8 @@ function sendShippedEmail(order, trackingNum) {
   const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#FBF8F3;font-family:'Helvetica Neue',Arial,sans-serif;">
-<div style="max-width:520px;margin:32px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(31,20,40,0.08);">
+<body style="margin:0;padding:0;background:#ffffff;font-family:'Helvetica Neue',Arial,sans-serif;">
+<div style="max-width:520px;margin:48px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 48px rgba(31,20,40,0.13);">
   <div style="background:#553D69;padding:32px 32px 24px;text-align:center;">
     <p style="margin:0 0 6px;color:#F9D200;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">SUUZZZ India</p>
     <h1 style="margin:0;color:#fff;font-size:24px;font-weight:700;">Your order is on its way! 📦</h1>
