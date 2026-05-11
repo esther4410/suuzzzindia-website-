@@ -30,7 +30,8 @@ function doGet(e) {
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
-    if (data.action === 'order') return ok(createOrder(data));
+    if (data.action === 'order')    return ok(createOrder(data));
+    if (data.action === 'waitlist') return ok(addToWaitlist(data));
   } catch(err) {
     return fail(err.message);
   }
@@ -135,6 +136,21 @@ function upsertCustomer(data) {
   } else {
     sheet.getRange(idx + 1, 8).setValue((rows[idx][7] || 0) + 1);
   }
+}
+
+// ─── Waitlist ─────────────────────────────────────────────────
+
+function addToWaitlist(data) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  let sheet = ss.getSheetByName('Waitlist');
+  if (!sheet) {
+    sheet = ss.insertSheet('Waitlist');
+    sheet.appendRow(['Timestamp', 'Name', 'Email']);
+    sheet.setFrozenRows(1);
+  }
+  const ts = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd HH:mm:ss');
+  sheet.appendRow([ts, data.name || '', data.email || '']);
+  return { success: true };
 }
 
 // ─── Track Order ─────────────────────────────────────────────
