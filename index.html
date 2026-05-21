@@ -21,7 +21,7 @@
     --purple: #644678;        /* Deep Plum (Hero / P-500) */
     --purple-deep: #3D2349;   /* Aubergine (P-900) */
     --purple-soft: #8A6B9E;   /* Soft Plum (P-300) */
-    --yellow: #F5B335;        /* Marigold (Joy) */
+    --yellow: #D2A54C;        /* Marigold (Joy) */
     --yellow-deep: #D89A1F;
     /* Neutrals — Sand base, Smoke ink */
     --bg: #ECE3D2;            /* Sand */
@@ -33,7 +33,7 @@
     --line-2: #C9BCA3;
     /* States */
     --sale: #644678;
-    --sale-accent: #F5B335;
+    --sale-accent: #D2A54C;
     --success: #B89CC4;       /* Lavender Mist (P-100) */
     --success-soft: #EFE5F2;
     /* Shape */
@@ -60,7 +60,7 @@
 
   /* ── ANNOUNCEMENT BAR ─────────────────────────────────────── */
   .announce-bar {
-    background: var(--purple-deep); color: white;
+    background: var(--yellow); color: var(--purple-deep);
     text-align: center;
     font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
     padding: 9px 16px;
@@ -68,12 +68,12 @@
   }
   .announce-bar .pill {
     display: inline-block;
-    background: var(--surface); color: var(--purple-deep);
+    background: var(--purple-deep); color: var(--surface);
     font-size: 10px; font-weight: 800; letter-spacing: 0.14em;
     padding: 2px 8px; border-radius: 999px;
     margin-right: 8px; text-transform: uppercase; vertical-align: 1px;
   }
-  .announce-bar b { color: var(--surface); font-weight: 800; }
+  .announce-bar b { color: var(--purple-deep); font-weight: 800; }
   @media (max-width: 600px) {
     .announce-bar { font-size: 11px; padding: 8px 12px; }
     .announce-bar .pill { font-size: 9px; padding: 2px 7px; margin-right: 6px; }
@@ -1006,8 +1006,8 @@
     display: inline-block;
     font-size: 13px; font-weight: 900; letter-spacing: 0.32em;
     text-transform: uppercase;
-    color: #FFF8E0;
-    background: var(--purple-deep);
+    color: var(--purple-deep);
+    background: var(--yellow);
     padding: 8px 20px; border-radius: 999px;
     margin-bottom: 18px;
     box-shadow: 0 4px 12px rgba(74,66,72,0.25);
