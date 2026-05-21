@@ -22,7 +22,7 @@
     --purple-deep: #3D2349;   /* Aubergine (P-900) */
     --purple-soft: #8A6B9E;   /* Soft Plum (P-300) */
     --yellow: #D2A54C;        /* Marigold (Joy) */
-    --yellow-deep: #D89A1F;
+    --yellow-deep: #A88234;
     /* Neutrals — Sand base, Smoke ink */
     --bg: #ECE3D2;            /* Sand */
     --surface: #F7F0DE;       /* Sand light */
@@ -60,7 +60,7 @@
 
   /* ── ANNOUNCEMENT BAR ─────────────────────────────────────── */
   .announce-bar {
-    background: var(--yellow); color: var(--purple-deep);
+    background: var(--purple-deep); color: var(--surface);
     text-align: center;
     font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
     padding: 9px 16px;
@@ -68,12 +68,12 @@
   }
   .announce-bar .pill {
     display: inline-block;
-    background: var(--purple-deep); color: var(--surface);
+    background: var(--yellow); color: var(--purple-deep);
     font-size: 10px; font-weight: 800; letter-spacing: 0.14em;
     padding: 2px 8px; border-radius: 999px;
     margin-right: 8px; text-transform: uppercase; vertical-align: 1px;
   }
-  .announce-bar b { color: var(--purple-deep); font-weight: 800; }
+  .announce-bar b { color: var(--yellow); font-weight: 800; }
   @media (max-width: 600px) {
     .announce-bar { font-size: 11px; padding: 8px 12px; }
     .announce-bar .pill { font-size: 9px; padding: 2px 7px; margin-right: 6px; }
@@ -152,7 +152,7 @@
   .hero::before {
     content: ""; position: absolute; inset: 0;
     background:
-      radial-gradient(60% 80% at 85% 20%, rgba(249,210,0,0.18), transparent 60%),
+      radial-gradient(60% 80% at 85% 20%, rgba(210,165,76,0.18), transparent 60%),
       radial-gradient(50% 70% at 10% 90%, rgba(123,90,153,0.45), transparent 60%);
     z-index: -1;
   }
@@ -390,7 +390,7 @@
   }
   .add-btn:hover {
     background: var(--yellow); color: var(--purple-deep);
-    box-shadow: 0 4px 12px rgba(249, 210, 0, 0.45);
+    box-shadow: 0 4px 12px rgba(210, 165, 76, 0.45);
   }
   .add-btn:active { transform: scale(0.98); }
   .add-btn.added { background: var(--success); color: var(--purple-deep); box-shadow: 0 4px 14px rgba(184,156,196,0.45); }
