@@ -779,11 +779,17 @@
   /* ── MOBILE FINE-TUNES ──────────────────────────────────── */
   @media (max-width: 600px) {
     /* Compact header */
-    header { padding: 10px 14px; gap: 8px; }
-    .brand img { height: 86px; }
-    .brand-wave { height: 16px; background-size: calc(100% / 3.5) 16px; }
-    .brand-wave.left  { left: 40px; right: calc(50% + 59px); }
-    .brand-wave.right { left: calc(50% + 59px); right: 160px; }
+    header { padding: 10px 14px; gap: 8px; justify-content: space-between; }
+    .brand {
+      position: static; transform: none; padding: 0;
+      left: auto; right: auto; top: auto; bottom: auto;
+      pointer-events: auto;
+    }
+    .brand img {
+      position: static; transform: none;
+      height: 48px;
+    }
+    .brand-wave { display: none; }
     .cart-btn { padding: 8px 12px; font-size: 12px; gap: 6px; }
     .cart-btn span:not(.cart-count) { display: none; }
     .cart-btn svg { width: 18px; height: 18px; }
