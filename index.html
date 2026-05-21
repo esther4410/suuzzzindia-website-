@@ -10,6 +10,9 @@
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="preload" as="image" href="banner-source.png" media="(min-width: 601px)">
+<link rel="preload" as="image" href="banner-mobile.png" media="(max-width: 600px)">
+<link rel="preload" as="image" href="hero-desktop.png" media="(min-width: 601px)">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 
 <style>
@@ -960,7 +963,7 @@
     position: relative;
     margin-top: 0;
     width: 100%;
-    background: url("banner-source.png") center/cover no-repeat, rgba(249, 210, 0, 0.86);
+    background: url("banner-source.png") center/cover no-repeat, var(--bg);
     color: var(--purple-deep);
     padding: 90px 110px 100px;
     text-align: center;
@@ -1040,7 +1043,7 @@
 
   @media (max-width: 600px) {
     .gob-overlay { padding: 40px 14px 50px; }
-    .gob-banner { padding: 70px 60px 80px; margin-top: 0; }
+    .gob-banner { padding: 70px 60px 80px; margin-top: 0; background: url("banner-mobile.png") center/cover no-repeat, var(--bg); }
     .gob-title { font-size: 26px; }
     .gob-desc { font-size: 13px; }
     .gob-close { bottom: -48px; right: 4px; padding: 8px 14px; font-size: 11px; }
