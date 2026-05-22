@@ -1,5 +1,5 @@
 // ============================================================
-// SUUZZZ India — Google Apps Script Backend
+// Safar Lee — Google Apps Script Backend
 // Deploy: Extensions > Apps Script > Deploy > Web App
 //         Execute as: Me | Access: Anyone
 // ============================================================
@@ -7,8 +7,10 @@
 const SPREADSHEET_ID = '1nO9sgSkP2JxA9hdRs3SpqLAxkpWKP_oMchXt1AlxUvo';
 const INVENTORY_GID  = 896187980;
 
+const PRODUCT_FOLDER_ID = '1DFOqdi4UxWgbWD4KZRzJaULbyK5XpWq2'; // Drive: 제품사진 폴더 (flat)
+
 const UPI_ID   = 'supplier@gpay';
-const UPI_NAME = 'SUUZZZ India';
+const UPI_NAME = 'Safar Lee';
 
 const SHIPPING_FREE_THRESHOLD = 2000;
 const SHIPPING_FEE = 80;
@@ -46,15 +48,99 @@ function getProducts() {
   const rows  = sheet.getDataRange().getValues();
   const keys  = rows[0];
 
+  const imageMap = getImageMapFromDrive();
+
   const products = rows.slice(1)
     .filter(r => r[0])
     .map(r => {
       const p = {};
       keys.forEach((k, i) => p[k] = r[i]);
+
+      const sku  = String(p.sku || p.SKU || r[0]).trim();
+      const imgs = imageMap[sku] || [];
+      p.images = imgs;
+      imgs.forEach((url, idx) => {
+        p['image' + (idx + 1)] = url;
+      });
+
       return p;
-    });
+    })
+    // status 컬럼: 'active' 만 노출. 'draft' / 'archived' / 빈칸 = 숨김.
+    // 헤더 대소문자 무관 (Status / status 둘 다 지원)
+    .filter(p => String(p.status || p.Status || '').toLowerCase() === 'active');
 
   return { products };
+}
+
+// ─── Drive 자동 스캔 (flat 폴더: <SKU>.<ext> / <SKU>-2.<ext>) ──
+
+function getImageMapFromDrive() {
+  const cache  = CacheService.getScriptCache();
+  const cached = cache.get('product_images');
+  if (cached) return JSON.parse(cached);
+
+  const folder = DriveApp.getFolderById(PRODUCT_FOLDER_ID);
+  const files  = folder.getFiles();
+  const groups = {};
+
+  while (files.hasNext()) {
+    const f    = files.next();
+    const mime = f.getMimeType();
+    if (mime.indexOf('image/') !== 0) continue;
+
+    const fullName = f.getName();
+    const lastDot  = fullName.lastIndexOf('.');
+    const base     = (lastDot === -1 ? fullName : fullName.substring(0, lastDot)).trim();
+
+    let sku, idx;
+    const m = base.match(/^(.+?)-(\d+)$/);
+    if (m) { sku = m[1]; idx = parseInt(m[2], 10); }
+    else   { sku = base; idx = 1; }
+
+    if (!groups[sku]) groups[sku] = [];
+    groups[sku].push({
+      idx: idx,
+      url: 'https://lh3.googleusercontent.com/d/' + f.getId() + '=w1200'
+    });
+  }
+
+  const map = {};
+  Object.keys(groups).forEach(function(sku) {
+    groups[sku].sort(function(a, b) { return a.idx - b.idx; });
+    map[sku] = groups[sku].map(function(i) { return i.url; });
+  });
+
+  cache.put('product_images', JSON.stringify(map), 300); // 5분
+  return map;
+}
+
+// 모든 제품사진 "Anyone with link" 공개 설정. 새 이미지 추가 후 1회 실행.
+function makeProductImagesPublic() {
+  const folder = DriveApp.getFolderById(PRODUCT_FOLDER_ID);
+  Logger.log('Folder name: ' + folder.getName());
+  const files = folder.getFiles();
+  let total   = 0;
+  let updated = 0;
+  while (files.hasNext()) {
+    const f = files.next();
+    total++;
+    try {
+      f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      updated++;
+    } catch(e) {
+      Logger.log('Failed: ' + f.getName() + ' — ' + e.message);
+    }
+  }
+  Logger.log('Total files: ' + total + ', Made public: ' + updated);
+  return { total: total, updated: updated };
+}
+
+// 5분 캐시 강제 갱신
+function refreshImageCache() {
+  CacheService.getScriptCache().remove('product_images');
+  const map = getImageMapFromDrive();
+  Logger.log('Cache refreshed. SKUs: ' + Object.keys(map).length);
+  return { skus: Object.keys(map).length };
 }
 
 // ─── Create Order ─────────────────────────────────────────────
@@ -101,64 +187,64 @@ function createOrder(data) {
 function sendOrderConfirmation(data, code, total, shipping, upiLink) {
   const itemRows = (data.items || []).map(i =>
     `<tr>
-      <td style="padding:8px 12px;border-bottom:1px solid #ECE5EE;">${i.sku}</td>
-      <td style="padding:8px 12px;border-bottom:1px solid #ECE5EE;text-align:center;">x${i.qty}</td>
-      <td style="padding:8px 12px;border-bottom:1px solid #ECE5EE;text-align:right;">₹${(i.price || 0) * i.qty}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #DCD0BA;">${i.sku}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #DCD0BA;text-align:center;">x${i.qty}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #DCD0BA;text-align:right;">₹${(i.price || 0) * i.qty}</td>
     </tr>`
   ).join('');
 
   const shipText = shipping === 0
-    ? '<span style="color:#553D69;font-weight:600;">Free</span>'
+    ? '<span style="color:#644678;font-weight:600;">Free</span>'
     : `₹${shipping}`;
 
   const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:'Helvetica Neue',Arial,sans-serif;">
-<div style="max-width:520px;margin:48px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 48px rgba(31,20,40,0.13);">
-  <div style="background:#553D69;padding:32px 32px 24px;text-align:center;">
-    <p style="margin:0 0 6px;color:#F9D200;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">SUUZZZ India</p>
+<div style="max-width:520px;margin:48px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 48px rgba(74,66,72,0.13);">
+  <div style="background:#644678;padding:32px 32px 24px;text-align:center;">
+    <p style="margin:0 0 6px;color:#D2A54C;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Safar Lee</p>
     <h1 style="margin:0;color:#fff;font-size:24px;font-weight:700;">Order Confirmed! 🎉</h1>
   </div>
   <div style="padding:28px 32px;">
-    <p style="margin:0 0 4px;color:#4A3C58;font-size:14px;">Hi <strong>${data.name}</strong>,</p>
-    <p style="margin:0 0 24px;color:#8B7E96;font-size:13px;">Thank you for your order! Please save your order code — you'll need it to track your delivery.</p>
-    <div style="background:#FBF8F3;border-radius:14px;padding:20px;text-align:center;margin-bottom:24px;">
-      <p style="margin:0 0 6px;color:#8B7E96;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Your Order Code</p>
-      <p style="margin:0;color:#553D69;font-size:28px;font-weight:800;letter-spacing:3px;">${code}</p>
+    <p style="margin:0 0 4px;color:#6B5F66;font-size:14px;">Hi <strong>${data.name}</strong>,</p>
+    <p style="margin:0 0 24px;color:#9A8E94;font-size:13px;">Thank you for your order! Please save your order code — you'll need it to track your delivery.</p>
+    <div style="background:#ECE3D2;border-radius:14px;padding:20px;text-align:center;margin-bottom:24px;">
+      <p style="margin:0 0 6px;color:#9A8E94;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Your Order Code</p>
+      <p style="margin:0;color:#644678;font-size:28px;font-weight:800;letter-spacing:3px;">${code}</p>
     </div>
     <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
       <thead>
-        <tr style="background:#FBF8F3;">
-          <th style="padding:8px 12px;text-align:left;font-size:12px;color:#8B7E96;font-weight:600;">Item</th>
-          <th style="padding:8px 12px;text-align:center;font-size:12px;color:#8B7E96;font-weight:600;">Qty</th>
-          <th style="padding:8px 12px;text-align:right;font-size:12px;color:#8B7E96;font-weight:600;">Price</th>
+        <tr style="background:#ECE3D2;">
+          <th style="padding:8px 12px;text-align:left;font-size:12px;color:#9A8E94;font-weight:600;">Item</th>
+          <th style="padding:8px 12px;text-align:center;font-size:12px;color:#9A8E94;font-weight:600;">Qty</th>
+          <th style="padding:8px 12px;text-align:right;font-size:12px;color:#9A8E94;font-weight:600;">Price</th>
         </tr>
       </thead>
       <tbody>${itemRows}</tbody>
     </table>
-    <div style="border-top:2px solid #ECE5EE;padding-top:16px;">
-      <p style="margin:4px 0;font-size:13px;color:#4A3C58;">Shipping: ${shipText}</p>
-      <p style="margin:8px 0 0;font-size:16px;font-weight:700;color:#1F1428;">Total: ₹${total}</p>
+    <div style="border-top:2px solid #DCD0BA;padding-top:16px;">
+      <p style="margin:4px 0;font-size:13px;color:#6B5F66;">Shipping: ${shipText}</p>
+      <p style="margin:8px 0 0;font-size:16px;font-weight:700;color:#4A4248;">Total: ₹${total}</p>
     </div>
-    <div style="margin:24px 0;background:#FFF8DC;border-radius:12px;padding:16px;">
-      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#1F1428;">💳 How to Pay</p>
-      <p style="margin:0 0 14px;font-size:13px;color:#4A3C58;">Your order ships once payment is confirmed.<br>Send <strong>₹${total}</strong> via GPay / PhonePe / Paytm to <strong>${UPI_ID}</strong></p>
+    <div style="margin:24px 0;background:#F5EFE0;border-radius:12px;padding:16px;">
+      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#4A4248;">💳 How to Pay</p>
+      <p style="margin:0 0 14px;font-size:13px;color:#6B5F66;">Your order ships once payment is confirmed.<br>Send <strong>₹${total}</strong> via GPay / PhonePe / Paytm to <strong>${UPI_ID}</strong></p>
       <div style="text-align:center;">
-        <a href="${upiLink}" style="display:inline-block;background:#F9D200;color:#1F1428;text-decoration:none;padding:16px 36px;border-radius:12px;font-size:15px;font-weight:800;letter-spacing:0.3px;">💳 Pay Now — ₹${total}</a>
+        <a href="${upiLink}" style="display:inline-block;background:#D2A54C;color:#4A4248;text-decoration:none;padding:16px 36px;border-radius:12px;font-size:15px;font-weight:800;letter-spacing:0.3px;">💳 Pay Now — ₹${total}</a>
       </div>
     </div>
   </div>
-  <div style="padding:20px 32px;border-top:1px solid #ECE5EE;text-align:center;">
-    <p style="margin:0 0 6px;font-size:12px;color:#8B7E96;">Follow us for restocks, new drops & behind the scenes</p>
-    <a href="https://instagram.com/suuzzz.india" style="color:#553D69;font-size:18px;font-weight:800;text-decoration:underline;">→ @suuzzz.india</a>
+  <div style="padding:20px 32px;border-top:1px solid #DCD0BA;text-align:center;">
+    <p style="margin:0 0 6px;font-size:12px;color:#9A8E94;">Follow us for restocks, new drops & behind the scenes</p>
+    <a href="https://instagram.com/safar.lee" style="color:#644678;font-size:18px;font-weight:800;text-decoration:underline;">→ @safar.lee</a>
   </div>
 </div>
 </body>
 </html>`;
 
   try {
-    MailApp.sendEmail({ to: data.email, subject: `SUUZZZ India — Order Confirmed ${code}`, htmlBody: html });
+    MailApp.sendEmail({ to: data.email, subject: `Safar Lee — Order Confirmed ${code}`, htmlBody: html });
   } catch(e) {
     Logger.log('Order email failed: ' + e.message);
   }
@@ -168,37 +254,37 @@ function sendOrderConfirmation(data, code, total, shipping, upiLink) {
 // Trigger: onOrderSheetEdit — Status column → CONFIRMED
 
 function sendPaymentConfirmedEmail(order) {
-  const trackUrl = `https://suuzzzindia-website.vercel.app/track.html?email=${encodeURIComponent(order['Email'])}&code=${encodeURIComponent(order['OrderCode'])}`;
+  const trackUrl = `https://safarlee-website.vercel.app/track.html?email=${encodeURIComponent(order['Email'])}&code=${encodeURIComponent(order['OrderCode'])}`;
   const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:'Helvetica Neue',Arial,sans-serif;">
-<div style="max-width:520px;margin:48px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 48px rgba(31,20,40,0.13);">
-  <div style="background:#553D69;padding:32px 32px 24px;text-align:center;">
-    <p style="margin:0 0 6px;color:#F9D200;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">SUUZZZ India</p>
+<div style="max-width:520px;margin:48px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 48px rgba(74,66,72,0.13);">
+  <div style="background:#644678;padding:32px 32px 24px;text-align:center;">
+    <p style="margin:0 0 6px;color:#D2A54C;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Safar Lee</p>
     <h1 style="margin:0;color:#fff;font-size:24px;font-weight:700;">Payment Confirmed! ✅</h1>
   </div>
   <div style="padding:28px 32px;">
-    <p style="margin:0 0 4px;color:#4A3C58;font-size:14px;">Hi <strong>${order['Name']}</strong>,</p>
-    <p style="margin:0 0 20px;color:#8B7E96;font-size:13px;">Order <strong>${order['OrderCode']}</strong></p>
+    <p style="margin:0 0 4px;color:#6B5F66;font-size:14px;">Hi <strong>${order['Name']}</strong>,</p>
+    <p style="margin:0 0 20px;color:#9A8E94;font-size:13px;">Order <strong>${order['OrderCode']}</strong></p>
     <div style="background:#F0FBF0;border-radius:14px;padding:20px;margin-bottom:24px;">
-      <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#1F1428;">Thank you for your purchase! 🎁</p>
-      <p style="margin:0;font-size:13px;color:#4A3C58;line-height:1.7;">We're so happy to have your order confirmed.<br>We'll pack it with love and care — shipping update coming soon!</p>
+      <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#4A4248;">Thank you for your purchase! 🎁</p>
+      <p style="margin:0;font-size:13px;color:#6B5F66;line-height:1.7;">We're so happy to have your order confirmed.<br>We'll pack it with love and care — shipping update coming soon!</p>
     </div>
     <div style="text-align:center;">
-      <a href="${trackUrl}" style="display:inline-block;background:#553D69;color:#fff;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:600;">Track My Order →</a>
+      <a href="${trackUrl}" style="display:inline-block;background:#644678;color:#fff;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:600;">Track My Order →</a>
     </div>
   </div>
-  <div style="padding:20px 32px;border-top:1px solid #ECE5EE;text-align:center;">
-    <p style="margin:0 0 6px;font-size:12px;color:#8B7E96;">Follow us for restocks, new drops & behind the scenes</p>
-    <a href="https://instagram.com/suuzzz.india" style="color:#553D69;font-size:18px;font-weight:800;text-decoration:underline;">→ @suuzzz.india</a>
+  <div style="padding:20px 32px;border-top:1px solid #DCD0BA;text-align:center;">
+    <p style="margin:0 0 6px;font-size:12px;color:#9A8E94;">Follow us for restocks, new drops & behind the scenes</p>
+    <a href="https://instagram.com/safar.lee" style="color:#644678;font-size:18px;font-weight:800;text-decoration:underline;">→ @safar.lee</a>
   </div>
 </div>
 </body>
 </html>`;
 
   try {
-    MailApp.sendEmail({ to: order['Email'], subject: `SUUZZZ India — Payment Confirmed ✅`, htmlBody: html });
+    MailApp.sendEmail({ to: order['Email'], subject: `Safar Lee — Payment Confirmed ✅`, htmlBody: html });
   } catch(e) {
     Logger.log('Payment email failed: ' + e.message);
   }
@@ -213,33 +299,33 @@ function sendShippedEmail(order, trackingNum) {
 <html>
 <head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:'Helvetica Neue',Arial,sans-serif;">
-<div style="max-width:520px;margin:48px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 48px rgba(31,20,40,0.13);">
-  <div style="background:#553D69;padding:32px 32px 24px;text-align:center;">
-    <p style="margin:0 0 6px;color:#F9D200;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">SUUZZZ India</p>
+<div style="max-width:520px;margin:48px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 48px rgba(74,66,72,0.13);">
+  <div style="background:#644678;padding:32px 32px 24px;text-align:center;">
+    <p style="margin:0 0 6px;color:#D2A54C;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Safar Lee</p>
     <h1 style="margin:0;color:#fff;font-size:24px;font-weight:700;">Your order is on its way! 📦</h1>
   </div>
   <div style="padding:28px 32px;">
-    <p style="margin:0 0 4px;color:#4A3C58;font-size:14px;">Hi <strong>${order['Name']}</strong>,</p>
-    <p style="margin:0 0 24px;color:#8B7E96;font-size:13px;">Order <strong>${order['OrderCode']}</strong> has been shipped!</p>
-    <div style="background:#FBF8F3;border-radius:14px;padding:20px;text-align:center;margin-bottom:24px;">
-      <p style="margin:0 0 6px;color:#8B7E96;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Tracking Number</p>
-      <p style="margin:0;color:#553D69;font-size:22px;font-weight:800;letter-spacing:2px;">${trackingNum}</p>
+    <p style="margin:0 0 4px;color:#6B5F66;font-size:14px;">Hi <strong>${order['Name']}</strong>,</p>
+    <p style="margin:0 0 24px;color:#9A8E94;font-size:13px;">Order <strong>${order['OrderCode']}</strong> has been shipped!</p>
+    <div style="background:#ECE3D2;border-radius:14px;padding:20px;text-align:center;margin-bottom:24px;">
+      <p style="margin:0 0 6px;color:#9A8E94;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Tracking Number</p>
+      <p style="margin:0;color:#644678;font-size:22px;font-weight:800;letter-spacing:2px;">${trackingNum}</p>
     </div>
     <div style="text-align:center;margin-bottom:12px;">
-      <a href="${trackUrl}" style="display:inline-block;background:#553D69;color:#fff;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:600;">Track My Package →</a>
+      <a href="${trackUrl}" style="display:inline-block;background:#644678;color:#fff;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:600;">Track My Package →</a>
     </div>
-    <p style="text-align:center;font-size:12px;color:#8B7E96;margin:0;">Supports all major Indian couriers</p>
+    <p style="text-align:center;font-size:12px;color:#9A8E94;margin:0;">Supports all major Indian couriers</p>
   </div>
-  <div style="padding:20px 32px;border-top:1px solid #ECE5EE;text-align:center;">
-    <p style="margin:0 0 6px;font-size:12px;color:#8B7E96;">Follow us for restocks, new drops & behind the scenes</p>
-    <a href="https://instagram.com/suuzzz.india" style="color:#553D69;font-size:18px;font-weight:800;text-decoration:underline;">→ @suuzzz.india</a>
+  <div style="padding:20px 32px;border-top:1px solid #DCD0BA;text-align:center;">
+    <p style="margin:0 0 6px;font-size:12px;color:#9A8E94;">Follow us for restocks, new drops & behind the scenes</p>
+    <a href="https://instagram.com/safar.lee" style="color:#644678;font-size:18px;font-weight:800;text-decoration:underline;">→ @safar.lee</a>
   </div>
 </div>
 </body>
 </html>`;
 
   try {
-    MailApp.sendEmail({ to: order['Email'], subject: `SUUZZZ India — Your order is on its way! 📦`, htmlBody: html });
+    MailApp.sendEmail({ to: order['Email'], subject: `Safar Lee — Your order is on its way! 📦`, htmlBody: html });
   } catch(e) {
     Logger.log('Shipping email failed: ' + e.message);
   }
