@@ -814,12 +814,13 @@
 
     /* Horizontal scroll filters */
     .filters-wrap {
-      padding: 0 14px; gap: 6px;
+      padding: 0 18px 4px;
+      gap: 6px;
       flex-wrap: nowrap; overflow-x: auto;
       scroll-snap-type: x mandatory;
+      scroll-padding-left: 18px;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
-      padding-bottom: 4px;
     }
     .filters-wrap::-webkit-scrollbar { display: none; }
     .filter-btn {
