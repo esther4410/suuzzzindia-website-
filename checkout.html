@@ -86,7 +86,7 @@
 
 <header>
   <a class="back" href="index.html">←</a>
-  <a href="index.html"><img src="wordmark.svg" onerror="this.src='logo.png'" alt="Safar Lee" style="height:42px;display:block"></a>
+  <a href="index.html"><img src="wordmark-purple.svg" alt="Safar Lee" style="height:42px;display:block"></a>
 </header>
 
 <div class="page">
@@ -154,6 +154,7 @@
     </div>
   </div>
 
+  <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;">
   <button class="submit-btn" id="submitBtn" onclick="placeOrder()">Place Order & Pay via UPI →</button>
   <p class="submit-note">🎁 Includes <b>free postcard</b> · ⚡ Ships in <b>2–3 days</b> · 🔒 100% secure</p>
 </div>
@@ -191,7 +192,7 @@ const PRE_LAUNCH = true; // 오픈 후 false로 변경
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbx-w6hDRFn2KHhIODytmzNhNsw4nHPaxz-p4FNI2yIUEeHlrMCAnySdtVLbKzwKjU-WoA/exec';
 
-const cart = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
+const cart = JSON.parse(localStorage.getItem('safarlee_cart') || '[]');
 if (!cart.length) window.location.href = 'index.html';
 
 const sub      = cart.reduce((s, i) => s + i.price * i.qty, 0);
@@ -260,6 +261,7 @@ async function placeOrder() {
     address:  document.getElementById('address').value.trim(),
     city:     document.getElementById('city').value.trim(),
     pincode:  document.getElementById('pincode').value.trim(),
+    website:  document.getElementById('website').value.trim(),
     items:    cart.map(i => ({ sku: i.sku, qty: i.qty })),
     subtotal: sub,
   };
@@ -283,7 +285,7 @@ async function placeOrder() {
     const data = await res.json();
 
     if (data.success) {
-      localStorage.removeItem('suuzzz_cart');
+      localStorage.removeItem('safarlee_cart');
       document.getElementById('displayCode').textContent = data.orderCode;
       document.getElementById('upiBtn').href = data.upiLink;
       document.getElementById('confirmOverlay').classList.add('show');

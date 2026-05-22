@@ -6,7 +6,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:title" content="Safar Lee">
 <meta property="og:description" content="Crafted in India · Refined aesthetic. Hand-made everyday objects that walk with you — cushions, throws, pouches, bags, accessories.">
-<meta property="og:image" content="logo.png">
+<meta property="og:image" content="og-image.png">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
@@ -1129,7 +1129,7 @@
 <footer>
   <div class="foot-inner">
     <div class="foot-brand">
-      <img src="wordmark.svg" alt="Safar Lee" onerror="this.src='logo.png'">
+      <img src="wordmark.svg" alt="Safar Lee">
       <p class="foot-tag">Companions for the smallest journeys, and the longest. Crafted in India · Refined aesthetic — cushions, throws, pouches, bags, accessories that walk with you.</p>
     </div>
     <div class="foot-col">
@@ -1224,7 +1224,7 @@
 <script>
 // ── CONFIG ────────────────────────────────────────────────
 const API_URL = 'https://script.google.com/macros/s/AKfycbx-w6hDRFn2KHhIODytmzNhNsw4nHPaxz-p4FNI2yIUEeHlrMCAnySdtVLbKzwKjU-WoA/exec';
-const CACHE_KEY = 'suuzzz_products_v2';
+const CACHE_KEY = 'safarlee_products_v1';
 const CACHE_TTL = 5 * 60 * 1000;
 const FREE_SHIP_THRESHOLD = 2000;
 
@@ -1275,7 +1275,7 @@ const FALLBACK_PRODUCTS = [
 ];
 
 let products = [];
-let cart = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
+let cart = JSON.parse(localStorage.getItem('safarlee_cart') || '[]');
 // Sync gift on initial load (handles legacy carts)
 (function syncGiftOnLoad(){
   const hasPaid = cart.some(x => x.sku !== 'GIFT-POSTCARD');
@@ -1285,7 +1285,7 @@ let cart = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
   } else if (!hasPaid && hasGift) {
     cart = cart.filter(x => x.sku !== 'GIFT-POSTCARD');
   }
-  localStorage.setItem('suuzzz_cart', JSON.stringify(cart));
+  localStorage.setItem('safarlee_cart', JSON.stringify(cart));
 })();
 let activeFilter = 'All';
 
@@ -1562,7 +1562,7 @@ function ensureGift() {
   }
 }
 
-function save() { localStorage.setItem('suuzzz_cart', JSON.stringify(cart)); }
+function save() { localStorage.setItem('safarlee_cart', JSON.stringify(cart)); }
 
 function livePrice(item) {
   if (item.isGift) return 0;

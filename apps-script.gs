@@ -148,7 +148,19 @@ function refreshImageCache() {
 
 // ─── Create Order ─────────────────────────────────────────────
 
+// 시트 수식 인젝션 방지: 유저 입력이 =, +, -, @ 로 시작하면 작은따옴표 prefix
+function safe(v) {
+  if (v === null || v === undefined) return '';
+  const s = String(v);
+  return /^[=+\-@]/.test(s.trim()) ? "'" + s : s;
+}
+
 function createOrder(data) {
+  // 봇 차단: honeypot 필드 채워진 요청은 fake success 후 무처리
+  if (data.website || data.url || data.honeypot) {
+    return { success: true, orderCode: 'BOT-REJECTED', total: 0, shipping: 0, upiLink: '' };
+  }
+
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
   let orderSheet = ss.getSheetByName('OrderLog');
@@ -171,8 +183,8 @@ function createOrder(data) {
 
   orderSheet.appendRow([
     code, date,
-    data.name, data.email, data.phone,
-    data.address, data.city, data.pincode,
+    safe(data.name), safe(data.email), safe(data.phone),
+    safe(data.address), safe(data.city), safe(data.pincode),
     itemsStr,
     data.subtotal, discount, shipping, total,
     'PENDING_PAYMENT', ''
@@ -363,6 +375,7 @@ function onOrderSheetEdit(e) {
 // ─── Waitlist ─────────────────────────────────────────────────
 
 function addToWaitlist(data) {
+  if (data.website || data.url || data.honeypot) return { success: true };
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = ss.getSheetByName('Waitlist');
   if (!sheet) {
@@ -371,13 +384,14 @@ function addToWaitlist(data) {
     sheet.setFrozenRows(1);
   }
   const date = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd HH:mm:ss');
-  sheet.appendRow([date, data.name || '', data.email || '']);
+  sheet.appendRow([date, safe(data.name), safe(data.email)]);
   return { success: true };
 }
 
 // ─── Pre-Launch Lead ──────────────────────────────────────────
 
 function addPreLaunchLead(data) {
+  if (data.website || data.url || data.honeypot) return { success: true };
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = ss.getSheetByName('PreLaunchLeads');
   if (!sheet) {
@@ -389,12 +403,12 @@ function addPreLaunchLead(data) {
   const itemsStr = (data.items || []).map(i => `${i.sku} x${i.qty}`).join(', ');
   sheet.appendRow([
     date,
-    data.name    || '',
-    data.email   || '',
-    data.phone   || '',
-    data.address || '',
-    data.city    || '',
-    data.pincode || '',
+    safe(data.name),
+    safe(data.email),
+    safe(data.phone),
+    safe(data.address),
+    safe(data.city),
+    safe(data.pincode),
     itemsStr,
     data.subtotal || 0,
   ]);
@@ -436,8 +450,8 @@ function upsertCustomer(data) {
 
   if (idx === -1) {
     sheet.appendRow([
-      data.email, data.name, data.phone,
-      data.address, data.city, data.pincode,
+      safe(data.email), safe(data.name), safe(data.phone),
+      safe(data.address), safe(data.city), safe(data.pincode),
       Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), 1
     ]);
   } else {
