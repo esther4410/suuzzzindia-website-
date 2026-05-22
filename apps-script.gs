@@ -62,6 +62,9 @@ function getProducts() {
       imgs.forEach((url, idx) => {
         p['image' + (idx + 1)] = url;
       });
+      // 프론트엔드 호환: 시트 Image URL 필드 덮어쓰기
+      if (imgs[0]) p['Image URL']   = imgs[0];
+      if (imgs[1]) p['Image URL 2'] = imgs[1];
 
       return p;
     })
