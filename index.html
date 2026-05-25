@@ -361,6 +361,14 @@
     text-transform: uppercase; letter-spacing: 0.06em;
   }
 
+  /* Size pills on product card */
+  .card-sizes { display: flex; gap: 4px; flex-wrap: wrap; margin: 5px 0 4px; }
+  .card-size-pill {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+    padding: 2px 7px; border-radius: 4px;
+    background: var(--cream); color: var(--purple); border: 1px solid var(--purple-soft);
+  }
+
   /* Discount-emphasis pricing */
   .price-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
   .price {
@@ -1434,6 +1442,10 @@ function renderGrid() {
       : `<span class="price">₹${price}</span>`;
 
     const hasVariant = !!(p['Variant 1 Name']);
+    const sizeVal = p['Size'] || p['size'] || '';
+    const sizesHtml = sizeVal
+      ? `<div class="card-sizes"><span class="card-size-pill">${escapeHtml(sizeVal)}</span></div>`
+      : '';
     const action = soldOut
       ? `<div class="sold-badge">Sold Out</div>`
       : hasVariant
@@ -1452,6 +1464,7 @@ function renderGrid() {
         <div class="card-body">
           <div class="card-sub">${escapeHtml(category({SKU:p.SKU}))} · ${escapeHtml(p.Color || '')}</div>
           <div class="card-name">${escapeHtml(p['Product Name'])}</div>
+          ${sizesHtml}
           <div class="price-row">${priceHtml}</div>
           <div class="card-actions">${action}</div>
         </div>
