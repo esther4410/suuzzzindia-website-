@@ -50,7 +50,7 @@
 
 <div class="page">
   <h2>Track Your Order</h2>
-  <p class="sub">Enter your email and the order code you received after checkout (looks like SUZ-AB1234).</p>
+  <p class="sub">Enter your email and the order code you received after checkout (looks like SAFAR-AB1234).</p>
 
   <div class="card">
     <div class="field">
@@ -59,9 +59,10 @@
     </div>
     <div class="field" style="margin-bottom:4px">
       <label>Order Code</label>
-      <input type="text" id="code" placeholder="SUZ-AB1234"
+      <input type="text" id="code" placeholder="SAFAR-AB1234"
         style="text-transform:uppercase;letter-spacing:1px"
-        oninput="this.value=this.value.toUpperCase()">
+        value="SAFAR-"
+        oninput="if(!this.value.startsWith('SAFAR-'))this.value='SAFAR-'+this.value.replace(/^SAFAR-?/i,'');this.value=this.value.toUpperCase()">
     </div>
     <button class="track-btn" id="trackBtn" onclick="doTrack()">Track Order →</button>
   </div>
@@ -105,7 +106,7 @@ async function doTrack() {
         <div class="error-box">
           😕 Order not found.<br><br>
           Double-check your email and order code.<br>
-          <small style="color:#aaa;display:block;margin-top:6px">Example code: SUZ-AB1234</small>
+          <small style="color:#aaa;display:block;margin-top:6px">Example code: SAFAR-AB1234</small>
         </div>`;
       resultEl.classList.add('show');
     }

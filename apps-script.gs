@@ -174,7 +174,7 @@ function createOrder(data) {
     orderSheet.setFrozenRows(1);
   }
 
-  const code     = 'SUZ-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+  const code     = 'SAFAR-' + Math.random().toString(36).substr(2, 6).toUpperCase();
   const date     = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd HH:mm:ss');
   const itemsStr = data.items.map(i => `${i.sku} x${i.qty}`).join(', ');
   const shipping = data.subtotal >= SHIPPING_FREE_THRESHOLD ? 0 : SHIPPING_FEE;
@@ -367,6 +367,9 @@ function onOrderSheetEdit(e) {
   if (col === statusCol && e.value === 'CONFIRMED') {
     sendPaymentConfirmedEmail(order);
   }
+  if (col === statusCol && e.value === 'CANCELLED') {
+    restoreStock(order['Items']);
+  }
   if (col === trackingCol && e.value) {
     sendShippedEmail(order, e.value);
   }
@@ -428,6 +431,30 @@ function decrementStock(items) {
       if (rows[i][0] === baseSku) {
         const cell = sheet.getRange(i + 1, 5);
         cell.setValue(Math.max(0, (cell.getValue() || 0) - item.qty));
+        break;
+      }
+    }
+  });
+}
+
+// ─── Restore Stock (취소 시 재고 복구) ───────────────────────────
+
+function restoreStock(itemsStr) {
+  if (!itemsStr) return;
+  const ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheets().find(s => s.getSheetId() === INVENTORY_GID);
+  const rows  = sheet.getDataRange().getValues();
+
+  // Items 형식: "SKU1 x2, SKU2 x1"
+  itemsStr.toString().split(',').forEach(function(part) {
+    const m = part.trim().match(/^(.+?)\s+x(\d+)$/i);
+    if (!m) return;
+    const baseSku = m[1].trim().split('|')[0]; // variant SKU 처리
+    const qty     = parseInt(m[2], 10);
+    for (var i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]).trim() === baseSku) {
+        const cell = sheet.getRange(i + 1, 5);
+        cell.setValue((cell.getValue() || 0) + qty);
         break;
       }
     }
