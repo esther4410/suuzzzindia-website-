@@ -15,6 +15,8 @@ const UPI_NAME = 'Safar Lee';
 const SHIPPING_FREE_THRESHOLD = 2000;
 const SHIPPING_FEE = 80;
 
+const WEBSITE_URL = 'https://safarlee-website.vercel.app';
+
 // ─── Router ──────────────────────────────────────────────────
 
 function doGet(e) {
@@ -22,6 +24,7 @@ function doGet(e) {
   try {
     if (action === 'products') return ok(getProducts());
     if (action === 'track')    return ok(trackOrder(e.parameter.email, e.parameter.code));
+    if (action === 'catalog')  return getCatalogFeed();
   } catch(err) {
     return fail(err.message);
   }
@@ -512,6 +515,62 @@ function trackOrder(email, code) {
 
 function makeUPILink(amount, code) {
   return `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&tn=${encodeURIComponent('Order ' + code)}&cu=INR`;
+}
+
+// ─── Meta Catalog Feed ────────────────────────────────────────
+// URL: <Apps Script Web App URL>?action=catalog
+// Meta Commerce Manager → 카탈로그 → 데이터 피드 → 이 URL 등록
+
+function getCatalogFeed() {
+  const ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheets().find(s => s.getSheetId() === INVENTORY_GID);
+  const rows  = sheet.getDataRange().getValues();
+  const keys  = rows[0];
+
+  const imageMap = getImageMapFromDrive();
+
+  const headers = ['id','title','description','availability','condition','price','sale_price','link','image_link','brand','google_product_category'];
+  const lines   = [headers.join('\t')];
+
+  rows.slice(1).forEach(function(r) {
+    const p = {};
+    keys.forEach(function(k, i) { p[k] = r[i]; });
+
+    const statusVal = String(p.status || p.Status || '').toLowerCase();
+    if (!p.SKU || statusVal !== 'active') return;
+
+    const sku      = String(p.SKU).trim();
+    const title    = String(p['Product Name'] || sku);
+    const desc     = String(p['Description'] || p['Product Name'] || title).replace(/\t|\n/g, ' ');
+    const stock    = Number(p['Current Stock'] || 0);
+    const price    = Number(p['Price (INR)'] || p['Price'] || 0);
+    const disc     = Number(p['Discount price (INR)'] || 0);
+    const images   = imageMap[sku] || [];
+    const imageUrl = images[0] || String(p['Image URL'] || '');
+
+    const availability = stock > 0 ? 'preorder' : 'out of stock';
+    const priceStr     = price.toFixed(2) + ' INR';
+    const salePriceStr = disc > 0 ? disc.toFixed(2) + ' INR' : '';
+    const link         = WEBSITE_URL + '/index.html#' + encodeURIComponent(sku);
+
+    lines.push([
+      sku,
+      title,
+      desc,
+      availability,
+      'new',
+      priceStr,
+      salePriceStr,
+      link,
+      imageUrl,
+      'Safar Lee',
+      'Home & Garden > Decor > Decorative Accents'
+    ].join('\t'));
+  });
+
+  return ContentService
+    .createTextOutput(lines.join('\n'))
+    .setMimeType(ContentService.MimeType.TEXT);
 }
 
 // ─── Helpers ─────────────────────────────────────────────────
