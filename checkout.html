@@ -297,6 +297,9 @@ async function placeOrder() {
       document.getElementById('displayCode').textContent = data.orderCode;
       document.getElementById('upiBtn').href = data.upiLink;
       document.getElementById('confirmOverlay').classList.add('show');
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'purchase', { transaction_id: data.orderCode, currency: 'INR', value: total, shipping: shipping, items: cart.map(i => ({ item_id: i.sku, item_name: i.name, price: i.price, quantity: i.qty })) });
+      }
     } else {
       throw new Error(data.error || 'Unknown error');
     }
