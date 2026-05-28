@@ -537,9 +537,8 @@ function getCatalogFeed() {
     keys.forEach(function(k, i) { p[k] = r[i]; });
 
     const statusVal = String(p.status || p.Status || '').toLowerCase();
-    if (!p.SKU || statusVal !== 'active') return;
-
-    const sku      = String(p.SKU).trim();
+    const sku       = String(p.SKU || p.sku || r[0] || '').trim();
+    if (!sku || statusVal !== 'active') return;
     const title    = String(p['Product Name'] || sku);
     const desc     = String(p['Description'] || p['Product Name'] || title).replace(/\t|\n/g, ' ');
     const stock    = Number(p['Current Stock'] || 0);
