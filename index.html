@@ -1408,6 +1408,10 @@ function renderGrid() {
     return;
   }
 
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'view_item_list', { item_list_name: activeFilter, items: list.map((p, i) => ({ item_id: p.SKU, item_name: p['Product Name'], index: i, price: Number(p['Discount price (INR)']) || Number(p['Price (INR)']) || 0 })) });
+  }
+
   grid.innerHTML = list.map(p => {
     const stock = Number(p['Current Stock']) || 0;
     const price = Number(p['Price (INR)']) || 0;
@@ -1733,7 +1737,13 @@ function closeCart() {
   document.getElementById('overlay').classList.remove('open');
   document.body.style.overflow = '';
 }
-function goCheckout() { if (cart.length) window.location.href = 'checkout.html'; }
+function goCheckout() {
+  if (!cart.length) return;
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'begin_checkout', { currency: 'INR', value: cart.reduce((s, i) => s + i.price * i.qty, 0), items: cart.map(i => ({ item_id: i.sku, item_name: i.name, price: i.price, quantity: i.qty })) });
+  }
+  window.location.href = 'checkout.html';
+}
 
 // ── PRODUCT MODAL ─────────────────────────────────────────
 let pmSku = null, pmImgs = [], pmIdx = 0;
@@ -1744,6 +1754,7 @@ function openProduct(sku) {
   pmSku = sku;
   pmImgs = [driveUrl(p['Image URL']), driveUrl(p['Image URL 2'])].filter(Boolean);
   if (typeof gtag !== 'undefined') {
+    gtag('event', 'select_item', { items: [{ item_id: sku, item_name: p['Product Name'], price: Number(p['Discount price (INR)']) || Number(p['Price (INR)']) || 0 }] });
     gtag('event', 'view_item', { currency: 'INR', value: Number(p['Discount price (INR)']) || Number(p['Price (INR)']) || 0, items: [{ item_id: sku, item_name: p['Product Name'], price: Number(p['Discount price (INR)']) || Number(p['Price (INR)']) || 0 }] });
   }
   pmIdx = 0;
