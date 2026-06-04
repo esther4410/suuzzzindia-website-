@@ -3,72 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Checkout — Safar Lee</title>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-T81CT97P1P"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-T81CT97P1P');
-</script>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Checkout — SUUZZZ India</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --yellow:#D2A54C; --purple:#644678; --purple-light:#8A6B9E; --bg:#ECE3D2; --white:#F7F0DE; --gray:#DCD0BA; --muted:#9A8E94; --error:#C73E4A; }
+  :root { --yellow:#F9D200; --purple:#553D69; --purple-light:#7B5A99; --bg:#FAFAFA; --white:#fff; --gray:#F0F0F0; --muted:#888; --error:#E53E3E; }
   * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:'Mulish','Sofia Pro',sans-serif; background:var(--bg); color:#4A4248; }
+  body { font-family:'Inter',sans-serif; background:var(--bg); color:#1A1A1A; }
 
-  .urgency-bar { background:var(--purple); color:var(--white); text-align:center; font-size:13px; font-weight:600; padding:9px 16px; letter-spacing:0.02em; }
-  .urgency-bar b { color:var(--yellow); font-weight:800; }
-  .urgency-bar .pulse { display:inline-block; width:8px; height:8px; background:var(--yellow); border-radius:50%; margin-right:6px; vertical-align:1px; animation:pulse 1.4s infinite; }
-  @keyframes pulse { 0%,100% { transform:scale(1); opacity:1; } 50% { transform:scale(1.3); opacity:0.7; } }
-
-  header { background:var(--white); border-bottom:2px solid var(--purple); padding:16px 24px; display:flex; align-items:center; gap:12px; }
+  header { background:var(--white); border-bottom:2px solid var(--yellow); padding:16px 24px; display:flex; align-items:center; gap:12px; }
   .back { text-decoration:none; color:var(--muted); font-size:20px; }
   .back:hover { color:var(--purple); }
   .logo { font-size:18px; font-weight:700; color:var(--purple); letter-spacing:2px; }
-  .logo span { color:var(--purple-light); }
+  .logo span { color:var(--yellow); }
 
   .page { max-width:700px; margin:0 auto; padding:24px 16px 80px; }
-  h2 { font-size:24px; font-weight:800; color:var(--purple); margin-bottom:6px; letter-spacing:-0.01em; }
-  .page-sub { font-size:14px; color:var(--muted); margin-bottom:20px; }
-  .page-sub b { color:var(--yellow); font-weight:800; }
+  h2 { font-size:22px; font-weight:700; color:var(--purple); margin-bottom:20px; }
 
-  .trust-row { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
-  .trust-badge { flex:1; min-width:140px; background:var(--white); border:1.5px solid var(--yellow); border-radius:10px; padding:10px 12px; display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; color:var(--purple); }
-  .trust-icon { font-size:18px; }
-
-  .section { background:var(--white); border-radius:12px; padding:20px; margin-bottom:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06); position:relative; }
-  .section h3 { font-size:15px; font-weight:800; color:var(--purple); margin-bottom:16px; padding-bottom:10px; display:flex; align-items:center; gap:8px; position:relative; }
-  .section h3::after { content:""; position:absolute; left:0; bottom:0; width:40px; height:3px; background:var(--yellow); border-radius:2px; }
-  .step-num { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; background:var(--yellow); color:var(--purple); border-radius:50%; font-size:12px; font-weight:800; }
+  .section { background:var(--white); border-radius:12px; padding:20px; margin-bottom:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+  .section h3 { font-size:15px; font-weight:700; color:var(--purple); margin-bottom:16px; border-bottom:1px solid var(--gray); padding-bottom:10px; }
 
   .order-item { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--gray); font-size:14px; }
   .order-item:last-child { border-bottom:none; }
   .order-item-name { font-weight:500; }
   .order-item-price { font-weight:700; color:var(--purple); }
-  .summary-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:14px; color:var(--muted); }
-  .summary-row.total { font-size:18px; font-weight:800; color:var(--purple); border-top:2px solid var(--yellow); margin-top:8px; padding-top:12px; }
-  .free-ship { background:var(--yellow); color:var(--purple); font-weight:800; padding:2px 10px; border-radius:999px; font-size:12px; letter-spacing:0.04em; }
-  .savings-callout { margin-top:10px; background:var(--yellow); color:var(--purple); padding:10px 14px; border-radius:8px; font-size:13px; font-weight:700; text-align:center; }
-  .savings-callout b { font-weight:900; }
+  .summary-row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; color:var(--muted); }
+  .summary-row.total { font-size:17px; font-weight:700; color:var(--purple); border-top:2px solid var(--gray); margin-top:8px; padding-top:12px; }
+  .free-ship { color:#2E7D32; font-weight:600; }
 
   .form-row { display:grid; gap:14px; }
   .form-row.two { grid-template-columns:1fr 1fr; }
   .field { display:flex; flex-direction:column; gap:6px; }
   label { font-size:13px; font-weight:600; color:#444; }
-  input { padding:11px 14px; border:1.5px solid #DCD0BA; border-radius:8px; font-size:14px; font-family:'Mulish','Sofia Pro',sans-serif; transition:border-color 0.15s, box-shadow 0.15s; background:var(--white); }
-  input:focus { outline:none; border-color:var(--yellow); box-shadow:0 0 0 3px rgba(210,165,76,0.2); }
+  input { padding:11px 14px; border:1.5px solid #DDD; border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; transition:border-color 0.15s; }
+  input:focus { outline:none; border-color:var(--purple); }
   input.err { border-color:var(--error); }
   .err-msg { font-size:11px; color:var(--error); min-height:14px; }
 
-  .submit-btn { width:100%; padding:18px; background:var(--purple); color:white; border:3px solid var(--yellow); border-radius:14px; font-size:17px; font-weight:800; cursor:pointer; letter-spacing:0.02em; box-shadow:0 6px 18px rgba(100,70,120,0.25); transition:transform 0.1s, box-shadow 0.15s; }
-  .submit-btn:hover { background:var(--purple-light); transform:translateY(-1px); box-shadow:0 10px 24px rgba(210,165,76,0.35); }
-  .submit-btn:active { transform:translateY(0); }
-  .submit-btn:disabled { background:var(--gray); color:var(--muted); cursor:not-allowed; border-color:var(--gray); box-shadow:none; }
-  .submit-note { margin-top:10px; text-align:center; font-size:12px; color:var(--muted); }
-  .submit-note b { color:var(--purple); font-weight:800; }
+  .submit-btn { width:100%; padding:16px; background:var(--purple); color:white; border:none; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; }
+  .submit-btn:hover { background:var(--purple-light); }
+  .submit-btn:disabled { background:var(--gray); color:var(--muted); cursor:not-allowed; }
 
   /* Confirmation */
   .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; padding:20px; }
@@ -87,39 +61,43 @@
 
   @media (max-width:480px) { .form-row.two { grid-template-columns:1fr; } }
 </style>
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','1907078666665244');
+fbq('track','PageView');
+fbq('track','InitiateCheckout');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1907078666665244&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel -->
 </head>
 <body>
 
-<div class="urgency-bar"><span class="pulse"></span><b>Safar 01</b> · Free postcard with every order — <b>first chapter, limited run</b></div>
-
 <header>
   <a class="back" href="index.html">←</a>
-  <a href="index.html"><img src="wordmark-purple.svg" alt="Safar Lee" style="height:42px;display:block"></a>
+  <a href="index.html"><img src="logo.png" alt="SUUZZZ" style="height:42px;display:block"></a>
 </header>
 
 <div class="page">
-  <h2>Almost yours! 🎉</h2>
-  <p class="page-sub">Just <b>2 quick steps</b> away — your daily companion is waiting.</p>
-
-  <div class="trust-row">
-    <div class="trust-badge"><span class="trust-icon">✦</span>Crafted in India</div>
-    <div class="trust-badge"><span class="trust-icon">⚡</span>Ships early June · Almost there!</div>
-    <div class="trust-badge"><span class="trust-icon">🔒</span>Secure checkout</div>
-  </div>
+  <h2>Checkout</h2>
 
   <div class="section">
-    <h3><span class="step-num">1</span>Your Order</h3>
+    <h3>Your Order</h3>
     <div id="orderItems"></div>
     <div style="margin-top:12px">
       <div class="summary-row"><span>Subtotal</span><span id="subVal"></span></div>
       <div class="summary-row"><span>Shipping</span><span id="shipVal"></span></div>
       <div class="summary-row total"><span>Total</span><span id="totalVal"></span></div>
     </div>
-    <div id="savingsCallout" class="savings-callout" style="display:none"></div>
   </div>
 
   <div class="section">
-    <h3><span class="step-num">2</span>Your Details</h3>
+    <h3>Your Details</h3>
     <div class="form-row">
       <div class="field">
         <label>Full Name *</label>
@@ -140,7 +118,7 @@
   </div>
 
   <div class="section">
-    <h3><span class="step-num">3</span>Shipping Address</h3>
+    <h3>Shipping Address</h3>
     <div class="form-row">
       <div class="field">
         <label>Address *</label>
@@ -162,9 +140,7 @@
     </div>
   </div>
 
-  <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;">
   <button class="submit-btn" id="submitBtn" onclick="placeOrder()">Place Order & Pay via UPI →</button>
-  <p class="submit-note">🎁 Includes <b>free postcard</b> · 📦 Shipping <b>early June</b> — heading your way soon · 🔒 100% secure</p>
 </div>
 
 <!-- Pre-Launch Modal -->
@@ -200,7 +176,7 @@ const PRE_LAUNCH = true; // 오픈 후 false로 변경
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbx-w6hDRFn2KHhIODytmzNhNsw4nHPaxz-p4FNI2yIUEeHlrMCAnySdtVLbKzwKjU-WoA/exec';
 
-const cart = JSON.parse(localStorage.getItem('safarlee_cart') || '[]');
+const cart = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
 if (!cart.length) window.location.href = 'index.html';
 
 const sub      = cart.reduce((s, i) => s + i.price * i.qty, 0);
@@ -216,16 +192,6 @@ document.getElementById('orderItems').innerHTML = cart.map(i =>
 document.getElementById('subVal').textContent   = `₹${sub}`;
 document.getElementById('shipVal').innerHTML    = shipping === 0 ? '<span class="free-ship">FREE 🎉</span>' : `₹${shipping}`;
 document.getElementById('totalVal').textContent = `₹${total}`;
-
-const savingsEl = document.getElementById('savingsCallout');
-if (shipping === 0) {
-  savingsEl.innerHTML = '🎉 You unlocked <b>FREE shipping</b> — saving ₹80!';
-  savingsEl.style.display = 'block';
-} else {
-  const need = 2000 - sub;
-  savingsEl.innerHTML = `🚚 Add <b>₹${need}</b> more to unlock <b>FREE shipping</b>!`;
-  savingsEl.style.display = 'block';
-}
 
 const rules = [
   { id:'name',    err:'nameErr',    test: v => v.length >= 2,                  msg:'Name required' },
@@ -269,7 +235,6 @@ async function placeOrder() {
     address:  document.getElementById('address').value.trim(),
     city:     document.getElementById('city').value.trim(),
     pincode:  document.getElementById('pincode').value.trim(),
-    website:  document.getElementById('website').value.trim(),
     items:    cart.map(i => ({ sku: i.sku, qty: i.qty })),
     subtotal: sub,
   };
@@ -293,12 +258,17 @@ async function placeOrder() {
     const data = await res.json();
 
     if (data.success) {
-      localStorage.removeItem('safarlee_cart');
+      localStorage.removeItem('suuzzz_cart');
       document.getElementById('displayCode').textContent = data.orderCode;
       document.getElementById('upiBtn').href = data.upiLink;
       document.getElementById('confirmOverlay').classList.add('show');
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'purchase', { transaction_id: data.orderCode, currency: 'INR', value: total, shipping: shipping, items: cart.map(i => ({ item_id: i.sku, item_name: i.name, price: i.price, quantity: i.qty })) });
+      if (typeof fbq !== 'undefined') {
+        fbq('track','Purchase',{
+          value: total, currency:'INR',
+          content_ids: cart.map(i => i.sku),
+          content_type:'product',
+          num_items: cart.reduce((s,i)=>s+i.qty,0)
+        });
       }
     } else {
       throw new Error(data.error || 'Unknown error');
