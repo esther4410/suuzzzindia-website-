@@ -547,7 +547,7 @@ function getCatalogFeed() {
     const images   = imageMap[sku] || [];
     const imageUrl = images[0] || String(p['Image URL'] || '');
 
-    const availability = stock > 0 ? 'preorder' : 'out of stock';
+    const availability = stock > 0 ? 'in stock' : 'out of stock';
     const priceStr     = price.toFixed(2) + ' INR';
     const salePriceStr = disc > 0 ? disc.toFixed(2) + ' INR' : '';
     const link         = WEBSITE_URL + '/index.html#' + encodeURIComponent(sku);
