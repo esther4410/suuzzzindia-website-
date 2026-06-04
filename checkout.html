@@ -180,7 +180,7 @@ const cart = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
 if (!cart.length) window.location.href = 'index.html';
 
 const sub      = cart.reduce((s, i) => s + i.price * i.qty, 0);
-const shipping = sub >= 2000 ? 0 : 80;
+const shipping = sub >= 2300 ? 0 : 80;
 const total    = sub + shipping;
 
 document.getElementById('orderItems').innerHTML = cart.map(i =>
