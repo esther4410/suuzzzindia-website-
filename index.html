@@ -908,7 +908,7 @@
     position: relative;
     margin-top: 0;
     width: 100%;
-    background: rgba(210, 165, 76, 0.92);
+    background: url("banner-source.png") center/cover no-repeat, var(--bg);
     color: var(--purple-deep);
     padding: 90px 110px 100px;
     text-align: center;
@@ -988,7 +988,7 @@
 
   @media (max-width: 600px) {
     .gob-overlay { padding: 40px 14px 50px; }
-    .gob-banner { padding: 70px 60px 80px; margin-top: 0; }
+    .gob-banner { padding: 70px 60px 80px; margin-top: 0; background: url("banner-mobile.png") center/cover no-repeat, var(--bg); }
     .gob-title { font-size: 26px; }
     .gob-desc { font-size: 13px; }
     .gob-close { bottom: -48px; right: 4px; padding: 8px 14px; font-size: 11px; }
