@@ -7,7 +7,7 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --yellow:#D2A54C; --purple:#644678; --purple-light:#8A6099; --bg:#FAFAFA; --white:#fff; --gray:#F0F0F0; --muted:#888; --error:#E53E3E; }
+  :root { --yellow:#F9D200; --purple:#553D69; --purple-light:#7B5A99; --bg:#FAFAFA; --white:#fff; --gray:#F0F0F0; --muted:#888; --error:#E53E3E; }
   * { box-sizing:border-box; margin:0; padding:0; }
   body { font-family:'Inter',sans-serif; background:var(--bg); color:#1A1A1A; }
 
@@ -68,12 +68,12 @@ n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
 n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init','1907078666665244');
+fbq('init','2510037666102813');
 fbq('track','PageView');
 fbq('track','InitiateCheckout');
 </script>
 <noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1907078666665244&ev=PageView&noscript=1"/></noscript>
+src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></noscript>
 <!-- End Meta Pixel -->
 </head>
 <body>
@@ -180,7 +180,7 @@ const cart = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
 if (!cart.length) window.location.href = 'index.html';
 
 const sub      = cart.reduce((s, i) => s + i.price * i.qty, 0);
-const shipping = sub >= 2300 ? 0 : 80;
+const shipping = sub >= 2000 ? 0 : 80;
 const total    = sub + shipping;
 
 document.getElementById('orderItems').innerHTML = cart.map(i =>
