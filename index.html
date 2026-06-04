@@ -1191,7 +1191,7 @@ const COLOR_NAME = {
   mint:   '#1F8A6A',
   blue:   '#2A5FAE',
   green:  '#3D7A2A',
-  purple: '#553D69',
+  purple: '#644678',
   yellow: '#A88200',
   orange: '#B85B14',
   red:    '#B53030',
@@ -1210,7 +1210,7 @@ const COLOR_GRAD = {
   blue:   'linear-gradient(135deg, #C9DCF1, #B5CCE8)',
   green:  'linear-gradient(135deg, #D4E8C9, #C2DCB6)',
   purple: 'linear-gradient(135deg, #E0CCEA, #D0B7DD)',
-  yellow: 'linear-gradient(135deg, #FBE89A, #F9D200)',
+  yellow: 'linear-gradient(135deg, #E8C97A, #D2A54C)',
   orange: 'linear-gradient(135deg, #FBD2A8, #F8B97A)',
   red:    'linear-gradient(135deg, #F4B8B8, #EE9C9C)',
   beige:  'linear-gradient(135deg, #EDE5D9, #DBCFBE)',
@@ -1358,7 +1358,7 @@ function renderGrid() {
         </div>
         <div class="badge-row">${leftBadge || '<span></span>'}${rightBadge || '<span></span>'}</div>
         <button class="quick-view" onclick="event.stopPropagation();openProduct('${p.SKU}')" aria-label="Quick view">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${'#553D69'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${'#644678'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
       </div>`;
     } else if (imgUrl) {
@@ -1367,7 +1367,7 @@ function renderGrid() {
         <img class="slide active" src="${imgUrl}" alt="${escapeHtml(p['Product Name'])}" loading="lazy">
         <div class="badge-row">${leftBadge || '<span></span>'}${rightBadge || '<span></span>'}</div>
         <button class="quick-view" onclick="event.stopPropagation();openProduct('${p.SKU}')" aria-label="Quick view">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#553D69" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#644678" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
       </div>`;
     } else {
@@ -1375,7 +1375,7 @@ function renderGrid() {
         ${placeholder}
         <div class="badge-row">${leftBadge || '<span></span>'}${rightBadge || '<span></span>'}</div>
         <button class="quick-view" onclick="event.stopPropagation();openProduct('${p.SKU}')" aria-label="Quick view">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#553D69" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#644678" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
       </div>`;
     }
