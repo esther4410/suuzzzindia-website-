@@ -517,6 +517,65 @@ function makeUPILink(amount, code) {
   return `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&tn=${encodeURIComponent('Order ' + code)}&cu=INR`;
 }
 
+// ─── Auto Cancel ─────────────────────────────────────────────
+// 설정: Apps Script 편집기 → 트리거 추가 → autoCancelOrders → 시간 기반 → 매일
+
+function autoCancelOrders() {
+  const ss         = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const orderSheet = ss.getSheetByName('OrderLog');
+  if (!orderSheet) return;
+
+  const rows      = orderSheet.getDataRange().getValues();
+  const headers   = rows[0];
+  const statusCol = headers.indexOf('Status');
+  const dateCol   = headers.indexOf('Date');
+  const emailCol  = headers.indexOf('Email');
+  const nameCol   = headers.indexOf('Name');
+  const codeCol   = headers.indexOf('OrderCode');
+  const itemsCol  = headers.indexOf('Items');
+  if (statusCol < 0 || dateCol < 0) return;
+
+  const now    = new Date();
+  const cutoff = 48 * 60 * 60 * 1000;
+  let cancelled = 0;
+
+  for (let i = 1; i < rows.length; i++) {
+    const row    = rows[i];
+    const status = String(row[statusCol] || '').trim();
+    if (status !== 'PENDING_PAYMENT') continue;
+    const orderDate = new Date(row[dateCol]);
+    if (isNaN(orderDate.getTime()) || now - orderDate < cutoff) continue;
+
+    orderSheet.getRange(i + 1, statusCol + 1).setValue('CANCELLED');
+    restoreStock(row[itemsCol]);
+
+    const email = String(row[emailCol] || '');
+    const name  = String(row[nameCol] || '');
+    const code  = String(row[codeCol] || '');
+    if (email) sendAutoCancelEmail(email, name, code);
+    cancelled++;
+  }
+
+  Logger.log('Auto cancelled: ' + cancelled + ' orders');
+}
+
+function sendAutoCancelEmail(email, name, code) {
+  const subject = 'Your Safar Lee order has been cancelled — ' + code;
+  const body = `
+<div style="max-width:520px;margin:48px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 48px rgba(74,66,72,0.13);">
+  <div style="background:#553D69;padding:32px 40px;">
+    <h1 style="margin:0;color:#fff;font-size:22px;font-weight:700;">Order Cancelled</h1>
+  </div>
+  <div style="padding:32px 40px;">
+    <p style="color:#4A4248;font-size:15px;">Hi ${name},</p>
+    <p style="color:#9A8E94;font-size:13px;line-height:1.7;">Your order <strong>${code}</strong> was automatically cancelled because payment was not received within 48 hours.</p>
+    <p style="color:#9A8E94;font-size:13px;line-height:1.7;">If you'd still like to order, please visit our website.</p>
+    <a href="${WEBSITE_URL}" style="display:inline-block;margin-top:16px;padding:14px 28px;background:#553D69;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;">Shop Again</a>
+  </div>
+</div>`;
+  GmailApp.sendEmail(email, subject, '', { htmlBody: body, name: 'Safar Lee' });
+}
+
 // ─── Meta Catalog Feed ────────────────────────────────────────
 // URL: <Apps Script Web App URL>?action=catalog
 // Meta Commerce Manager → 카탈로그 → 데이터 피드 → 이 URL 등록
