@@ -908,11 +908,11 @@
     position: relative;
     margin-top: 0;
     width: 100%;
-    background: rgba(249, 210, 0, 0.86);
+    background: url("banner-source.png") center/cover no-repeat, var(--bg);
     color: var(--purple-deep);
     padding: 90px 110px 100px;
     text-align: center;
-    box-shadow: inset 0 -10px 30px rgba(85,61,105,0.08);
+    box-shadow: inset 0 -10px 30px rgba(100,70,120,0.08);
     /* concave four-sided "sagging banner" via SVG mask — path morphs for natural breeze motion */
     -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' preserveAspectRatio='none'><path fill='black'><animate attributeName='d' dur='7s' repeatCount='indefinite' calcMode='spline' keySplines='0.42 0 0.58 1; 0.42 0 0.58 1; 0.42 0 0.58 1; 0.42 0 0.58 1' keyTimes='0; 0.25; 0.5; 0.75; 1' values='M 3 0 Q 50 9 97 0 Q 92 25 97 50 Q 50 41 3 50 Q 8 25 3 0 Z; M 4 1 Q 52 7 96 -1 Q 91 23 96 51 Q 48 43 2 49 Q 9 25 4 1 Z; M 2 -1 Q 48 11 98 1 Q 93 27 98 49 Q 52 39 4 51 Q 7 25 2 -1 Z; M 4 1 Q 52 8 96 0 Q 91 24 95 51 Q 48 42 2 49 Q 9 26 4 1 Z; M 3 0 Q 50 9 97 0 Q 92 25 97 50 Q 50 41 3 50 Q 8 25 3 0 Z'/></path></svg>");
             mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' preserveAspectRatio='none'><path fill='black'><animate attributeName='d' dur='7s' repeatCount='indefinite' calcMode='spline' keySplines='0.42 0 0.58 1; 0.42 0 0.58 1; 0.42 0 0.58 1; 0.42 0 0.58 1' keyTimes='0; 0.25; 0.5; 0.75; 1' values='M 3 0 Q 50 9 97 0 Q 92 25 97 50 Q 50 41 3 50 Q 8 25 3 0 Z; M 4 1 Q 52 7 96 -1 Q 91 23 96 51 Q 48 43 2 49 Q 9 25 4 1 Z; M 2 -1 Q 48 11 98 1 Q 93 27 98 49 Q 52 39 4 51 Q 7 25 2 -1 Z; M 4 1 Q 52 8 96 0 Q 91 24 95 51 Q 48 42 2 49 Q 9 26 4 1 Z; M 3 0 Q 50 9 97 0 Q 92 25 97 50 Q 50 41 3 50 Q 8 25 3 0 Z'/></path></svg>");
@@ -988,7 +988,7 @@
 
   @media (max-width: 600px) {
     .gob-overlay { padding: 40px 14px 50px; }
-    .gob-banner { padding: 70px 60px 80px; margin-top: 0; }
+    .gob-banner { padding: 70px 60px 80px; margin-top: 0; background: url("banner-mobile.png") center/cover no-repeat, var(--bg); }
     .gob-title { font-size: 26px; }
     .gob-desc { font-size: 13px; }
     .gob-close { bottom: -48px; right: 4px; padding: 8px 14px; font-size: 11px; }
