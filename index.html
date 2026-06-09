@@ -652,7 +652,7 @@
   .pm-feature svg { width: 16px; height: 16px; color: var(--purple); flex-shrink: 0; }
 
   #pmVariantSelect:focus { outline: none; border-color: var(--purple); }
-  .pm-actions { margin-top: auto; padding-top: 24px; display: flex; gap: 10px; }
+  .pm-actions { margin-top: auto; padding-top: 24px; display: flex; flex-direction: column; gap: 10px; }
   .pm-add {
     flex: 1; padding: 16px;
     background: var(--purple); color: white;
@@ -1191,8 +1191,8 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
         <div class="pm-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v5"></path><polyline points="9 11 12 14 22 9"></polyline></svg> Tracking number sent</div>
       </div>
       <div class="pm-actions">
-        <button class="pm-add" id="pmAddBtn" onclick="pmAddToCart()">Add to Cart</button>
-        <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.5;">🎁 <strong style="color:var(--purple)">Pre-order customers get priority access + exclusive early-bird price.</strong> Add to cart → checkout to register.</p>
+        <button class="pm-add" id="pmAddBtn" onclick="pmAddToCart()" style="width:100%;">Add to Cart</button>
+        <p style="font-size:11px;color:var(--muted);text-align:center;line-height:1.5;">Pre-order customers get <strong style="color:var(--purple)">priority access + exclusive early-bird price.</strong> Add to cart → checkout to register.</p>
       </div>
     </div>
   </div>
