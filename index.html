@@ -707,6 +707,29 @@
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); }
 
+  /* ── PRE-LAUNCH NUDGE ───────────────────────────────────── */
+  .prelaunch-nudge {
+    position: fixed; bottom: 80px; left: 50%;
+    transform: translateX(-50%) translateY(120px);
+    background: var(--purple); color: white;
+    padding: 14px 20px 14px 18px; border-radius: 16px;
+    font-size: 13px; font-weight: 500; line-height: 1.45;
+    box-shadow: var(--shadow-2);
+    z-index: 499; opacity: 0;
+    transition: opacity .3s, transform .35s;
+    max-width: 320px; width: calc(100% - 32px);
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .prelaunch-nudge.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .prelaunch-nudge-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .prelaunch-nudge-text b { display: block; font-weight: 700; margin-bottom: 2px; }
+  .prelaunch-nudge-close {
+    position: absolute; top: 8px; right: 10px;
+    background: none; border: none; color: rgba(255,255,255,0.6);
+    font-size: 16px; cursor: pointer; line-height: 1; padding: 2px 4px;
+  }
+  @media (max-width: 600px) { .prelaunch-nudge { bottom: 90px; font-size: 12px; } }
+
   /* ── FOOTER ──────────────────────────────────────────────── */
   footer {
     background: var(--purple-deep); color: rgba(255,255,255,0.7);
@@ -1174,6 +1197,14 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
 </div>
 
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg">Added to cart</span></div>
+<div class="prelaunch-nudge" id="prelaunchNudge">
+  <div class="prelaunch-nudge-icon">🎁</div>
+  <div class="prelaunch-nudge-text">
+    <b>Register for early access</b>
+    Be first to shop — pre-order customers get priority access &amp; an exclusive early-bird discount.
+  </div>
+  <button class="prelaunch-nudge-close" onclick="dismissNudge()" aria-label="Close">✕</button>
+</div>
 
 <!-- Sticky mobile cart bar -->
 <div class="mobile-cart-bar" id="mobileCartBar">
@@ -1474,6 +1505,7 @@ function addToCart(sku, ev) {
   }
 
   showToast(`Added — ${p['Product Name']}`);
+  showNudge();
 }
 
 function addToCartWithVariant(sku, variantName, variantPrice) {
@@ -1791,6 +1823,20 @@ function closeProduct() {
   document.body.style.overflow = '';
 }
 function closePmIfBg(e) { if (e.target === document.getElementById('pmOverlay')) closeProduct(); }
+
+// ── PRE-LAUNCH NUDGE ──────────────────────────────────────
+let nudgeShown = false, nudgeTimer;
+function showNudge() {
+  if (nudgeShown) return;
+  nudgeShown = true;
+  nudgeTimer = setTimeout(() => {
+    document.getElementById('prelaunchNudge').classList.add('show');
+  }, 3000);
+}
+function dismissNudge() {
+  clearTimeout(nudgeTimer);
+  document.getElementById('prelaunchNudge').classList.remove('show');
+}
 
 // ── TOAST ─────────────────────────────────────────────────
 let toastTimer;
