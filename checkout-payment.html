@@ -248,6 +248,7 @@ async function _verifyPayment(orderCode) {
     document.getElementById('verifyingOverlay').classList.remove('show');
 
     if (data.paid) {
+      localStorage.removeItem('suuzzz_cart');
       document.getElementById('paidCode').textContent = orderCode;
       document.getElementById('paidOverlay').classList.add('show');
       if (typeof fbq !== 'undefined') {
@@ -277,26 +278,8 @@ function _showFailed(orderCode, title, msg) {
 }
 
 function retryPayment() {
-  // Go back to PhonePe for this order code
-  if (window._retryOrderCode) {
-    fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'verifyPayment', orderCode: window._retryOrderCode }),
-    })
-    .then(r => r.json())
-    .then(d => {
-      if (d.paid) {
-        document.getElementById('failedOverlay').classList.remove('show');
-        document.getElementById('paidCode').textContent = window._retryOrderCode;
-        document.getElementById('paidOverlay').classList.add('show');
-      } else {
-        window.location.href = 'index.html'; // let them start fresh
-      }
-    })
-    .catch(() => { window.location.href = 'index.html'; });
-  } else {
-    window.location.href = 'index.html';
-  }
+  // Cart is still in localStorage — go back to checkout form for a fresh attempt
+  window.location.href = 'checkout-payment.html';
 }
 
 // ── Checkout submit ──────────────────────────────────────────
@@ -341,8 +324,7 @@ async function placeOrder() {
     const data = await res.json();
 
     if (data.success && data.phonepeUrl) {
-      localStorage.removeItem('suuzzz_cart');
-      // Redirect to PhonePe payment page
+      // Cart cleared only after payment confirmed, not here
       window.location.href = data.phonepeUrl;
     } else {
       throw new Error(data.error || 'Payment setup failed. Please try again.');
