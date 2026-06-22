@@ -177,7 +177,7 @@ function createOrder(data) {
     orderSheet.appendRow([
       'OrderCode','Date','Name','Email','Phone',
       'Address','City','Pincode','Items',
-      'Subtotal','Discount','Shipping','Total','Status','TrackingNumber'
+      'Subtotal','Discount','Shipping','Total','Status','TrackingNumber','StockDeducted'
     ]);
     orderSheet.setFrozenRows(1);
   }
@@ -198,7 +198,9 @@ function createOrder(data) {
     'PENDING_PAYMENT', ''
   ]);
 
-  decrementStock(data.items);
+  const outOfStock = checkStock(data.items);
+  if (outOfStock) throw new Error(outOfStock + ' is out of stock. Please remove it from your cart.');
+
   upsertCustomer(data);
 
   const totalPaise = total * 100; // PhonePe expects amount in paise (₹1 = 100 paise)
@@ -378,7 +380,7 @@ function onOrderSheetEdit(e) {
     sendPaymentConfirmedEmail(order);
   }
   if (col === statusCol && e.value === 'CANCELLED') {
-    restoreStock(order['Items']);
+    if (order['StockDeducted'] === 'YES') restoreStock(order['Items']);
   }
   if (col === trackingCol && e.value) {
     sendShippedEmail(order, e.value);
@@ -429,6 +431,23 @@ function addPreLaunchLead(data) {
 }
 
 // ─── Stock ───────────────────────────────────────────────────
+
+function checkStock(items) {
+  const ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheets().find(s => s.getSheetId() === INVENTORY_GID);
+  const rows  = sheet.getDataRange().getValues();
+
+  for (const item of items) {
+    const baseSku = item.sku.split('|')[0];
+    for (let i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]).trim() !== baseSku) continue;
+      const stock = Number(rows[i][4] || 0);
+      if (item.qty > stock) return String(rows[i][1] || baseSku);
+      break;
+    }
+  }
+  return null;
+}
 
 function decrementStock(items) {
   const ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
@@ -674,6 +693,19 @@ function _markOrderPaid(orderCode) {
     const cur = String(rows[i][statIdx]);
     if (cur === 'CONFIRMED' || cur === 'SHIPPED' || cur === 'DELIVERED') return;
     sheet.getRange(i + 1, statIdx + 1).setValue('CONFIRMED');
+
+    // Decrement stock now that payment is confirmed
+    const itemsStr = rows[i][headers.indexOf('Items')];
+    if (itemsStr) {
+      const parsedItems = String(itemsStr).split(',').map(function(part) {
+        const m = part.trim().match(/^(.+?)\s+x(\d+)$/i);
+        return m ? { sku: m[1].trim(), qty: parseInt(m[2], 10) } : null;
+      }).filter(Boolean);
+      if (parsedItems.length) decrementStock(parsedItems);
+    }
+    const sdIdx = headers.indexOf('StockDeducted');
+    if (sdIdx >= 0) sheet.getRange(i + 1, sdIdx + 1).setValue('YES');
+
     const order = {};
     headers.forEach(function(h, idx) { order[h] = rows[i][idx]; });
     sendPaymentConfirmedEmail(order);

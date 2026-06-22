@@ -61,6 +61,14 @@
 
   @media (max-width:480px) { .form-row.two { grid-template-columns:1fr; } }
 </style>
+<!-- GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-T81CT97P1P"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-T81CT97P1P');
+</script>
 <!-- Meta Pixel -->
 <script>
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -275,6 +283,12 @@ function _showFailed(orderCode, title, msg) {
     window._retryOrderCode = orderCode;
   }
   document.getElementById('failedOverlay').classList.add('show');
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'payment_failed', { order_code: orderCode, reason: title });
+  }
+  if (typeof fbq !== 'undefined') {
+    fbq('trackCustom', 'PaymentFailed', { order_code: orderCode, reason: title });
+  }
 }
 
 function retryPayment() {
