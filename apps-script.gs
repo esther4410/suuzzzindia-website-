@@ -12,7 +12,7 @@ const PRODUCT_FOLDER_ID = '1DFOqdi4UxWgbWD4KZRzJaULbyK5XpWq2'; // Drive: 제품�
 const UPI_ID   = 'supplier@gpay';
 const UPI_NAME = 'Safar Lee';
 
-const SHIPPING_FREE_THRESHOLD = 2000;
+const SHIPPING_FREE_THRESHOLD = 2300;
 const SHIPPING_FEE = 80;
 
 const WEBSITE_URL = 'https://safarlee-website.vercel.app';
@@ -32,9 +32,14 @@ function doGet(e) {
 }
 
 function doPost(e) {
+  // PhonePe webhook: URL에 ?phonePeWebhook=1 파라미터로 구분
+  if (e.parameter && e.parameter.phonePeWebhook) {
+    return handlePhonePeWebhook(e);
+  }
   try {
     const data = JSON.parse(e.postData.contents);
     if (data.action === 'order')         return ok(createOrder(data));
+    if (data.action === 'verifyPayment') return ok(handlePaymentVerification(data));
     if (data.action === 'waitlist')      return ok(addToWaitlist(data));
     if (data.action === 'preLaunchLead') return ok(addPreLaunchLead(data));
   } catch(err) {
@@ -195,9 +200,11 @@ function createOrder(data) {
 
   decrementStock(data.items);
   upsertCustomer(data);
-  sendOrderConfirmation(data, code, total, shipping, makeUPILink(total, code));
 
-  return { success: true, orderCode: code, total, shipping, upiLink: makeUPILink(total, code) };
+  const totalPaise = total * 100; // PhonePe expects amount in paise (₹1 = 100 paise)
+  const phonepeUrl = createPhonePePayment(code, totalPaise, safe(data.phone));
+
+  return { success: true, orderCode: code, total, shipping, phonepeUrl };
 }
 
 // ─── Order Confirmation Email ─────────────────────────────────
@@ -515,6 +522,197 @@ function trackOrder(email, code) {
 
 function makeUPILink(amount, code) {
   return `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&tn=${encodeURIComponent('Order ' + code)}&cu=INR`;
+}
+
+// ─── PhonePe Payment Gateway v1 ──────────────────────────────
+//
+// SETUP (one-time):
+//   1. GCP Console → Secret Manager API 활성화
+//   2. Secret Manager에 비밀 1개 생성:
+//        phonepe-salt-key  →  PhonePe Business > Developer Settings > API Key 값
+//   3. IAM → Apps Script 서비스 계정(프로젝트번호@appspot.gserviceaccount.com)
+//        → 역할: "Secret Manager 보안 비밀 접근자" 추가
+//   4. Script Properties 등록:
+//        PHONEPE_GCP_PROJECT  →  safar-lee-stats
+//        PHONEPE_TEST_MODE    →  true  (실서비스 오픈 시 false)
+//
+// Webhook URL (PhonePe Business Dashboard > Developer Settings에 등록):
+//   <Apps Script Web App URL>?phonePeWebhook=1
+
+const PHONEPE_MERCHANT_ID = 'FABNATURAONLINE';
+const PHONEPE_SALT_IDX    = '1';
+const PHONEPE_BASE_TEST   = 'https://api-preprod.phonepe.com/apis/pg-sandbox';
+const PHONEPE_BASE_PROD   = 'https://api.phonepe.com/apis/hermes';
+
+function _isTest() {
+  return PropertiesService.getScriptProperties().getProperty('PHONEPE_TEST_MODE') !== 'false';
+}
+
+function _ppBase() {
+  return _isTest() ? PHONEPE_BASE_TEST : PHONEPE_BASE_PROD;
+}
+
+// Google Secret Manager에서 비밀 값 가져오기
+function _getSecretFromGSM(secretName) {
+  const props     = PropertiesService.getScriptProperties();
+  const projectId = props.getProperty('PHONEPE_GCP_PROJECT');
+  if (!projectId) throw new Error('PHONEPE_GCP_PROJECT not set in Script Properties');
+
+  const url = 'https://secretmanager.googleapis.com/v1/projects/'
+            + projectId + '/secrets/' + secretName + '/versions/latest:access';
+
+  const res = UrlFetchApp.fetch(url, {
+    headers:            { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
+    muteHttpExceptions: true,
+  });
+
+  if (res.getResponseCode() !== 200) {
+    throw new Error('Secret Manager: ' + secretName + ' fetch failed — ' + res.getContentText());
+  }
+
+  const p = JSON.parse(res.getContentText()).payload;
+  return Utilities.newBlob(Utilities.base64Decode(p.data)).getDataAsString();
+}
+
+function _getSaltKey() {
+  const cache  = CacheService.getScriptCache();
+  const cached = cache.get('pp_salt');
+  if (cached) return cached;
+  const salt = _getSecretFromGSM('phonepe-salt-key');
+  cache.put('pp_salt', salt, 3600);
+  return salt;
+}
+
+// SHA256 hex 계산
+function _sha256Hex(input) {
+  return Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    input,
+    Utilities.Charset.UTF_8
+  ).map(function(b) {
+    return ('0' + (b < 0 ? b + 256 : b).toString(16)).slice(-2);
+  }).join('');
+}
+
+// 결제 시작 → PhonePe 결제 페이지 URL 반환
+function createPhonePePayment(orderCode, totalPaise, phone) {
+  const saltKey     = _getSaltKey();
+  const redirectUrl = WEBSITE_URL + '/checkout-payment.html?orderCode=' + encodeURIComponent(orderCode);
+  const webhookUrl  = ScriptApp.getService().getUrl() + '?phonePeWebhook=1';
+
+  const body = {
+    merchantId:            PHONEPE_MERCHANT_ID,
+    merchantTransactionId: orderCode,
+    amount:                totalPaise,
+    redirectUrl:           redirectUrl,
+    redirectMode:          'REDIRECT',
+    callbackUrl:           webhookUrl,
+    paymentInstrument:     { type: 'PAY_PAGE' },
+  };
+  if (phone) body.mobileNumber = String(phone).replace(/\D/g, '').slice(-10);
+
+  const base64Body = Utilities.base64Encode(JSON.stringify(body));
+  const xVerify    = _sha256Hex(base64Body + '/' + saltKey) + '###' + PHONEPE_SALT_IDX;
+
+  const res = UrlFetchApp.fetch(_ppBase() + '/pg/v1/pay', {
+    method:             'post',
+    contentType:        'application/json',
+    headers:            { 'X-VERIFY': xVerify },
+    payload:            JSON.stringify({ request: base64Body }),
+    muteHttpExceptions: true,
+  });
+
+  const result = JSON.parse(res.getContentText());
+  const url    = result.data
+              && result.data.instrumentResponse
+              && result.data.instrumentResponse.redirectInfo
+              && result.data.instrumentResponse.redirectInfo.url;
+
+  if (!url) throw new Error('PhonePe pay init failed: ' + JSON.stringify(result));
+  return url;
+}
+
+// 결제 완료 여부 확인 (고객 리다이렉트 후 호출)
+function handlePaymentVerification(data) {
+  const orderCode = data && data.orderCode;
+  if (!orderCode) throw new Error('orderCode required');
+
+  const saltKey = _getSaltKey();
+  const path    = '/pg/v1/status/' + PHONEPE_MERCHANT_ID + '/' + encodeURIComponent(orderCode);
+  const xVerify = _sha256Hex(path + '/' + saltKey) + '###' + PHONEPE_SALT_IDX;
+
+  const res = UrlFetchApp.fetch(_ppBase() + path, {
+    method:             'get',
+    headers:            { 'X-VERIFY': xVerify, 'X-MERCHANT-ID': PHONEPE_MERCHANT_ID },
+    muteHttpExceptions: true,
+  });
+
+  const result = JSON.parse(res.getContentText());
+  const state  = result.data && result.data.state;
+
+  if (state === 'COMPLETED') {
+    _markOrderPaid(orderCode);
+    return { success: true, paid: true, state };
+  }
+
+  return { success: true, paid: false, state: state || 'UNKNOWN' };
+}
+
+// 주문 상태 CONFIRMED로 업데이트 + 결제 확인 이메일 발송
+function _markOrderPaid(orderCode) {
+  const ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheetByName('OrderLog');
+  if (!sheet) return;
+
+  const rows    = sheet.getDataRange().getValues();
+  const headers = rows[0];
+  const codeIdx = headers.indexOf('OrderCode');
+  const statIdx = headers.indexOf('Status');
+
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][codeIdx] !== orderCode) continue;
+    const cur = String(rows[i][statIdx]);
+    if (cur === 'CONFIRMED' || cur === 'SHIPPED' || cur === 'DELIVERED') return;
+    sheet.getRange(i + 1, statIdx + 1).setValue('CONFIRMED');
+    const order = {};
+    headers.forEach(function(h, idx) { order[h] = rows[i][idx]; });
+    sendPaymentConfirmedEmail(order);
+    return;
+  }
+}
+
+// ─── PhonePe Webhook Handler (v1) ────────────────────────────
+// PhonePe가 결제 완료 시 callbackUrl로 서버→서버 알림 전송
+// X-VERIFY: SHA256(base64payload + "/" + saltKey) + "###" + saltIndex
+
+function handlePhonePeWebhook(e) {
+  try {
+    const raw     = JSON.parse(e.postData.contents);
+    const saltKey = _getSaltKey();
+    const b64Data = raw.response || '';
+
+    // 서명 검증
+    const xVerify  = e.headers && (e.headers['X-VERIFY'] || e.headers['x-verify'] || '');
+    const expected = _sha256Hex(b64Data + '/' + saltKey) + '###' + PHONEPE_SALT_IDX;
+
+    if (xVerify && xVerify !== expected) {
+      Logger.log('PhonePe webhook: 서명 불일치, 무시');
+      return ContentService.createTextOutput('OK');
+    }
+
+    const payload   = JSON.parse(Utilities.newBlob(Utilities.base64Decode(b64Data)).getDataAsString());
+    const orderCode = payload.data && payload.data.merchantTransactionId;
+    const paid      = payload.code === 'PAYMENT_SUCCESS';
+
+    Logger.log('PhonePe webhook: ' + payload.code + ' / ' + orderCode);
+
+    if (paid && orderCode) _markOrderPaid(orderCode);
+
+    return ContentService.createTextOutput('OK');
+  } catch(err) {
+    Logger.log('PhonePe webhook error: ' + err.message);
+    return ContentService.createTextOutput('OK'); // PhonePe에 항상 200 반환
+  }
 }
 
 // ─── Auto Cancel ─────────────────────────────────────────────

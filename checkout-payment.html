@@ -140,78 +140,169 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
     </div>
   </div>
 
-  <button class="submit-btn" id="submitBtn" onclick="placeOrder()">Place Order & Pay via UPI →</button>
+  <button class="submit-btn" id="submitBtn" onclick="placeOrder()">Place Order & Pay via PhonePe →</button>
 </div>
 
-<!-- Pre-Launch Modal -->
-<div class="overlay" id="preLaunchOverlay">
+<!-- Verifying Payment Overlay (shown when returning from PhonePe) -->
+<div class="overlay" id="verifyingOverlay">
   <div class="confirm-box">
-    <div class="confirm-icon">🎉</div>
-    <h2 style="color:#644678;">You're on the list!</h2>
-    <p>You've secured <strong>priority access</strong> to our First Drop — plus an <strong>exclusive early-bird price</strong> when we launch.<br><br>We'll reach out personally the moment orders open. Limited pieces only.</p>
-    <p style="font-size:12px;color:#aaa;margin-top:8px;">Launching Mid June 2026 · Only for pre-order customers</p>
-    <a href="index.html" style="display:block;width:100%;padding:14px;background:#644678;color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;margin-top:16px;">Back to Shop</a>
+    <div class="confirm-icon">⏳</div>
+    <h2 style="color:#644678;">Verifying payment...</h2>
+    <p>Please wait while we confirm your payment with PhonePe.</p>
+    <div style="margin-top:16px;font-size:13px;color:#aaa;">Do not close this tab.</div>
   </div>
 </div>
 
-<!-- Confirmation Modal -->
-<div class="overlay" id="confirmOverlay">
+<!-- Payment Success Overlay -->
+<div class="overlay" id="paidOverlay">
   <div class="confirm-box">
-    <div class="confirm-icon">🎉</div>
-    <h2>Order Placed!</h2>
-    <p>Save your order code below — you'll need it to track your order.</p>
+    <div class="confirm-icon">✅</div>
+    <h2 style="color:#2E7D32;">Payment Confirmed!</h2>
+    <p>Your order is confirmed. We've sent a confirmation email to your inbox.</p>
     <div class="code-box">
       <small>YOUR ORDER CODE</small>
-      <strong id="displayCode">SUZ-XXXXXX</strong>
+      <strong id="paidCode">SAFAR-XXXXXX</strong>
     </div>
-    <p>We've sent your order details to your email. Tap below to complete payment via UPI. Your order ships once payment is confirmed.</p>
-    <a id="upiBtn" class="upi-btn" href="#">Pay Now via UPI 💛</a>
-    <div class="upi-note">Opens GPay / PhonePe / Paytm with amount pre-filled.<br>On desktop: use UPI app and enter the amount manually.</div>
-    <a class="track-link" href="track.html">Track my order →</a>
+    <p style="font-size:13px;color:#888;margin-top:8px;">Your order will be packed and shipped shortly. Track it below.</p>
+    <a href="track.html" style="display:block;width:100%;padding:14px;background:#644678;color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;margin-top:16px;">Track My Order →</a>
+    <a href="index.html" style="display:block;text-align:center;margin-top:12px;font-size:13px;color:#644678;font-weight:600;">← Back to Shop</a>
+  </div>
+</div>
+
+<!-- Payment Failed / Pending Overlay -->
+<div class="overlay" id="failedOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">⚠️</div>
+    <h2 style="color:#E53E3E;" id="failedTitle">Payment Incomplete</h2>
+    <p id="failedMsg">Your payment was not completed. Your order is saved — you can try again.</p>
+    <div class="code-box" id="failedCodeBox" style="display:none">
+      <small>YOUR ORDER CODE</small>
+      <strong id="failedCode">SAFAR-XXXXXX</strong>
+    </div>
+    <button onclick="retryPayment()" style="display:block;width:100%;padding:14px;background:#644678;color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;">Try Again →</button>
+    <a href="index.html" style="display:block;text-align:center;margin-top:12px;font-size:13px;color:#aaa;">Cancel — Back to Shop</a>
   </div>
 </div>
 
 <script>
-const PRE_LAUNCH = true; // 오픈 후 false로 변경
-
 const API_URL = 'https://script.google.com/macros/s/AKfycbx-w6hDRFn2KHhIODytmzNhNsw4nHPaxz-p4FNI2yIUEeHlrMCAnySdtVLbKzwKjU-WoA/exec';
 
-const cart = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
-if (!cart.length) window.location.href = 'index.html';
+// ── Returning from PhonePe? ──────────────────────────────────
+const _urlParams  = new URLSearchParams(window.location.search);
+const _returnCode = _urlParams.get('orderCode');
 
-const sub      = cart.reduce((s, i) => s + i.price * i.qty, 0);
-const shipping = sub >= 2000 ? 0 : 80;
-const total    = sub + shipping;
+if (_returnCode) {
+  // Hide the checkout form while verifying
+  document.querySelector('.page').style.display = 'none';
+  document.getElementById('verifyingOverlay').classList.add('show');
+  _verifyPayment(_returnCode);
+} else {
+  // Normal checkout — build cart summary
+  const cart = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
+  if (!cart.length) window.location.href = 'index.html';
 
-document.getElementById('orderItems').innerHTML = cart.map(i =>
-  `<div class="order-item">
-    <span class="order-item-name">${i.name} × ${i.qty}</span>
-    <span class="order-item-price">₹${i.price * i.qty}</span>
-  </div>`
-).join('');
-document.getElementById('subVal').textContent   = `₹${sub}`;
-document.getElementById('shipVal').innerHTML    = shipping === 0 ? '<span class="free-ship">FREE 🎉</span>' : `₹${shipping}`;
-document.getElementById('totalVal').textContent = `₹${total}`;
+  const sub      = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const shipping = sub >= 2300 ? 0 : 80;
+  const total    = sub + shipping;
 
-const rules = [
-  { id:'name',    err:'nameErr',    test: v => v.length >= 2,                  msg:'Name required' },
-  { id:'email',   err:'emailErr',   test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), msg:'Valid email required' },
-  { id:'phone',   err:'phoneErr',   test: v => /[\d]{7,}/.test(v),             msg:'Phone required' },
-  { id:'address', err:'addressErr', test: v => v.length >= 5,                  msg:'Address required' },
-  { id:'city',    err:'cityErr',    test: v => v.length >= 2,                  msg:'City required' },
-  { id:'pincode', err:'pincodeErr', test: v => /^\d{6}$/.test(v),              msg:'6-digit pincode required' },
-];
+  document.getElementById('orderItems').innerHTML = cart.map(i =>
+    `<div class="order-item">
+      <span class="order-item-name">${i.name} × ${i.qty}</span>
+      <span class="order-item-price">₹${i.price * i.qty}</span>
+    </div>`
+  ).join('');
+  document.getElementById('subVal').textContent   = `₹${sub}`;
+  document.getElementById('shipVal').innerHTML    = shipping === 0 ? '<span class="free-ship">FREE 🎉</span>' : `₹${shipping}`;
+  document.getElementById('totalVal').textContent = `₹${total}`;
 
-rules.forEach(r => {
-  document.getElementById(r.id).addEventListener('input', () => {
-    document.getElementById(r.id).classList.remove('err');
-    document.getElementById(r.err).textContent = '';
+  const rules = [
+    { id:'name',    err:'nameErr',    test: v => v.length >= 2,                        msg:'Name required' },
+    { id:'email',   err:'emailErr',   test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), msg:'Valid email required' },
+    { id:'phone',   err:'phoneErr',   test: v => /[\d]{7,}/.test(v),                   msg:'Phone required' },
+    { id:'address', err:'addressErr', test: v => v.length >= 5,                        msg:'Address required' },
+    { id:'city',    err:'cityErr',    test: v => v.length >= 2,                        msg:'City required' },
+    { id:'pincode', err:'pincodeErr', test: v => /^\d{6}$/.test(v),                    msg:'6-digit pincode required' },
+  ];
+
+  rules.forEach(r => {
+    document.getElementById(r.id).addEventListener('input', () => {
+      document.getElementById(r.id).classList.remove('err');
+      document.getElementById(r.err).textContent = '';
+    });
   });
-});
 
+  window._cart    = cart;
+  window._sub     = sub;
+  window._total   = total;
+  window._rules   = rules;
+}
+
+// ── Payment verification (called on return from PhonePe) ─────
+async function _verifyPayment(orderCode) {
+  try {
+    const res  = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'verifyPayment', orderCode }),
+    });
+    const data = await res.json();
+    document.getElementById('verifyingOverlay').classList.remove('show');
+
+    if (data.paid) {
+      document.getElementById('paidCode').textContent = orderCode;
+      document.getElementById('paidOverlay').classList.add('show');
+      if (typeof fbq !== 'undefined') {
+        fbq('track', 'Purchase', { currency: 'INR', content_type: 'product' });
+      }
+    } else if (data.state === 'FAILED' || data.state === 'CANCELLED') {
+      _showFailed(orderCode, 'Payment Failed', 'Your payment was declined or cancelled. Please try again.');
+    } else {
+      // PENDING or UNKNOWN — payment may still be processing
+      _showFailed(orderCode, 'Payment Pending', 'Your payment is still being processed. Please check back in a few minutes or contact us.');
+    }
+  } catch(e) {
+    document.getElementById('verifyingOverlay').classList.remove('show');
+    _showFailed(orderCode, 'Verification Error', 'Could not verify payment. Please contact team@safarlee.in with your order code.');
+  }
+}
+
+function _showFailed(orderCode, title, msg) {
+  document.getElementById('failedTitle').textContent = title;
+  document.getElementById('failedMsg').textContent   = msg;
+  if (orderCode) {
+    document.getElementById('failedCode').textContent = orderCode;
+    document.getElementById('failedCodeBox').style.display = 'block';
+    window._retryOrderCode = orderCode;
+  }
+  document.getElementById('failedOverlay').classList.add('show');
+}
+
+function retryPayment() {
+  // Go back to PhonePe for this order code
+  if (window._retryOrderCode) {
+    fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'verifyPayment', orderCode: window._retryOrderCode }),
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.paid) {
+        document.getElementById('failedOverlay').classList.remove('show');
+        document.getElementById('paidCode').textContent = window._retryOrderCode;
+        document.getElementById('paidOverlay').classList.add('show');
+      } else {
+        window.location.href = 'index.html'; // let them start fresh
+      }
+    })
+    .catch(() => { window.location.href = 'index.html'; });
+  } else {
+    window.location.href = 'index.html';
+  }
+}
+
+// ── Checkout submit ──────────────────────────────────────────
 function validate() {
   let ok = true;
-  rules.forEach(r => {
+  (window._rules || []).forEach(r => {
     const val = document.getElementById(r.id).value.trim();
     if (!r.test(val)) {
       document.getElementById(r.id).classList.add('err');
@@ -225,8 +316,11 @@ function validate() {
 async function placeOrder() {
   if (!validate()) return;
   const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = PRE_LAUNCH ? 'Saving your info...' : 'Placing order...';
+  btn.disabled    = true;
+  btn.textContent = 'Creating order...';
+
+  const cart = window._cart || [];
+  const sub  = window._sub  || 0;
 
   const payload = {
     name:     document.getElementById('name').value.trim(),
@@ -235,20 +329,9 @@ async function placeOrder() {
     address:  document.getElementById('address').value.trim(),
     city:     document.getElementById('city').value.trim(),
     pincode:  document.getElementById('pincode').value.trim(),
-    items:    cart.map(i => ({ sku: i.sku, qty: i.qty })),
+    items:    cart.map(i => ({ sku: i.sku, qty: i.qty, price: i.price })),
     subtotal: sub,
   };
-
-  if (PRE_LAUNCH) {
-    try {
-      await fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'preLaunchLead', ...payload }),
-      });
-    } catch(e) { /* silent — still show modal even if save fails */ }
-    document.getElementById('preLaunchOverlay').classList.add('show');
-    return;
-  }
 
   try {
     const res  = await fetch(API_URL, {
@@ -257,26 +340,17 @@ async function placeOrder() {
     });
     const data = await res.json();
 
-    if (data.success) {
+    if (data.success && data.phonepeUrl) {
       localStorage.removeItem('suuzzz_cart');
-      document.getElementById('displayCode').textContent = data.orderCode;
-      document.getElementById('upiBtn').href = data.upiLink;
-      document.getElementById('confirmOverlay').classList.add('show');
-      if (typeof fbq !== 'undefined') {
-        fbq('track','Purchase',{
-          value: total, currency:'INR',
-          content_ids: cart.map(i => i.sku),
-          content_type:'product',
-          num_items: cart.reduce((s,i)=>s+i.qty,0)
-        });
-      }
+      // Redirect to PhonePe payment page
+      window.location.href = data.phonepeUrl;
     } else {
-      throw new Error(data.error || 'Unknown error');
+      throw new Error(data.error || 'Payment setup failed. Please try again.');
     }
   } catch(e) {
-    alert('Error: ' + e.message + '\nPlease try again.');
-    btn.disabled = false;
-    btn.textContent = 'Place Order & Pay via UPI →';
+    alert('Error: ' + e.message);
+    btn.disabled    = false;
+    btn.textContent = 'Place Order & Pay via PhonePe →';
   }
 }
 </script>
