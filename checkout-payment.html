@@ -243,6 +243,16 @@ if (_returnCode) {
   window._sub     = sub;
   window._total   = total;
   window._rules   = rules;
+
+  const saved = sessionStorage.getItem('sf_form');
+  if (saved) {
+    try {
+      const f = JSON.parse(saved);
+      ['name','email','phone','address','city','pincode'].forEach(id => {
+        if (f[id]) document.getElementById(id).value = f[id];
+      });
+    } catch(e) {}
+  }
 }
 
 // ── Payment verification (called on return from PhonePe) ─────
@@ -257,6 +267,7 @@ async function _verifyPayment(orderCode) {
 
     if (data.paid) {
       localStorage.removeItem('suuzzz_cart');
+      sessionStorage.removeItem('sf_form');
       document.getElementById('paidCode').textContent = orderCode;
       document.getElementById('paidOverlay').classList.add('show');
       if (typeof fbq !== 'undefined') {
@@ -338,7 +349,14 @@ async function placeOrder() {
     const data = await res.json();
 
     if (data.success && data.phonepeUrl) {
-      // Cart cleared only after payment confirmed, not here
+      sessionStorage.setItem('sf_form', JSON.stringify({
+        name:    document.getElementById('name').value.trim(),
+        email:   document.getElementById('email').value.trim(),
+        phone:   document.getElementById('phone').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        city:    document.getElementById('city').value.trim(),
+        pincode: document.getElementById('pincode').value.trim(),
+      }));
       window.location.href = data.phonepeUrl;
     } else {
       throw new Error(data.error || 'Payment setup failed. Please try again.');
