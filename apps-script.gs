@@ -612,7 +612,7 @@ function createPhonePePayment(orderCode, totalPaise, phone) {
   if (phone) body.mobileNumber = String(phone).replace(/\D/g, '').slice(-10);
 
   const base64Body = Utilities.base64Encode(JSON.stringify(body));
-  const xVerify    = _sha256Hex(base64Body + '/' + saltKey) + '###' + PHONEPE_SALT_IDX;
+  const xVerify    = _sha256Hex(base64Body + '/pg/v1/pay' + saltKey) + '###' + PHONEPE_SALT_IDX;
 
   const res = UrlFetchApp.fetch(_ppBase() + '/pg/v1/pay', {
     method:             'post',
@@ -639,7 +639,7 @@ function handlePaymentVerification(data) {
 
   const saltKey = _getSaltKey();
   const path    = '/pg/v1/status/' + PHONEPE_MERCHANT_ID + '/' + encodeURIComponent(orderCode);
-  const xVerify = _sha256Hex(path + '/' + saltKey) + '###' + PHONEPE_SALT_IDX;
+  const xVerify = _sha256Hex(path + saltKey) + '###' + PHONEPE_SALT_IDX;
 
   const res = UrlFetchApp.fetch(_ppBase() + path, {
     method:             'get',
