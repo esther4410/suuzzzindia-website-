@@ -111,7 +111,7 @@ function getImageMapFromDrive() {
     if (!groups[sku]) groups[sku] = [];
     groups[sku].push({
       idx: idx,
-      url: 'https://lh3.googleusercontent.com/d/' + f.getId() + '=w1200'
+      url: 'https://drive.google.com/thumbnail?id=' + f.getId() + '&sz=w1200'
     });
   }
 
