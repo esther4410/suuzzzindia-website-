@@ -956,8 +956,8 @@
     position: relative;
     margin-top: 0;
     width: 100%;
-    background: url("banner-source.png") center/cover no-repeat, var(--bg);
-    color: var(--purple-deep);
+    background: linear-gradient(rgba(20,10,30,0.48), rgba(20,10,30,0.48)), url("banner-photo.jpg") center/cover no-repeat;
+    color: white;
     padding: 90px 110px 100px;
     text-align: center;
     box-shadow: inset 0 -10px 30px rgba(100,70,120,0.08);
@@ -1008,14 +1008,15 @@
   .gob-title {
     font-size: clamp(28px, 5vw, 38px);
     font-weight: 900; letter-spacing: -0.02em;
-    line-height: 1.1; color: var(--purple-deep);
+    line-height: 1.1; color: white;
     margin-bottom: 12px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
   }
   .gob-desc {
     font-size: 14px; line-height: 1.6;
-    color: var(--purple-deep);
-    opacity: 0.85;
+    color: rgba(255,255,255,0.88);
     max-width: 380px; margin: 0 auto;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.35);
   }
   .gob-close {
     position: absolute;
@@ -1036,7 +1037,7 @@
 
   @media (max-width: 600px) {
     .gob-overlay { padding: 40px 14px 50px; }
-    .gob-banner { padding: 70px 60px 80px; margin-top: 0; background: url("banner-mobile.png") center/cover no-repeat, var(--bg); }
+    .gob-banner { padding: 70px 60px 80px; margin-top: 0; background: linear-gradient(rgba(20,10,30,0.48), rgba(20,10,30,0.48)), url("banner-photo.jpg") center top/cover no-repeat; }
     .gob-title { font-size: 26px; }
     .gob-desc { font-size: 13px; }
     .gob-close { bottom: -48px; right: 4px; padding: 8px 14px; font-size: 11px; }
