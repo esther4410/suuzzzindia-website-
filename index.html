@@ -653,6 +653,22 @@
 
   #pmVariantSelect:focus { outline: none; border-color: var(--purple); }
   .pm-actions { margin-top: auto; padding-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+
+  /* Description */
+  .pm-desc { font-size: 13px; color: var(--ink-2); line-height: 1.6; margin: 10px 0 4px; }
+
+  /* Frequently Bought Together */
+  .pm-fbt { margin-top: 22px; }
+  .pm-fbt-title { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .pm-fbt-scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+  .pm-fbt-scroll::-webkit-scrollbar { display: none; }
+  .pm-fbt-card { flex: 0 0 120px; border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; cursor: pointer; transition: border-color .15s; }
+  .pm-fbt-card:hover { border-color: var(--purple); }
+  .pm-fbt-thumb { width: 100%; height: 90px; object-fit: cover; display: block; }
+  .pm-fbt-thumb-placeholder { width: 100%; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .pm-fbt-info { padding: 6px 8px 8px; }
+  .pm-fbt-name { font-size: 10px; font-weight: 600; color: var(--ink); line-height: 1.3; margin-bottom: 2px; }
+  .pm-fbt-price { font-size: 11px; font-weight: 700; color: var(--purple); }
   .pm-add {
     flex: 1; padding: 16px;
     background: var(--purple); color: white;
@@ -1177,6 +1193,7 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
       <div class="pm-cat" id="pmCat"></div>
       <div class="pm-name" id="pmName"></div>
       <div class="pm-sub" id="pmSub"></div>
+      <div class="pm-desc" id="pmDesc"></div>
       <div class="pm-price-row" id="pmPriceRow"></div>
       <div id="pmDimensions" style="margin:4px 0 10px;"></div>
       <div id="pmStockWrap"></div>
@@ -1189,6 +1206,10 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
         <div class="pm-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h2a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v5a3 3 0 003 3h2"></path><circle cx="12" cy="17" r="3"></circle></svg> Free ship over ₹2300</div>
         <div class="pm-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path><path d="M12 7v5l3 3"></path></svg> Pre-Order Open · Ships 1 July</div>
         <div class="pm-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v5"></path><polyline points="9 11 12 14 22 9"></polyline></svg> Tracking number sent</div>
+      </div>
+      <div class="pm-fbt" id="pmFbt" style="display:none;">
+        <div class="pm-fbt-title">Frequently Bought Together</div>
+        <div class="pm-fbt-scroll" id="pmFbtScroll"></div>
       </div>
       <div class="pm-actions">
         <button class="pm-add" id="pmAddBtn" onclick="pmAddToCart()" style="width:100%;">Add to Cart</button>
@@ -1271,6 +1292,7 @@ const FALLBACK_PRODUCTS = [
   { SKU:'01C-STRIPE-YEL', 'Product Name':'Sun Stripe Cushion Cover', Design:'Stripe', Color:'Yellow', 'Price (INR)':1490, 'Discount price (INR)':0, 'Current Stock':0, 'Image URL':'', 'Image URL 2':'' },
   { SKU:'01M-BRASS-ORG', 'Product Name':'Hand-Hammered Brass Bowl', Design:'Brass', Color:'Orange', 'Price (INR)':2290, 'Discount price (INR)':1990, 'Current Stock':2, 'Image URL':'', 'Image URL 2':'' },
   { SKU:'01M-CANDLE-BEI', 'Product Name':'Etched Tin Candle Holder', Design:'Etched', Color:'Beige', 'Price (INR)':890, 'Discount price (INR)':0, 'Current Stock':14, 'Image URL':'', 'Image URL 2':'' },
+  { SKU:'01A-FILLER-WHT', 'Product Name':'Cushion Filler Insert', Design:'Filler', Color:'White', 'Price (INR)':490, 'Discount price (INR)':0, 'Current Stock':30, 'Image URL':'', 'Image URL 2':'' },
 ];
 
 let products = [];
@@ -1331,6 +1353,7 @@ function category(p) {
   if (s.startsWith('01P')) return 'Pouches';
   if (s.startsWith('01B')) return 'Bags';
   if (s.startsWith('01C')) return 'Cushions';
+  if (s.startsWith('01A')) return 'Accessories';
   if (s.startsWith('01M')) return 'Metal';
   return 'Other';
 }
@@ -1726,6 +1749,8 @@ function openProduct(sku) {
   document.getElementById('pmCat').textContent = category({SKU:p.SKU});
   document.getElementById('pmName').textContent = p['Product Name'];
   document.getElementById('pmSub').textContent = `${p.Design || ''} · ${p.Color || ''}`;
+  const descEl = document.getElementById('pmDesc');
+  if (descEl) { descEl.textContent = p['Description'] || ''; descEl.style.display = p['Description'] ? '' : 'none'; }
 
   const price = Number(p['Price (INR)']) || 0;
   const disc  = Number(p['Discount price (INR)']) || 0;
@@ -1750,19 +1775,24 @@ function openProduct(sku) {
     stockWrap.innerHTML = `<div class="pm-stock-line"><span class="dot-stock"></span>In stock — est. delivery early June</div>`;
   }
 
-  // Variants
-  const v1n = p['Variant 1 Name'] || '';
-  const v1p = Number(p['Variant 1 Price']) || 0;
-  const v2n = p['Variant 2 Name'] || '';
-  const v2p = Number(p['Variant 2 Price']) || 0;
+  // Variants (filter out "Cover Only" option — cushions now include filler)
+  const isCushion = (p.SKU || '').startsWith('01C');
+  const coverOnlyPattern = /cover\s*only/i;
+  const rawVariants = [
+    { name: p['Variant 1 Name'] || '', price: Number(p['Variant 1 Price']) || 0 },
+    { name: p['Variant 2 Name'] || '', price: Number(p['Variant 2 Price']) || 0 },
+  ].filter(v => v.name && !(isCushion && coverOnlyPattern.test(v.name)));
   const variantWrap = document.getElementById('pmVariantWrap');
   const variantSel  = document.getElementById('pmVariantSelect');
-  if (v1n) {
+  if (rawVariants.length) {
     variantSel.innerHTML = '';
-    variantSel.appendChild(Object.assign(document.createElement('option'), { value: `${v1n}|${v1p || (onSale ? disc : price)}`, textContent: v1p ? `${v1n} — ₹${v1p}` : v1n }));
-    if (v2n) variantSel.appendChild(Object.assign(document.createElement('option'), { value: `${v2n}|${v2p || (onSale ? disc : price)}`, textContent: v2p ? `${v2n} — ₹${v2p}` : v2n }));
+    rawVariants.forEach(v => {
+      variantSel.appendChild(Object.assign(document.createElement('option'), {
+        value: `${v.name}|${v.price || (onSale ? disc : price)}`,
+        textContent: v.price ? `${v.name} — ₹${v.price}` : v.name,
+      }));
+    });
     variantWrap.style.display = 'block';
-    // Set initial price to first variant
     onVariantChange();
   } else {
     variantWrap.style.display = 'none';
@@ -1789,6 +1819,36 @@ function openProduct(sku) {
   } else {
     arrows.style.display = 'none';
     dots.innerHTML = '';
+  }
+
+  // Frequently Bought Together
+  const fbtWrap = document.getElementById('pmFbt');
+  const fbtScroll = document.getElementById('pmFbtScroll');
+  const design = (p.Design || '').trim().toLowerCase();
+  let fbtItems = products.filter(x => x.SKU !== sku && (x.Design || '').trim().toLowerCase() === design);
+  if (isCushion) {
+    const filler = products.find(x => (x.SKU || '').startsWith('01A'));
+    if (filler) fbtItems = [filler, ...fbtItems.filter(x => x.SKU !== (filler.SKU))];
+  }
+  if (fbtItems.length) {
+    fbtScroll.innerHTML = fbtItems.map(x => {
+      const xImg = driveUrl(x['Image URL']);
+      const xPrice = Number(x['Discount price (INR)']) || Number(x['Price (INR)']) || 0;
+      const xCk = (x.Color || '').toLowerCase();
+      const thumb = xImg
+        ? `<img class="pm-fbt-thumb" src="${xImg}" alt="${escapeHtml(x['Product Name'])}" loading="lazy">`
+        : `<div class="pm-fbt-thumb-placeholder" style="background:${COLOR_GRAD[xCk]||COLOR_GRAD.purple}">${COLOR_INITIAL(x.Color)}</div>`;
+      return `<div class="pm-fbt-card" onclick="closeProduct();setTimeout(()=>openProduct('${x.SKU}'),200)">
+        ${thumb}
+        <div class="pm-fbt-info">
+          <div class="pm-fbt-name">${escapeHtml(x['Product Name'])}</div>
+          <div class="pm-fbt-price">₹${xPrice}</div>
+        </div>
+      </div>`;
+    }).join('');
+    fbtWrap.style.display = '';
+  } else {
+    fbtWrap.style.display = 'none';
   }
 
   document.getElementById('pmOverlay').classList.add('open');
