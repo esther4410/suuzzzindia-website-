@@ -1247,7 +1247,7 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
 // ── CONFIG ────────────────────────────────────────────────
 const API_URL = 'https://script.google.com/macros/s/AKfycbx-w6hDRFn2KHhIODytmzNhNsw4nHPaxz-p4FNI2yIUEeHlrMCAnySdtVLbKzwKjU-WoA/exec';
 const CACHE_KEY = 'suuzzz_products_v2';
-const CACHE_TTL = 5 * 60 * 1000;
+const CACHE_TTL = 24 * 60 * 60 * 1000;
 const FREE_SHIP_THRESHOLD = 2000;
 
 // Color → product-name accent (vivid but readable on white card)
@@ -1284,18 +1284,7 @@ const COLOR_GRAD = {
 };
 const COLOR_INITIAL = c => (c||'?')[0]?.toUpperCase() || '✦';
 
-// Sample fallback products — used if API fails. Designed to be representative.
-const FALLBACK_PRODUCTS = [
-  { SKU:'01P-BLOOM-PNK', 'Product Name':'Bloom Coin Pouch', Design:'Bloom', Color:'Pink', 'Price (INR)':480, 'Discount price (INR)':380, 'Current Stock':12, 'Image URL':'', 'Image URL 2':'' },
-  { SKU:'01P-MEADOW-MNT', 'Product Name':'Meadow Pouch', Design:'Meadow', Color:'Mint', 'Price (INR)':520, 'Discount price (INR)':0, 'Current Stock':3, 'Image URL':'', 'Image URL 2':'' },
-  { SKU:'01B-TOTE-BLU', 'Product Name':'Everyday Block-Print Tote', Design:'Block', Color:'Blue', 'Price (INR)':1490, 'Discount price (INR)':1190, 'Current Stock':6, 'Image URL':'', 'Image URL 2':'' },
-  { SKU:'01B-MARKET-GRN', 'Product Name':'Market Bag in Forest Green', Design:'Market', Color:'Green', 'Price (INR)':1290, 'Discount price (INR)':0, 'Current Stock':9, 'Image URL':'', 'Image URL 2':'' },
-  { SKU:'01C-FLORAL-PUR', 'Product Name':'Floral Linen Cushion Cover', Design:'Floral', Color:'Purple', 'Price (INR)':1690, 'Discount price (INR)':1390, 'Current Stock':4, 'Image URL':'', 'Image URL 2':'' },
-  { SKU:'01C-STRIPE-YEL', 'Product Name':'Sun Stripe Cushion Cover', Design:'Stripe', Color:'Yellow', 'Price (INR)':1490, 'Discount price (INR)':0, 'Current Stock':0, 'Image URL':'', 'Image URL 2':'' },
-  { SKU:'01M-BRASS-ORG', 'Product Name':'Hand-Hammered Brass Bowl', Design:'Brass', Color:'Orange', 'Price (INR)':2290, 'Discount price (INR)':1990, 'Current Stock':2, 'Image URL':'', 'Image URL 2':'' },
-  { SKU:'01M-CANDLE-BEI', 'Product Name':'Etched Tin Candle Holder', Design:'Etched', Color:'Beige', 'Price (INR)':890, 'Discount price (INR)':0, 'Current Stock':14, 'Image URL':'', 'Image URL 2':'' },
-  { SKU:'01A-FILLER-WHT', 'Product Name':'Cushion Filler Insert', Design:'Filler', Color:'White', 'Price (INR)':490, 'Discount price (INR)':0, 'Current Stock':30, 'Image URL':'', 'Image URL 2':'' },
-];
+const FALLBACK_PRODUCTS = [];
 
 let products = [];
 let cart = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
@@ -1477,7 +1466,7 @@ function renderGrid() {
   list.forEach((p, i) => {
     const sid = `sl-${p.SKU}`;
     const total = [p['Image URL'], p['Image URL 2'], p['Image URL 3'], p['Image URL 4'], p['Image URL 5']].filter(x => driveUrl(x)).length;
-    if (total > 1) startCardAuto(sid, total, i % 2 === 0 ? 0 : 2000);
+    if (total > 1) startCardAuto(sid, total, (i % 4) * 1000);
   });
 }
 
