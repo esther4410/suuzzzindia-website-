@@ -1474,10 +1474,10 @@ function renderGrid() {
 
   // 이미지 여러 장인 카드 자동 넘김 시작
   Object.keys(_cardTimers).forEach(id => { clearInterval(_cardTimers[id]); delete _cardTimers[id]; });
-  list.forEach(p => {
+  list.forEach((p, i) => {
     const sid = `sl-${p.SKU}`;
     const total = [p['Image URL'], p['Image URL 2'], p['Image URL 3'], p['Image URL 4'], p['Image URL 5']].filter(x => driveUrl(x)).length;
-    if (total > 1) startCardAuto(sid, total);
+    if (total > 1) startCardAuto(sid, total, i % 2 === 0 ? 0 : 2000);
   });
 }
 
@@ -1714,13 +1714,17 @@ function goSlide(sid, idx) {
 }
 
 const _cardTimers = {};
-function startCardAuto(sid, total) {
+function startCardAuto(sid, total, delay) {
   if (_cardTimers[sid]) return;
   let cur = 0;
-  _cardTimers[sid] = setInterval(() => {
-    cur = (cur + 1) % total;
-    goSlide(sid, cur);
-  }, 1800);
+  const start = () => {
+    _cardTimers[sid] = setInterval(() => {
+      cur = (cur + 1) % total;
+      goSlide(sid, cur);
+    }, 4000);
+  };
+  if (delay) setTimeout(start, delay);
+  else start();
 }
 function stopCardAuto(sid) {
   clearInterval(_cardTimers[sid]);
