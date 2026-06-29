@@ -1466,7 +1466,7 @@ function renderGrid() {
   list.forEach((p, i) => {
     const sid = `sl-${p.SKU}`;
     const total = [p['Image URL'], p['Image URL 2'], p['Image URL 3'], p['Image URL 4'], p['Image URL 5']].filter(x => driveUrl(x)).length;
-    if (total > 1) startCardAuto(sid, total, (i % 4) * 1000);
+    if (total > 1) startCardAuto(sid, total, (i % 2) * 2500);
   });
 }
 
@@ -1710,7 +1710,7 @@ function startCardAuto(sid, total, delay) {
     _cardTimers[sid] = setInterval(() => {
       cur = (cur + 1) % total;
       goSlide(sid, cur);
-    }, 4000);
+    }, 5000);
   };
   if (delay) setTimeout(start, delay);
   else start();
