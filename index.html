@@ -1383,7 +1383,15 @@ function renderGrid() {
     return;
   }
 
-  grid.innerHTML = list.map(p => {
+  const acc = list.filter(p => (p.SKU || '').startsWith('01A'));
+  const rest = list.filter(p => !(p.SKU || '').startsWith('01A'));
+  for (let i = rest.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [rest[i], rest[j]] = [rest[j], rest[i]];
+  }
+  const shuffled = [...rest, ...acc];
+
+  grid.innerHTML = shuffled.map(p => {
     const stock = Number(p['Current Stock']) || 0;
     const price = Number(p['Price (INR)']) || 0;
     const disc  = Number(p['Discount price (INR)']) || 0;
@@ -1463,7 +1471,7 @@ function renderGrid() {
 
   // 이미지 여러 장인 카드 자동 넘김 시작
   Object.keys(_cardTimers).forEach(id => { clearInterval(_cardTimers[id]); delete _cardTimers[id]; });
-  list.forEach((p, i) => {
+  shuffled.forEach((p, i) => {
     const sid = `sl-${p.SKU}`;
     const total = [p['Image URL'], p['Image URL 2'], p['Image URL 3'], p['Image URL 4'], p['Image URL 5']].filter(x => driveUrl(x)).length;
     if (total > 1) startCardAuto(sid, total, (i % 2) * 2500);
