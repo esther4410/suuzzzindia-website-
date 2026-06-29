@@ -1407,6 +1407,7 @@ function renderGrid() {
     const imgUrl2 = driveUrl(p['Image URL 2']);
     const ck      = (p.Color || '').toLowerCase();
     const sid     = `sl-${p.SKU}`;
+    const cardImgs = [imgUrl, imgUrl2, driveUrl(p['Image URL 3']), driveUrl(p['Image URL 4']), driveUrl(p['Image URL 5'])].filter(Boolean);
 
     // Badges: sale on left, limited stock on right
     const leftBadge = onSale ? `<span class="badge badge-sale">−${savePct}% OFF</span>` : '';
@@ -1415,32 +1416,21 @@ function renderGrid() {
     // Media
     let media;
     const placeholder = `<div class="card-placeholder" style="background:${COLOR_GRAD[ck] || COLOR_GRAD.purple}"><span style="color:white;font-weight:800;font-size:38px;letter-spacing:.04em;text-shadow:0 2px 6px rgba(0,0,0,.15)">${COLOR_INITIAL(p.Color)}</span></div>`;
-    if (imgUrl && imgUrl2) {
-      media = `<div class="card-media" id="${sid}" onclick="openProduct('${p.SKU}')">
+    {
+      const hasImgs = cardImgs.length > 0;
+      const slides = cardImgs.map((u, i) =>
+        `<img class="slide${i===0?' active':''}" src="${u}" alt="${escapeHtml(p['Product Name'])}" loading="lazy">`
+      ).join('');
+      const dots = cardImgs.length > 1
+        ? `<div class="slide-dots">${cardImgs.map((_, i) =>
+            `<div class="dot${i===0?' active':''}" onclick="event.stopPropagation();goSlide('${sid}',${i})"></div>`
+          ).join('')}</div>`
+        : '';
+      const hoverAttr = '';
+      media = `<div class="card-media" id="${sid}" onclick="openProduct('${p.SKU}')" ${hoverAttr}>
         ${placeholder}
-        <img class="slide active" src="${imgUrl}" alt="${escapeHtml(p['Product Name'])}" loading="lazy" onload="this.style.opacity=1">
-        <img class="slide" src="${imgUrl2}" alt="${escapeHtml(p['Product Name'])}" loading="lazy">
-        <div class="slide-dots">
-          <div class="dot active" onclick="event.stopPropagation();goSlide('${sid}',0)"></div>
-          <div class="dot" onclick="event.stopPropagation();goSlide('${sid}',1)"></div>
-        </div>
-        <div class="badge-row">${leftBadge || '<span></span>'}${rightBadge || '<span></span>'}</div>
-        <button class="quick-view" onclick="event.stopPropagation();openProduct('${p.SKU}')" aria-label="Quick view">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${'#553D69'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-      </div>`;
-    } else if (imgUrl) {
-      media = `<div class="card-media" onclick="openProduct('${p.SKU}')">
-        ${placeholder}
-        <img class="slide active" src="${imgUrl}" alt="${escapeHtml(p['Product Name'])}" loading="lazy">
-        <div class="badge-row">${leftBadge || '<span></span>'}${rightBadge || '<span></span>'}</div>
-        <button class="quick-view" onclick="event.stopPropagation();openProduct('${p.SKU}')" aria-label="Quick view">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#553D69" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-      </div>`;
-    } else {
-      media = `<div class="card-media" onclick="openProduct('${p.SKU}')">
-        ${placeholder}
+        ${hasImgs ? slides : ''}
+        ${dots}
         <div class="badge-row">${leftBadge || '<span></span>'}${rightBadge || '<span></span>'}</div>
         <button class="quick-view" onclick="event.stopPropagation();openProduct('${p.SKU}')" aria-label="Quick view">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#553D69" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -1481,6 +1471,14 @@ function renderGrid() {
         </div>
       </article>`;
   }).join('');
+
+  // 이미지 여러 장인 카드 자동 넘김 시작
+  Object.keys(_cardTimers).forEach(id => { clearInterval(_cardTimers[id]); delete _cardTimers[id]; });
+  list.forEach(p => {
+    const sid = `sl-${p.SKU}`;
+    const total = [p['Image URL'], p['Image URL 2'], p['Image URL 3'], p['Image URL 4'], p['Image URL 5']].filter(x => driveUrl(x)).length;
+    if (total > 1) startCardAuto(sid, total);
+  });
 }
 
 function escapeHtml(s) {
@@ -1713,6 +1711,20 @@ function goSlide(sid, idx) {
   if (!el) return;
   el.querySelectorAll('.slide').forEach((s, i) => s.classList.toggle('active', i === idx));
   el.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+
+const _cardTimers = {};
+function startCardAuto(sid, total) {
+  if (_cardTimers[sid]) return;
+  let cur = 0;
+  _cardTimers[sid] = setInterval(() => {
+    cur = (cur + 1) % total;
+    goSlide(sid, cur);
+  }, 1800);
+}
+function stopCardAuto(sid) {
+  clearInterval(_cardTimers[sid]);
+  delete _cardTimers[sid];
 }
 
 function openCart() {
