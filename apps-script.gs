@@ -11,7 +11,7 @@ const PRODUCT_FOLDER_ID = '1DFOqdi4UxWgbWD4KZRzJaULbyK5XpWq2'; // Drive: 제품�
 
 const UPI_ID   = 'supplier@gpay';
 const UPI_NAME = 'Safar Lee';
-
+vscode-webview://1njmj48uur7t7ls494leq0eu0ujto368q32t8cdegep05ttaonit/Safar%20Lee/Marketing/C4%20-%20Odd%20Nature%20Reveal%20Film.md
 const SHIPPING_FREE_THRESHOLD = 2300;
 const SHIPPING_FEE = 80;
 
@@ -73,6 +73,9 @@ function getProducts() {
       // 프론트엔드 호환: 시트 Image URL 필드 덮어쓰기
       if (imgs[0]) p['Image URL']   = imgs[0];
       if (imgs[1]) p['Image URL 2'] = imgs[1];
+      if (imgs[2]) p['Image URL 3'] = imgs[2];
+      if (imgs[3]) p['Image URL 4'] = imgs[3];
+      if (imgs[4]) p['Image URL 5'] = imgs[4];
 
       return p;
     })

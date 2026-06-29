@@ -567,8 +567,9 @@
     overflow: hidden;
   }
   .pm-img-side img {
-    width: 100%; height: 100%; object-fit: cover;
+    width: 100%; height: 100%; object-fit: contain;
     aspect-ratio: 1;
+    background: #fff;
   }
   .pm-arrows {
     position: absolute; inset: 0;
@@ -1185,8 +1186,8 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
     <div class="pm-img-side" id="pmImgSide">
       <img id="pmImg" src="" alt="">
       <div class="pm-arrows" id="pmArrows" style="display:none">
-        <button class="pm-arrow" onclick="pmSlide(-1)" aria-label="Previous">‹</button>
-        <button class="pm-arrow" onclick="pmSlide(1)" aria-label="Next">›</button>
+        <button class="pm-arrow" onclick="pmGoTo((pmIdx-1+pmImgs.length)%pmImgs.length,true)" aria-label="Previous">‹</button>
+        <button class="pm-arrow" onclick="pmGoTo((pmIdx+1)%pmImgs.length,true)" aria-label="Next">›</button>
       </div>
       <div class="pm-dots" id="pmDots"></div>
     </div>
@@ -1727,13 +1728,19 @@ function closeCart() {
 function goCheckout() { if (cart.length) window.location.href = 'checkout-payment.html'; }
 
 // ── PRODUCT MODAL ─────────────────────────────────────────
-let pmSku = null, pmImgs = [], pmIdx = 0;
+let pmSku = null, pmImgs = [], pmIdx = 0, pmAutoTimer = null;
 
 function openProduct(sku) {
   const p = products.find(x => x.SKU === sku);
   if (!p) return;
   pmSku = sku;
-  pmImgs = [driveUrl(p['Image URL']), driveUrl(p['Image URL 2'])].filter(Boolean);
+  pmImgs = [
+    driveUrl(p['Image URL']),
+    driveUrl(p['Image URL 2']),
+    driveUrl(p['Image URL 3']),
+    driveUrl(p['Image URL 4']),
+    driveUrl(p['Image URL 5']),
+  ].filter(Boolean);
   pmIdx = 0;
 
   const ck = (p.Color || '').toLowerCase();
@@ -1816,11 +1823,16 @@ function openProduct(sku) {
   if (pmImgs.length > 1) {
     arrows.style.display = 'flex';
     dots.innerHTML = pmImgs.map((_, i) =>
-      `<div class="dot${i===0?' active':''}" style="cursor:pointer" onclick="pmGoTo(${i})"></div>`
+      `<div class="dot${i===0?' active':''}" style="cursor:pointer" onclick="pmGoTo(${i},true)"></div>`
     ).join('');
   } else {
     arrows.style.display = 'none';
     dots.innerHTML = '';
+  }
+
+  clearInterval(pmAutoTimer);
+  if (pmImgs.length > 1) {
+    pmAutoTimer = setInterval(() => pmSlide(1), 4000);
   }
 
   // Frequently Bought Together
@@ -1865,11 +1877,15 @@ function onVariantChange() {
   document.getElementById('pmPriceRow').innerHTML = `<span class="pm-price">₹${variantPrice}</span>`;
 }
 
-function pmGoTo(idx) {
+function pmGoTo(idx, resetTimer = false) {
   pmIdx = idx;
   document.getElementById('pmImg').src = pmImgs[idx];
   document.getElementById('pmDots').querySelectorAll('.dot')
     .forEach((d, i) => d.classList.toggle('active', i === idx));
+  if (resetTimer && pmImgs.length > 1) {
+    clearInterval(pmAutoTimer);
+    pmAutoTimer = setInterval(() => pmSlide(1), 4000);
+  }
 }
 function pmSlide(dir) { pmGoTo((pmIdx + dir + pmImgs.length) % pmImgs.length); }
 function pmAddToCart() {
@@ -1886,6 +1902,8 @@ function pmAddToCart() {
   }
 }
 function closeProduct() {
+  clearInterval(pmAutoTimer);
+  pmAutoTimer = null;
   document.getElementById('pmOverlay').classList.remove('open');
   document.body.style.overflow = '';
 }
