@@ -1180,7 +1180,7 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
       </div>
     </div>
   </div>
-  <div class="cat-banner cat-banner--metal" onclick="shopCategory('Metal')">
+  <div class="cat-banner cat-banner--metal" onclick="shopCategory('Trays')">
     <img src="banner2.jpg" alt="Metal Tableware">
     <div class="cat-banner-overlay">
       <div class="cat-banner-label">Handcrafted in India</div>
@@ -1418,10 +1418,10 @@ async function init() {
 
 function category(p) {
   const s = p.SKU || '';
-  if (s.startsWith('01P')) return 'Pouches';
-  if (s.startsWith('01B')) return 'Bags';
-  if (s.startsWith('01C')) return 'Cushions';
-  if (s.startsWith('01A')) return 'Accessories';
+  if (s.startsWith('02P')) return 'Pouches';
+  if (s.startsWith('02B')) return 'Bags';
+  if (s.startsWith('02C')) return 'Cushions';
+  if (s.startsWith('02A')) return 'Accessories';
   if (s.startsWith('01T')) return 'Trays';
   if (s.startsWith('01M')) return 'Metal';
   return 'Other';
