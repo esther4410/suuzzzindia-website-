@@ -134,7 +134,7 @@ async function doTrack() {
 function renderOrder(o) {
   const s = STATUS[o.Status] || STATUS.PENDING_PAYMENT;
   const tracking = o.TrackingNumber
-    ? `<a class="track-link-el" href="https://shiprocket.co/tracking/${o.TrackingNumber}" target="_blank">${o.TrackingNumber} →</a>`
+    ? `<a class="track-link-el" href="https://www.trackoncourier.com/track.aspx?no=${encodeURIComponent(o.TrackingNumber)}" target="_blank">${o.TrackingNumber} →</a>`
     : `<span style="color:var(--muted)">Not shipped yet</span>`;
 
   document.getElementById('result').innerHTML = `
