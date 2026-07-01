@@ -1465,8 +1465,8 @@ function renderGrid() {
     return;
   }
 
-  const acc = list.filter(p => (p.SKU || '').startsWith('01A'));
-  const rest = list.filter(p => !(p.SKU || '').startsWith('01A'));
+  const acc = list.filter(p => (p.SKU || '').startsWith('02A'));
+  const rest = list.filter(p => !(p.SKU || '').startsWith('02A'));
   for (let i = rest.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [rest[i], rest[j]] = [rest[j], rest[i]];
@@ -1880,7 +1880,7 @@ function openProduct(sku) {
   }
 
   // Variants (filter out "Cover Only" option — cushions now include filler)
-  const isCushion = (p.SKU || '').startsWith('01C');
+  const isCushion = (p.SKU || '').startsWith('02C');
   const coverOnlyPattern = /cover\s*only/i;
   const rawVariants = [
     { name: p['Variant 1 Name'] || '', price: Number(p['Variant 1 Price']) || 0 },
@@ -1936,7 +1936,7 @@ function openProduct(sku) {
   const design = (p.Design || '').trim().toLowerCase();
   let fbtItems = products.filter(x => x.SKU !== sku && (x.Design || '').trim().toLowerCase() === design);
   if (isCushion) {
-    const filler = products.find(x => (x.SKU || '').startsWith('01A'));
+    const filler = products.find(x => (x.SKU || '').startsWith('02A'));
     if (filler) fbtItems = [filler, ...fbtItems.filter(x => x.SKU !== (filler.SKU))];
   }
   if (fbtItems.length) {
