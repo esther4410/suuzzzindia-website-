@@ -58,6 +58,11 @@
   .thread-a-label{font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
   .thread-a{font-size:13px;color:var(--ink-2);line-height:1.6}
   .empty-msg{text-align:center;color:var(--muted);font-size:14px;padding:24px 0}
+  .notice{background:linear-gradient(135deg,#2C1F3E 0%,#3D2558 100%);border-radius:var(--r-lg);padding:20px 22px;margin-bottom:32px;border-left:4px solid var(--yellow)}
+  .notice-label{font-size:10px;font-weight:800;color:var(--yellow);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+  .notice-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:10px;line-height:1.4}
+  .notice-body{font-size:13px;color:rgba(255,255,255,.80);line-height:1.7}
+  .notice-body strong{color:#fff}
 </style>
 </head>
 <body>
@@ -70,6 +75,15 @@
 <div class="page">
   <h1 class="page-title">Help &amp; Q&amp;A</h1>
   <p class="page-sub">Frequently asked questions below. Can't find your answer? Leave us a message — we reply within 1–2 business days.</p>
+
+  <div class="notice">
+    <div class="notice-label">📦 Shipping Notice</div>
+    <div class="notice-title">Your order may arrive in 2 separate packages</div>
+    <div class="notice-body">
+      <strong>Textile items</strong> (pouches, cushions, bags) and <strong>Metal trays</strong> ship from separate warehouses and may arrive on different days.<br>
+      You will receive <strong>individual tracking numbers</strong> for each shipment — this is completely normal. No need to worry!
+    </div>
+  </div>
 
   <div class="sec-title">Frequently Asked Questions</div>
   <div class="faq-list" id="faqList"></div>
@@ -95,18 +109,18 @@
         <label>Category <span class="req">*</span></label>
         <select id="qCat">
           <option value="">Select category…</option>
-          <option value="배송문의">배송 / Shipping</option>
-          <option value="교환·반품">교환·반품 / Returns</option>
-          <option value="제품문의">제품 / Product</option>
-          <option value="결제문의">결제 / Payment</option>
-          <option value="기타">기타 / Other</option>
+          <option value="Shipping">Shipping</option>
+          <option value="Returns & Exchange">Returns &amp; Exchange</option>
+          <option value="Product">Product</option>
+          <option value="Payment">Payment</option>
+          <option value="Other">Other</option>
         </select>
       </div>
     </div>
     <div class="field">
       <label>Question <span class="req">*</span></label>
       <textarea id="qText" placeholder="Tell us what you need help with…"></textarea>
-      <p class="hint">📷 사진이 있으면 Instagram DM 또는 WhatsApp으로 보내주세요.</p>
+      <p class="hint">📷 If you have photos (e.g. damaged item), please send them via Instagram DM <a href="https://instagram.com/safarlee.in" target="_blank" style="color:var(--purple)">@safarlee.in</a> or WhatsApp.</p>
     </div>
     <button class="submit-btn" id="submitBtn" onclick="submitQuestion()">Send Message →</button>
     <div class="success-msg" id="successMsg">✅ Message sent! We'll reply within 1–2 business days. Check your inbox for updates.</div>
@@ -129,18 +143,22 @@
 const API = 'https://script.google.com/macros/s/AKfycbx-w6hDRFn2KHhIODytmzNhNsw4nHPaxz-p4FNI2yIUEeHlrMCAnySdtVLbKzwKjU-WoA/exec';
 
 const FAQS = [
-  { q: '주문 후 배송까지 얼마나 걸리나요? / How long does shipping take?',
-    a: '주문 확인 후 2–4일 내 발송됩니다. 발송 시 운송장 번호를 이메일로 안내드립니다.<br><br>After payment is confirmed, orders are shipped within 2–4 business days. You\'ll receive a tracking number by email.' },
-  { q: '배송비는 얼마인가요? / What is the shipping fee?',
-    a: '₹2,300 이상 구매 시 무료 배송입니다. 미만 구매 시 ₹80이 부과됩니다.<br><br>Free shipping on orders over ₹2,300. A flat fee of ₹80 applies to orders below that.' },
-  { q: '주문 취소 또는 변경이 가능한가요? / Can I cancel or change my order?',
-    a: '발송 전(CONFIRMED 상태)에는 취소 가능합니다. 발송 후에는 취소가 불가합니다. 아래 문의 폼으로 연락해 주세요.<br><br>Cancellations are accepted before dispatch (status: CONFIRMED). Once shipped, cancellations are not possible.' },
-  { q: '제품이 파손되어 도착했어요 / My item arrived damaged.',
-    a: '정말 죄송합니다. 파손 사진을 Instagram DM 또는 WhatsApp으로 보내주시면 교환 또는 환불 처리해 드리겠습니다.<br><br>We\'re so sorry! Please send photos via Instagram DM or WhatsApp and we\'ll arrange an exchange or refund.' },
-  { q: '교환·반품은 어떻게 하나요? / How do I return or exchange?',
-    a: '수령 후 7일 이내, 미사용·미세탁 상태의 제품만 가능합니다. 아래 문의 폼으로 연락해 주세요.<br><br>Returns accepted within 7 days of receipt for unused, unwashed items only. Contact us via the form below.' },
-  { q: '결제는 어떤 방법으로 할 수 있나요? / What payment methods do you accept?',
-    a: 'PhonePe, GPay, Paytm 등 UPI 결제를 지원합니다. 주문 완료 후 결제 링크가 자동 발송됩니다.<br><br>We accept UPI payments (PhonePe, GPay, Paytm). A payment link is sent automatically after placing your order.' },
+  { q: 'How long does shipping take?',
+    a: 'Orders are shipped within 2–4 business days after payment is confirmed. You\'ll receive a tracking number by email once dispatched.' },
+  { q: 'What is the shipping fee?',
+    a: 'Free shipping on orders over ₹2,300. A flat fee of ₹80 applies to orders below that amount.' },
+  { q: 'Can I cancel or change my order?',
+    a: 'Cancellations are accepted before dispatch (status: CONFIRMED). Once your order is shipped, cancellations are not possible. Please use the form below to contact us as soon as possible.' },
+  { q: 'My item arrived damaged.',
+    a: 'We\'re so sorry! Please send us photos of the damage and we\'ll arrange an exchange or refund right away.<br><br>' +
+       '📸 <strong>Send photos via:</strong><br>' +
+       '• Instagram DM: <a href="https://instagram.com/safarlee.in" target="_blank" style="color:var(--purple)">@safarlee.in</a><br>' +
+       '• WhatsApp (Metal / Trays): <a href="https://wa.me/917983052259" style="color:var(--purple)">+91 79830 52259</a><br>' +
+       '• WhatsApp (Textile / Pouches / Cushions): <a href="https://wa.me/917206011271" style="color:var(--purple)">+91 72060 11271</a>' },
+  { q: 'How do I return or exchange an item?',
+    a: 'Returns are accepted within 7 days of receipt for unused, unwashed items only. Please use the inquiry form below to start the process.' },
+  { q: 'What payment methods do you accept?',
+    a: 'We accept <strong>PhonePe</strong> (UPI). A payment link is sent to you automatically after placing your order.' },
 ];
 
 function buildFAQ() {
@@ -202,7 +220,7 @@ async function loadMyQnA() {
         return '<div class="thread">' +
           '<div class="thread-meta">' +
             '<span class="badge ' + (t.Status === 'ANSWERED' ? 'badge-answered' : 'badge-pending') + '">' +
-              (t.Status === 'ANSWERED' ? '답변 완료' : '답변 대기') +
+              (t.Status === 'ANSWERED' ? 'Answered' : 'Pending') +
             '</span>' +
             '<span class="thread-cat">' + esc(t.Category) + '</span>' +
             '<span class="thread-date">' + esc(t.Date) + '</span>' +
