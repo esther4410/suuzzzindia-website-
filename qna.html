@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help &amp; Q&amp;A — Safar Lee</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--purple:#644678;--purple-deep:#4A3060;--yellow:#F5C842;--bg:#FBF8F3;--surface:#fff;--ink:#1F1428;--ink-2:#4A3C58;--muted:#8B7E96;--line:#ECE5EE;--r-md:12px;--r-lg:20px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+  img{display:block;max-width:100%}
+  button{font-family:inherit;cursor:pointer}
+  header{background:#fff;border-bottom:2px solid var(--yellow);padding:14px 24px;display:flex;align-items:center;gap:12px}
+  .back{text-decoration:none;color:var(--muted);font-size:20px;line-height:1}
+  .back:hover{color:var(--purple)}
+  .page{max-width:680px;margin:0 auto;padding:40px 16px 80px}
+  .page-title{font-size:clamp(22px,4vw,30px);font-weight:700;color:var(--purple);margin-bottom:6px}
+  .page-sub{color:var(--muted);font-size:14px;margin-bottom:36px;line-height:1.6}
+  .sec-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--line)}
+  .faq-list{display:flex;flex-direction:column;gap:2px;margin-bottom:48px}
+  .faq-item{background:var(--surface);border-radius:var(--r-md);overflow:hidden;border:1px solid var(--line)}
+  .faq-q{width:100%;text-align:left;padding:16px 18px;font-size:14px;font-weight:600;color:var(--ink);background:none;border:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .faq-q:hover{color:var(--purple)}
+  .faq-arrow{font-size:11px;color:var(--muted);transition:transform .2s;flex-shrink:0}
+  .faq-item.open .faq-arrow{transform:rotate(180deg)}
+  .faq-a{display:none;padding:0 18px 16px;font-size:13px;color:var(--ink-2);line-height:1.75}
+  .faq-item.open .faq-a{display:block}
+  .card{background:var(--surface);border-radius:var(--r-lg);padding:28px;box-shadow:0 8px 24px rgba(31,20,40,.10),0 2px 6px rgba(31,20,40,.05);margin-bottom:32px}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  @media(max-width:520px){.form-row{grid-template-columns:1fr}}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  label{font-size:11px;font-weight:700;color:var(--ink-2);letter-spacing:.06em;text-transform:uppercase}
+  .req{color:var(--yellow);margin-left:2px}
+  input,select,textarea{padding:11px 14px;border:1.5px solid var(--line);border-radius:var(--r-md);font-size:14px;font-family:inherit;color:var(--ink);background:#fff;transition:border-color .15s}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--purple)}
+  textarea{resize:vertical;min-height:100px}
+  .hint{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5}
+  .submit-btn{width:100%;padding:14px;background:var(--purple);color:#fff;border:none;border-radius:var(--r-md);font-size:14px;font-weight:700;margin-top:8px;transition:background .15s}
+  .submit-btn:hover{background:var(--purple-deep)}
+  .submit-btn:disabled{background:var(--line);color:var(--muted);cursor:not-allowed}
+  .success-msg{background:#EFF8F0;border:1.5px solid #B5DFBA;border-radius:var(--r-md);padding:16px;font-size:14px;color:#2E7D32;text-align:center;display:none;margin-top:12px}
+  .lookup-row{display:flex;gap:8px}
+  .lookup-row input{flex:1}
+  .lookup-btn{padding:11px 18px;background:var(--purple);color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:700;white-space:nowrap;transition:background .15s}
+  .lookup-btn:hover{background:var(--purple-deep)}
+  .threads{margin-top:20px;display:flex;flex-direction:column;gap:12px}
+  .thread{border:1.5px solid var(--line);border-radius:var(--r-md);padding:16px;background:#fff}
+  .thread-meta{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+  .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  .badge-pending{background:#FFF3CD;color:#7B5E00}
+  .badge-answered{background:#EFF8F0;color:#2E7D32}
+  .thread-cat{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  .thread-date{font-size:11px;color:var(--muted)}
+  .thread-q{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+  .thread-a-wrap{background:#F5EFE0;border-radius:8px;padding:12px;margin-top:8px}
+  .thread-a-label{font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+  .thread-a{font-size:13px;color:var(--ink-2);line-height:1.6}
+  .empty-msg{text-align:center;color:var(--muted);font-size:14px;padding:24px 0}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="index.html">&#8592;</a>
+  <a href="index.html"><img src="logo.svg" alt="Safar Lee" style="height:48px"></a>
+</header>
+
+<div class="page">
+  <h1 class="page-title">Help &amp; Q&amp;A</h1>
+  <p class="page-sub">Frequently asked questions below. Can't find your answer? Leave us a message — we reply within 1–2 business days.</p>
+
+  <div class="sec-title">Frequently Asked Questions</div>
+  <div class="faq-list" id="faqList"></div>
+
+  <div class="sec-title">Send Us a Message</div>
+  <div class="card">
+    <div class="form-row">
+      <div class="field">
+        <label>Name <span class="req">*</span></label>
+        <input type="text" id="qName" placeholder="Your name">
+      </div>
+      <div class="field">
+        <label>Email <span class="req">*</span></label>
+        <input type="email" id="qEmail" placeholder="you@email.com">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Order Code</label>
+        <input type="text" id="qOrder" placeholder="SAFAR-AB1234 (optional)" style="text-transform:uppercase">
+      </div>
+      <div class="field">
+        <label>Category <span class="req">*</span></label>
+        <select id="qCat">
+          <option value="">Select category…</option>
+          <option value="배송문의">배송 / Shipping</option>
+          <option value="교환·반품">교환·반품 / Returns</option>
+          <option value="제품문의">제품 / Product</option>
+          <option value="결제문의">결제 / Payment</option>
+          <option value="기타">기타 / Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Question <span class="req">*</span></label>
+      <textarea id="qText" placeholder="Tell us what you need help with…"></textarea>
+      <p class="hint">📷 사진이 있으면 Instagram DM 또는 WhatsApp으로 보내주세요.</p>
+    </div>
+    <button class="submit-btn" id="submitBtn" onclick="submitQuestion()">Send Message →</button>
+    <div class="success-msg" id="successMsg">✅ Message sent! We'll reply within 1–2 business days. Check your inbox for updates.</div>
+  </div>
+
+  <div class="sec-title">My Inquiries</div>
+  <div class="card">
+    <div class="field" style="margin-bottom:0">
+      <label>Enter your email to view your inquiries</label>
+      <div class="lookup-row">
+        <input type="email" id="lookupEmail" placeholder="you@email.com">
+        <button class="lookup-btn" onclick="loadMyQnA()">View →</button>
+      </div>
+    </div>
+    <div class="threads" id="threads"></div>
+  </div>
+</div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbx-w6hDRFn2KHhIODytmzNhNsw4nHPaxz-p4FNI2yIUEeHlrMCAnySdtVLbKzwKjU-WoA/exec';
+
+const FAQS = [
+  { q: '주문 후 배송까지 얼마나 걸리나요? / How long does shipping take?',
+    a: '주문 확인 후 2–4일 내 발송됩니다. 발송 시 운송장 번호를 이메일로 안내드립니다.<br><br>After payment is confirmed, orders are shipped within 2–4 business days. You\'ll receive a tracking number by email.' },
+  { q: '배송비는 얼마인가요? / What is the shipping fee?',
+    a: '₹2,300 이상 구매 시 무료 배송입니다. 미만 구매 시 ₹80이 부과됩니다.<br><br>Free shipping on orders over ₹2,300. A flat fee of ₹80 applies to orders below that.' },
+  { q: '주문 취소 또는 변경이 가능한가요? / Can I cancel or change my order?',
+    a: '발송 전(CONFIRMED 상태)에는 취소 가능합니다. 발송 후에는 취소가 불가합니다. 아래 문의 폼으로 연락해 주세요.<br><br>Cancellations are accepted before dispatch (status: CONFIRMED). Once shipped, cancellations are not possible.' },
+  { q: '제품이 파손되어 도착했어요 / My item arrived damaged.',
+    a: '정말 죄송합니다. 파손 사진을 Instagram DM 또는 WhatsApp으로 보내주시면 교환 또는 환불 처리해 드리겠습니다.<br><br>We\'re so sorry! Please send photos via Instagram DM or WhatsApp and we\'ll arrange an exchange or refund.' },
+  { q: '교환·반품은 어떻게 하나요? / How do I return or exchange?',
+    a: '수령 후 7일 이내, 미사용·미세탁 상태의 제품만 가능합니다. 아래 문의 폼으로 연락해 주세요.<br><br>Returns accepted within 7 days of receipt for unused, unwashed items only. Contact us via the form below.' },
+  { q: '결제는 어떤 방법으로 할 수 있나요? / What payment methods do you accept?',
+    a: 'PhonePe, GPay, Paytm 등 UPI 결제를 지원합니다. 주문 완료 후 결제 링크가 자동 발송됩니다.<br><br>We accept UPI payments (PhonePe, GPay, Paytm). A payment link is sent automatically after placing your order.' },
+];
+
+function buildFAQ() {
+  document.getElementById('faqList').innerHTML = FAQS.map(function(f, i) {
+    return '<div class="faq-item" id="faq' + i + '">' +
+      '<button class="faq-q" onclick="toggleFAQ(' + i + ')">' +
+        '<span>' + f.q + '</span><span class="faq-arrow">▼</span>' +
+      '</button>' +
+      '<div class="faq-a">' + f.a + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleFAQ(i) {
+  document.getElementById('faq' + i).classList.toggle('open');
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+}
+
+async function submitQuestion() {
+  const name      = document.getElementById('qName').value.trim();
+  const email     = document.getElementById('qEmail').value.trim();
+  const orderCode = document.getElementById('qOrder').value.trim().toUpperCase();
+  const category  = document.getElementById('qCat').value;
+  const question  = document.getElementById('qText').value.trim();
+  if (!name || !email || !category || !question) { alert('Please fill in all required fields.'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    const res  = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'submitQnA', name, email, orderCode, category, question }) });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('successMsg').style.display = 'block';
+      ['qName','qEmail','qOrder','qText'].forEach(function(id) { document.getElementById(id).value = ''; });
+      document.getElementById('qCat').value = '';
+    } else { alert('Error: ' + (data.error || 'Unknown error')); }
+  } catch(e) { alert('Connection error. Please try again.'); }
+  btn.disabled = false; btn.textContent = 'Send Message →';
+}
+
+async function loadMyQnA() {
+  const email = document.getElementById('lookupEmail').value.trim();
+  if (!email) { alert('Please enter your email.'); return; }
+  const btn = document.querySelector('.lookup-btn');
+  btn.textContent = 'Loading…'; btn.disabled = true;
+  const el = document.getElementById('threads');
+  el.innerHTML = '';
+  try {
+    const res     = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getMyQnA', email }) });
+    const data    = await res.json();
+    const threads = data.threads || [];
+    if (!threads.length) {
+      el.innerHTML = '<div class="empty-msg">No inquiries found for this email.</div>';
+    } else {
+      el.innerHTML = threads.map(function(t) {
+        return '<div class="thread">' +
+          '<div class="thread-meta">' +
+            '<span class="badge ' + (t.Status === 'ANSWERED' ? 'badge-answered' : 'badge-pending') + '">' +
+              (t.Status === 'ANSWERED' ? '답변 완료' : '답변 대기') +
+            '</span>' +
+            '<span class="thread-cat">' + esc(t.Category) + '</span>' +
+            '<span class="thread-date">' + esc(t.Date) + '</span>' +
+          '</div>' +
+          '<div class="thread-q">' + esc(t.Question) + '</div>' +
+          (t.Answer ? '<div class="thread-a-wrap"><div class="thread-a-label">Safar Lee</div><div class="thread-a">' + esc(t.Answer) + '</div></div>' : '') +
+        '</div>';
+      }).join('');
+    }
+  } catch(e) { el.innerHTML = '<div class="empty-msg">Connection error. Please try again.</div>'; }
+  btn.textContent = 'View →'; btn.disabled = false;
+}
+
+var _p = new URLSearchParams(window.location.search);
+if (_p.get('email')) {
+  document.getElementById('lookupEmail').value = _p.get('email');
+  loadMyQnA();
+}
+
+buildFAQ();
+</script>
+</body>
+</html>
