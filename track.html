@@ -88,12 +88,13 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
 const API_URL = 'https://script.google.com/macros/s/AKfycbx-w6hDRFn2KHhIODytmzNhNsw4nHPaxz-p4FNI2yIUEeHlrMCAnySdtVLbKzwKjU-WoA/exec';
 
 const STATUS = {
-  PENDING_PAYMENT: { icon:'⏳', text:'Waiting for payment',      color:'#888' },
-  CONFIRMED:       { icon:'✅', text:'Order confirmed',           color:'#2E7D32' },
-  PACKING:         { icon:'📦', text:'Packing with love...',      color:'#553D69' },
-  SHIPPED:         { icon:'🚚', text:'On the way!',               color:'#1565C0' },
-  DELIVERED:       { icon:'🎉', text:'Delivered — enjoy the joy!',color:'#2E7D32' },
-  CANCELLED:       { icon:'❌', text:'Order cancelled',           color:'#E53E3E' },
+  PENDING_PAYMENT:   { icon:'⏳', text:'Waiting for payment',           color:'#888' },
+  CONFIRMED:         { icon:'✅', text:'Order confirmed',                color:'#2E7D32' },
+  PACKING:           { icon:'📦', text:'Packing with love...',           color:'#553D69' },
+  PARTIALLY_SHIPPED: { icon:'🚚', text:'First package on the way!',      color:'#1565C0' },
+  SHIPPED:           { icon:'🚚', text:'On the way!',                    color:'#1565C0' },
+  DELIVERED:         { icon:'🎉', text:'Delivered — enjoy the joy!',     color:'#2E7D32' },
+  CANCELLED:         { icon:'❌', text:'Order cancelled',                color:'#E53E3E' },
 };
 
 async function doTrack() {
@@ -133,9 +134,24 @@ async function doTrack() {
 
 function renderOrder(o) {
   const s = STATUS[o.Status] || STATUS.PENDING_PAYMENT;
-  const tracking = o.TrackingNumber
-    ? `<a class="track-link-el" href="https://www.trackon.in/courier-tracking?awb=${encodeURIComponent(o.TrackingNumber)}" target="_blank">${o.TrackingNumber} →</a>`
-    : `<span style="color:var(--muted)">Not shipped yet</span>`;
+
+  // Build tracking rows — support dual-shipment (TrackingTextile + TrackingMetal)
+  // and fallback for old single-shipment orders (TrackingNumber)
+  const trackEntries = [];
+  if (o.TrackingTextile) trackEntries.push({ num: o.TrackingTextile, label: 'Tracking 1 · Trackon' });
+  if (o.TrackingMetal)   trackEntries.push({ num: o.TrackingMetal,   label: 'Tracking 2 · Trackon' });
+  if (!trackEntries.length && o.TrackingNumber) trackEntries.push({ num: o.TrackingNumber, label: 'Tracking · Trackon' });
+
+  const trackingHtml = trackEntries.length
+    ? trackEntries.map(t => `
+      <div class="detail-row">
+        <span class="d-label">${t.label}</span>
+        <a class="track-link-el d-val" href="https://www.trackon.in/courier-tracking?awb=${encodeURIComponent(t.num)}" target="_blank">${t.num} →</a>
+      </div>`).join('')
+    : `<div class="detail-row"><span class="d-label">Tracking</span><span class="d-val" style="color:var(--muted)">Not shipped yet</span></div>`;
+
+  const dateStr = o.Date ? new Date(o.Date).toLocaleDateString('en-IN', { year:'numeric', month:'short', day:'numeric' }) : '';
+  const shipTo  = [o.City, o.Pincode].filter(Boolean).join(', ') || '—';
 
   document.getElementById('result').innerHTML = `
     <div class="card">
@@ -147,11 +163,11 @@ function renderOrder(o) {
         </div>
       </div>
       <div class="detail-row"><span class="d-label">Order Code</span><span class="d-val">${o.OrderCode}</span></div>
-      <div class="detail-row"><span class="d-label">Date</span><span class="d-val">${o.Date}</span></div>
+      <div class="detail-row"><span class="d-label">Date</span><span class="d-val">${dateStr}</span></div>
       <div class="detail-row"><span class="d-label">Items</span><span class="d-val">${o.Items}</span></div>
       <div class="detail-row"><span class="d-label">Total</span><span class="d-val" style="color:var(--purple)">₹${o.Total}</span></div>
-      <div class="detail-row"><span class="d-label">Ship To</span><span class="d-val">${o.City}, ${o.Pincode}</span></div>
-      <div class="detail-row"><span class="d-label">Tracking</span><span class="d-val">${tracking}</span></div>
+      <div class="detail-row"><span class="d-label">Ship To</span><span class="d-val">${shipTo}</span></div>
+      ${trackingHtml}
     </div>`;
   document.getElementById('result').classList.add('show');
 }
