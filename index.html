@@ -1123,9 +1123,9 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
     <span class="gob-eyelet bl"></span>
     <span class="gob-eyelet br"></span>
   <div class="gob-banner">
-    <div class="gob-eyebrow">Pre-Order Open · Ships 1 July · Last Pieces</div>
+    <div class="gob-eyebrow">Pre-Order Open · Ships Early July · Last Pieces</div>
     <h2 class="gob-title">Pre-order our<br>last pieces.</h2>
-    <p class="gob-desc">Very limited pieces left — once they're gone, they're gone. Pre-order now and get yours shipped <strong>1st July.</strong></p>
+    <p class="gob-desc">Very limited pieces left — once they're gone, they're gone. Pre-order now and get yours shipped <strong>early July.</strong></p>
   </div>
 
   <button class="gob-close" onclick="document.getElementById('gobOverlay').classList.add('closed')" aria-label="Close">
@@ -1164,7 +1164,7 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
     <div class="hero-meta">
       <span><b>·</b> Handmade in India</span>
       <span><b>·</b> Free shipping over ₹2000</span>
-      <span><b>·</b> Pre-Order Open · Ships 1 July</span>
+      <span><b>·</b> Pre-Order Open · Ships Early July</span>
     </div>
   </div>
 </section>
@@ -1286,7 +1286,7 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
       <div class="pm-features">
         <div class="pm-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg> Handmade in India</div>
         <div class="pm-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h2a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v5a3 3 0 003 3h2"></path><circle cx="12" cy="17" r="3"></circle></svg> Free ship over ₹2300</div>
-        <div class="pm-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path><path d="M12 7v5l3 3"></path></svg> Pre-Order Open · Ships 1 July</div>
+        <div class="pm-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path><path d="M12 7v5l3 3"></path></svg> Pre-Order Open · Ships Early July</div>
         <div class="pm-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v5"></path><polyline points="9 11 12 14 22 9"></polyline></svg> Tracking number sent</div>
       </div>
       <div class="pm-fbt" id="pmFbt" style="display:none;">
@@ -1306,7 +1306,7 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
   <div class="prelaunch-nudge-icon">🎁</div>
   <div class="prelaunch-nudge-text">
     <b>Pre-Order Open · Last pieces</b>
-    Ships 1st July — reserve yours before they're gone.
+    Ships early July — reserve yours before they're gone.
   </div>
   <button class="prelaunch-nudge-close" onclick="dismissNudge()" aria-label="Close">✕</button>
 </div>
@@ -1324,6 +1324,20 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
 </div>
 
 <script>
+// ── SHIP DATE LABEL — auto-updates monthly ─────────────────
+function getShipLabel() {
+  var now = new Date();
+  var m = now.getMonth(); // 0=Jan … 6=Jul 7=Aug
+  var d = now.getDate();
+  if (m < 6)                   return 'early July';
+  if (m === 6 && d <= 20)      return 'early July';
+  if (m === 6)                 return 'late July';
+  if (m === 7 && d <= 15)      return 'early August';
+  if (m === 7)                 return 'late August';
+  if (m === 8 && d <= 15)      return 'early September';
+  return 'soon';
+}
+
 // ── CONFIG ────────────────────────────────────────────────
 const API_URL = 'https://script.google.com/macros/s/AKfycbx-w6hDRFn2KHhIODytmzNhNsw4nHPaxz-p4FNI2yIUEeHlrMCAnySdtVLbKzwKjU-WoA/exec';
 const CACHE_KEY = 'suuzzz_products_v2';
@@ -1879,7 +1893,7 @@ function openProduct(sku) {
   } else if (stock <= 5) {
     stockWrap.innerHTML = `<div class="pm-urgent"><span class="pm-urgent-dot"></span>Last chance — only ${stock} left in stock</div>`;
   } else {
-    stockWrap.innerHTML = `<div class="pm-stock-line"><span class="dot-stock"></span>In stock — est. delivery early June</div>`;
+    stockWrap.innerHTML = `<div class="pm-stock-line"><span class="dot-stock"></span>In stock — est. delivery ${getShipLabel()}</div>`;
   }
 
   // Variants (filter out "Cover Only" option — cushions now include filler)
