@@ -11,11 +11,10 @@ const PRODUCT_FOLDER_ID = '1DFOqdi4UxWgbWD4KZRzJaULbyK5XpWq2'; // Drive: 제품�
 
 const UPI_ID   = 'supplier@gpay';
 const UPI_NAME = 'Safar Lee';
-vscode-webview://1njmj48uur7t7ls494leq0eu0ujto368q32t8cdegep05ttaonit/Safar%20Lee/Marketing/C4%20-%20Odd%20Nature%20Reveal%20Film.md
 const SHIPPING_FREE_THRESHOLD = 2300;
 const SHIPPING_FEE = 80;
 
-const WEBSITE_URL = 'https://safarlee-website.vercel.app';
+const WEBSITE_URL = 'https://safarlee.in';
 
 // ─── Router ──────────────────────────────────────────────────
 
@@ -274,7 +273,7 @@ function sendOrderConfirmation(data, code, total, shipping, upiLink) {
 </html>`;
 
   try {
-    MailApp.sendEmail({ to: data.email, subject: `Safar Lee — Order Confirmed ${code}`, htmlBody: html });
+    MailApp.sendEmail({ to: data.email, subject: `Safar Lee — Order Confirmed ${code}`, htmlBody: html, from: 'team@safarlee.in', name: 'Safar Lee' });
   } catch(e) {
     Logger.log('Order email failed: ' + e.message);
   }
@@ -284,7 +283,7 @@ function sendOrderConfirmation(data, code, total, shipping, upiLink) {
 // Trigger: onOrderSheetEdit — Status column → CONFIRMED
 
 function sendPaymentConfirmedEmail(order) {
-  const trackUrl = `https://safarlee-website.vercel.app/track.html?email=${encodeURIComponent(order['Email'])}&code=${encodeURIComponent(order['OrderCode'])}`;
+  const trackUrl = `${WEBSITE_URL}/track.html?email=${encodeURIComponent(order['Email'])}&code=${encodeURIComponent(order['OrderCode'])}`;
   const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
@@ -314,7 +313,7 @@ function sendPaymentConfirmedEmail(order) {
 </html>`;
 
   try {
-    MailApp.sendEmail({ to: order['Email'], subject: `Safar Lee — Payment Confirmed ✅`, htmlBody: html });
+    MailApp.sendEmail({ to: order['Email'], subject: `Safar Lee — Payment Confirmed ✅`, htmlBody: html, from: 'team@safarlee.in', name: 'Safar Lee' });
   } catch(e) {
     Logger.log('Payment email failed: ' + e.message);
   }
@@ -355,7 +354,7 @@ function sendShippedEmail(order, trackingNum) {
 </html>`;
 
   try {
-    MailApp.sendEmail({ to: order['Email'], subject: `Safar Lee — Your order is on its way! 📦`, htmlBody: html });
+    MailApp.sendEmail({ to: order['Email'], subject: `Safar Lee — Your order is on its way! 📦`, htmlBody: html, from: 'team@safarlee.in', name: 'Safar Lee' });
   } catch(e) {
     Logger.log('Shipping email failed: ' + e.message);
   }
@@ -806,7 +805,7 @@ function sendAutoCancelEmail(email, name, code) {
     <a href="${WEBSITE_URL}" style="display:inline-block;margin-top:16px;padding:14px 28px;background:#553D69;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;">Shop Again</a>
   </div>
 </div>`;
-  GmailApp.sendEmail(email, subject, '', { htmlBody: body, name: 'Safar Lee' });
+  GmailApp.sendEmail(email, subject, '', { htmlBody: body, name: 'Safar Lee', from: 'team@safarlee.in' });
 }
 
 // ─── Meta Catalog Feed ────────────────────────────────────────
