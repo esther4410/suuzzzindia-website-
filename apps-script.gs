@@ -599,7 +599,8 @@ function _getSaltKey() {
   const cache  = CacheService.getScriptCache();
   const cached = cache.get('pp_salt');
   if (cached) return cached;
-  const salt = _getSecretFromGSM('phonepe-salt-key');
+  const salt = PropertiesService.getScriptProperties().getProperty('PHONEPE_SALT_KEY');
+  if (!salt) throw new Error('PHONEPE_SALT_KEY not set in Script Properties');
   cache.put('pp_salt', salt, 3600);
   return salt;
 }
