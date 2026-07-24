@@ -284,12 +284,28 @@ async function _verifyPayment(orderCode) {
     document.getElementById('verifyingOverlay').classList.remove('show');
 
     if (data.paid) {
+      // Capture purchase value + product ids BEFORE clearing the cart
+      var _pTotal = window._total || 0;
+      var _pIds   = (window._cart || []).map(function(i){ return i.sku; });
+      try {
+        if (!_pTotal || !_pIds.length) {
+          var _pc = JSON.parse(localStorage.getItem('suuzzz_cart') || '[]');
+          if (_pc.length) {
+            _pIds   = _pc.map(function(i){ return i.sku; });
+            _pTotal = _pc.reduce(function(a,i){ return a + (Number(i.price)||0)*(Number(i.qty)||1); }, 0);
+          }
+        }
+      } catch(e) {}
       localStorage.removeItem('suuzzz_cart');
       sessionStorage.removeItem('sf_form');
       document.getElementById('paidCode').textContent = orderCode;
       document.getElementById('paidOverlay').classList.add('show');
       if (typeof fbq !== 'undefined') {
-        fbq('track', 'Purchase', { currency: 'INR', content_type: 'product' });
+        fbq('track', 'Purchase', {
+          value: _pTotal, currency: 'INR',
+          content_ids: _pIds, content_type: 'product',
+          num_items: _pIds.length, order_id: orderCode
+        });
       }
     } else if (data.state === 'FAILED' || data.state === 'CANCELLED') {
       _showFailed(orderCode, 'Payment Failed', 'Your payment was declined or cancelled. Please try again.');

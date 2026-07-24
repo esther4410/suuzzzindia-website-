@@ -1116,7 +1116,6 @@ t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 document,'script','https://connect.facebook.net/en_US/fbevents.js');
 fbq('init','2510037666102813');
 fbq('track','PageView');
-fbq('track','ViewContent',{content_type:'product_group',content_category:'Home Decor'});
 </script>
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></noscript>
@@ -1841,6 +1840,16 @@ function openProduct(sku) {
   const p = products.find(x => x.SKU === sku);
   if (!p) return;
   pmSku = sku;
+  if (typeof fbq !== 'undefined') {
+    const _vcPrice = Number(p['Price (INR)']) || 0;
+    const _vcDisc  = Number(p['Discount price (INR)']) || 0;
+    fbq('track','ViewContent',{
+      content_ids:[sku], content_name:p['Product Name'],
+      content_type:'product',
+      value: _vcDisc > 0 ? _vcDisc : _vcPrice,
+      currency:'INR'
+    });
+  }
   pmImgs = [
     driveUrl(p['Image URL']),
     driveUrl(p['Image URL 2']),
