@@ -1427,15 +1427,17 @@ async function init() {
   }
 }
 
+// SKU 앞 3글자 → 카테고리 (01=메탈, 02=텍스타일)
+const CATEGORY_BY_PREFIX = {
+  '01B': 'Bowls', '01C': 'Coasters', '01D': 'Diyas', '01H': 'Trays', '01L': 'Candle Holders',
+  '01M': 'Metal', '01P': 'Plates', '01T': 'Trays', '01V': 'Vases', '01W': 'Candles',
+  '02A': 'Accessories', '02B': 'Bags', '02C': 'Cushions', '02D': 'Doormats', '02F': 'Poufs',
+  '02P': 'Pouches', '02Q': 'Bedcovers', '02R': 'Cushions', '02S': 'Laptop Sleeves', '02T': 'Throws',
+};
+
 function category(p) {
-  const s = p.SKU || '';
-  if (s.startsWith('02P')) return 'Pouches';
-  if (s.startsWith('02B')) return 'Bags';
-  if (s.startsWith('02C')) return 'Cushions';
-  if (s.startsWith('02A')) return 'Accessories';
-  if (s.startsWith('01T')) return 'Trays';
-  if (s.startsWith('01M')) return 'Metal';
-  return 'Other';
+  const s = String(p.SKU || '').toUpperCase();
+  return CATEGORY_BY_PREFIX[s.slice(0, 3)] || 'Other';
 }
 
 function render() {
