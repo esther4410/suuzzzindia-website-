@@ -1,3 +1,5 @@
 {
+  "redirects": [{ "source": "/catalog", "destination": "/catalogb2b", "permanent": false }],
+  "headers": [{ "source": "/catalogb2b/(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] }],
   "rewrites": [{ "source": "/(.*)", "destination": "/$1" }]
 }

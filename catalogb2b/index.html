@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Safar Lee — Trade Catalog</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="https://use.typekit.net/tnv1bkt.css">
+<style>
+  :root { --plum: #644678; --deep: #4A3C58; --ink: #1F1428; --gold: #8A6516; --lilac: #F4EEF7; --rule: #E4D8EF; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FFFFFF; color: var(--ink); font-family: "sofia-pro", "Sofia Pro", system-ui, -apple-system, sans-serif; line-height: 1.5; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 32px 20px 56px; }
+  header { text-align: center; padding-bottom: 24px; border-bottom: 1px solid var(--rule); }
+  header img { width: 150px; height: auto; }
+  .kicker { margin: 12px 0 0; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
+  h1 { margin: 6px 0 0; font-size: 30px; font-weight: 500; color: var(--plum); }
+  .lead { margin: 10px auto 0; max-width: 520px; color: var(--deep); }
+  section { margin-top: 28px; }
+  .btn { display: inline-block; min-height: 48px; padding: 13px 26px; border: 0; border-radius: 999px; background: var(--plum); color: #FFFFFF; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
+  .center { text-align: center; }
+  #viewer { display: none; margin-top: 20px; width: 100%; height: 72vh; border: 1px solid var(--rule); border-radius: 12px; }
+  #soon { padding: 36px 20px; border-radius: 12px; background: var(--lilac); color: var(--deep); text-align: center; }
+  .card { padding: 26px 20px; border-radius: 12px; background: var(--lilac); }
+  .card h2 { margin: 0 0 6px; font-size: 22px; font-weight: 500; color: var(--plum); text-align: center; }
+  .card > p { margin: 0 auto 18px; max-width: 480px; color: var(--deep); text-align: center; }
+  form { max-width: 480px; margin: 0 auto; display: grid; gap: 14px; }
+  label { display: grid; gap: 5px; font-size: 14px; font-weight: 600; color: var(--deep); }
+  label span { font-weight: 400; }
+  input, textarea { width: 100%; min-height: 48px; padding: 12px 14px; border: 1.5px solid var(--rule); border-radius: 10px; background: #FFFFFF; color: var(--ink); font: inherit; font-size: 16px; }
+  textarea { min-height: 84px; resize: vertical; }
+  input:focus, textarea:focus { outline: 2px solid var(--plum); outline-offset: 1px; border-color: var(--plum); }
+  #formNote { margin: 0; min-height: 22px; font-size: 14px; color: var(--plum); text-align: center; }
+  footer { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--deep); text-align: center; }
+  footer a { color: var(--plum); }
+  @media (min-width: 720px) { h1 { font-size: 38px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <a href="/"><img src="/wordmark-purple.svg" alt="Safar Lee"></a>
+    <p class="kicker">Trade</p>
+    <h1>Catalog 2026/27</h1>
+    <p class="lead">European design, crafted in India. Trays, tableware, candles, cushions, textiles and bags for your shop.</p>
+  </header>
+
+  <!-- Catalog: replace  catalogb2b/SafarLee_Lookbook_B2B_open.pdf  with a new file of the same name to update it. -->
+  <section>
+    <div id="soon">The catalog is being finalised and will appear here shortly.</div>
+    <div id="open" class="center" hidden>
+      <a class="btn" href="SafarLee_Lookbook_B2B_open.pdf" target="_blank" rel="noopener">Open the catalog (PDF)</a>
+    </div>
+    <iframe id="viewer" title="Safar Lee trade catalog"></iframe>
+  </section>
+
+  <section class="card" id="request">
+    <h2>Get trade prices</h2>
+    <p>Orders start from 20 pieces. Leave your details and we will email you the full trade price list.</p>
+    <form id="leadForm" novalidate>
+      <label>Name <input name="name" type="text" autocomplete="name" required></label>
+      <label>Company <input name="company" type="text" autocomplete="organization" required></label>
+      <label>Country <input name="country" type="text" autocomplete="country-name" required></label>
+      <label>Email <input name="email" type="email" autocomplete="email" inputmode="email" required></label>
+      <label>What are you interested in? <span>(optional)</span> <textarea name="interest"></textarea></label>
+      <button class="btn" type="submit">Send request</button>
+      <p id="formNote" role="status"></p>
+    </form>
+  </section>
+
+  <footer>
+    Safar Lee · A home décor brand by SUUZZZ<br>
+    Email: <a href="mailto:info@safar-lee.com">info@safar-lee.com</a> · <a href="/">safarlee.in</a>
+  </footer>
+
+</div>
+<script>
+  var CATALOG_PDF = "SafarLee_Lookbook_B2B_open.pdf";
+  // Lead list: paste the Apps Script web-app URL here to save requests to the "lookbook interest" sheet.
+  // While it is empty, the form opens the visitor's email app with the details filled in, so no request is lost.
+  var LEAD_ENDPOINT = "";
+  var CONTACT_EMAIL = "info@safar-lee.com";
+
+  // Show the catalog only once the PDF exists next to this page.
+  fetch(CATALOG_PDF, { method: "HEAD" }).then(function (r) {
+    var type = r.headers.get("content-type") || "";
+    if (!r.ok || type.indexOf("pdf") === -1) { return; }
+    document.getElementById("soon").hidden = true;
+    document.getElementById("open").hidden = false;
+    if (window.matchMedia("(min-width: 720px)").matches) {
+      var v = document.getElementById("viewer");
+      v.src = CATALOG_PDF;
+      v.style.display = "block";
+    }
+  }).catch(function () {});
+
+  var form = document.getElementById("leadForm"), note = document.getElementById("formNote");
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    var el = form.elements;
+    var data = {
+      name: el["name"].value.trim(), company: el["company"].value.trim(), country: el["country"].value.trim(),
+      email: el["email"].value.trim(), interest: el["interest"].value.trim(),
+      source: new URLSearchParams(location.search).get("src") || "", date: new Date().toISOString()
+    };
+    if (LEAD_ENDPOINT) {
+      note.textContent = "Sending…";
+      fetch(LEAD_ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) })
+        .then(function (r) { if (!r.ok) { throw new Error("send failed"); } note.textContent = "Thank you. We will email you the trade price list."; form.reset(); })
+        .catch(function () { note.textContent = "Could not send. Please email " + CONTACT_EMAIL + "."; });
+      return;
+    }
+    var body = "Name: " + data.name + "\nCompany: " + data.company + "\nCountry: " + data.country +
+               "\nEmail: " + data.email + "\nInterested in: " + data.interest + (data.source ? "\nSource: " + data.source : "");
+    location.href = "mailto:" + CONTACT_EMAIL + "?subject=" + encodeURIComponent("Trade price list request — " + data.company) +
+                    "&body=" + encodeURIComponent(body);
+    note.textContent = "Your email app should open with the request ready. Press send to finish.";
+  });
+</script>
+</body>
+</html>
