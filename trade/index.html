@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Safar Lee — Trade Access</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="https://use.typekit.net/tnv1bkt.css">
+<style>
+  :root { --plum: #644678; --deep: #4A3C58; --ink: #1F1428; --gold: #8A6516; --lilac: #F4EEF7; --rule: #E4D8EF; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FFFFFF; color: var(--ink); font-family: "sofia-pro", "Sofia Pro", system-ui, -apple-system, sans-serif; line-height: 1.5; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 32px 20px 56px; text-align: center; }
+  header { padding-bottom: 24px; border-bottom: 1px solid var(--rule); }
+  header img { width: 150px; height: auto; }
+  .kicker { margin: 12px 0 0; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
+  h1 { margin: 6px 0 0; font-size: 30px; font-weight: 500; color: var(--plum); }
+  .lead { margin: 10px auto 0; max-width: 480px; color: var(--deep); }
+  section { margin-top: 28px; }
+  .card { padding: 28px 20px; border-radius: 12px; background: var(--lilac); }
+  .actions { display: grid; gap: 12px; max-width: 360px; margin: 20px auto 0; }
+  .btn { display: block; width: 100%; min-height: 50px; padding: 14px 26px; border: 0; border-radius: 999px; background: var(--plum); color: #FFFFFF; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
+  .btn.ghost { background: #FFFFFF; color: var(--plum); border: 1.5px solid var(--plum); }
+  .btn[disabled] { opacity: .6; cursor: default; }
+  .small { margin: 16px auto 0; max-width: 460px; font-size: 13px; color: var(--deep); }
+  footer { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--deep); }
+  a { color: var(--plum); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <a href="/"><img src="/wordmark-purple.svg" alt="Safar Lee"></a>
+    <p class="kicker">Trade access</p>
+    <h1 id="title">Checking your link…</h1>
+    <p class="lead" id="lead"></p>
+  </header>
+
+  <section class="card" id="ok" hidden>
+    <div class="actions">
+      <button class="btn" id="btnPdf" type="button">Open the trade lookbook (PDF)</button>
+      <button class="btn ghost" id="btnForm" type="button" hidden>Download the order form (Excel)</button>
+    </div>
+    <p class="small" id="status" role="status"></p>
+    <p class="small"><b>Confidential.</b> These trade prices are for your company only. Please do not share this link or the files.</p>
+  </section>
+
+  <section class="card" id="denied" hidden>
+    <p>This link is not active. It may have expired or been replaced.</p>
+    <div class="actions"><a class="btn" href="/catalogb2b#request">Request trade access</a></div>
+  </section>
+
+  <footer>
+    Safar Lee · A home décor brand by SUUZZZ<br>
+    Email: <a href="mailto:info@safar-lee.com">info@safar-lee.com</a>
+  </footer>
+
+</div>
+<script>
+  // Web-app URL of the B2B Apps Script (kept outside this repo). Must match the one in /catalogb2b.
+  var B2B_ENDPOINT = "https://script.google.com/macros/s/AKfycbyfPtkZIZBJ741iuyKcNCEbNCkkgS9k0hMQa_6xqsHrnzy7mErNx97VEh7-Fl-dub_z1w/exec";
+
+  var token = new URLSearchParams(location.search).get("k") || "";
+  var $ = function (id) { return document.getElementById(id); };
+
+  function deny() {
+    $("title").textContent = "Trade access";
+    $("lead").textContent = "";
+    $("denied").hidden = false;
+  }
+
+  function call(params) {
+    var q = Object.keys(params).map(function (k) { return k + "=" + encodeURIComponent(params[k]); }).join("&");
+    return fetch(B2B_ENDPOINT + "?" + q).then(function (r) { return r.json(); });
+  }
+
+  function getFile(which, button) {
+    var label = button.textContent;
+    button.disabled = true;
+    $("status").textContent = "Preparing your file. This can take a few seconds…";
+    call({ action: "file", k: token, which: which }).then(function (d) {
+      if (!d.ok) { throw new Error("no file"); }
+      var bytes = atob(d.data), buf = new Uint8Array(bytes.length);
+      for (var i = 0; i < bytes.length; i++) { buf[i] = bytes.charCodeAt(i); }
+      var url = URL.createObjectURL(new Blob([buf], { type: d.type || "application/octet-stream" }));
+      var a = document.createElement("a");
+      a.className = "btn";
+      a.href = url;
+      a.textContent = (which === "pdf" ? "Your lookbook is ready: tap to open" : "Your order form is ready: tap to save");
+      if (which === "pdf") { a.target = "_blank"; a.rel = "noopener"; } else { a.download = d.name || "SafarLee_OrderForm.xlsx"; }
+      button.replaceWith(a);
+      $("status").textContent = "";
+    }).catch(function () {
+      button.disabled = false;
+      button.textContent = label;
+      $("status").textContent = "Could not load the file. Please try again, or email info@safar-lee.com.";
+    });
+  }
+
+  if (!B2B_ENDPOINT || token.length < 32) {
+    deny();
+  } else {
+    call({ action: "view", k: token }).then(function (d) {
+      if (!d.ok) { deny(); return; }
+      $("title").textContent = "Welcome, " + String(d.name).split(" ")[0];
+      $("lead").textContent = "Trade lookbook for " + d.company + ". Your access is valid until " +
+        new Date(d.expires).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) + ".";
+      $("ok").hidden = false;
+      $("btnPdf").addEventListener("click", function () { getFile("pdf", $("btnPdf")); });
+      if (d.hasOrderForm) {
+        $("btnForm").hidden = false;
+        $("btnForm").addEventListener("click", function () { getFile("orderform", $("btnForm")); });
+      }
+    }).catch(deny);
+  }
+</script>
+</body>
+</html>

@@ -28,9 +28,10 @@
   form { max-width: 480px; margin: 0 auto; display: grid; gap: 14px; }
   label { display: grid; gap: 5px; font-size: 14px; font-weight: 600; color: var(--deep); }
   label span { font-weight: 400; }
-  input, textarea { width: 100%; min-height: 48px; padding: 12px 14px; border: 1.5px solid var(--rule); border-radius: 10px; background: #FFFFFF; color: var(--ink); font: inherit; font-size: 16px; }
+  input, textarea, select { width: 100%; min-height: 48px; padding: 12px 14px; border: 1.5px solid var(--rule); border-radius: 10px; background: #FFFFFF; color: var(--ink); font: inherit; font-size: 16px; }
   textarea { min-height: 84px; resize: vertical; }
-  input:focus, textarea:focus { outline: 2px solid var(--plum); outline-offset: 1px; border-color: var(--plum); }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--plum); outline-offset: 1px; border-color: var(--plum); }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   #formNote { margin: 0; min-height: 22px; font-size: 14px; color: var(--plum); text-align: center; }
   footer { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--deep); text-align: center; }
   footer a { color: var(--plum); }
@@ -58,13 +59,26 @@
 
   <section class="card" id="request">
     <h2>Get trade prices</h2>
-    <p>Orders start from 20 pieces. Leave your details and we will email you the full trade price list.</p>
+    <p>Orders start from 20 pieces. Leave your business details. Once we confirm your request, we email you a personal link to the full trade price list.</p>
     <form id="leadForm" novalidate>
       <label>Name <input name="name" type="text" autocomplete="name" required></label>
       <label>Company <input name="company" type="text" autocomplete="organization" required></label>
       <label>Country <input name="country" type="text" autocomplete="country-name" required></label>
-      <label>Email <input name="email" type="email" autocomplete="email" inputmode="email" required></label>
+      <label>Business email <input name="email" type="email" autocomplete="email" inputmode="email" required></label>
+      <label>Type of business
+        <select name="businessType" required>
+          <option value="">Please choose</option>
+          <option>Retail shop</option>
+          <option>Online seller</option>
+          <option>Hotel / cafe</option>
+          <option>Gifting</option>
+          <option>Distributor</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label>Phone or WhatsApp <span>(optional)</span> <input name="phone" type="tel" autocomplete="tel"></label>
       <label>What are you interested in? <span>(optional)</span> <textarea name="interest"></textarea></label>
+      <label class="hp" aria-hidden="true">Website <input name="website" type="text" tabindex="-1" autocomplete="off"></label>
       <button class="btn" type="submit">Send request</button>
       <p id="formNote" role="status"></p>
     </form>
@@ -78,9 +92,9 @@
 </div>
 <script>
   var CATALOG_PDF = "/catalogb2b/SafarLee_Lookbook_B2B_open.pdf";   // full path: the page is served at /catalogb2b without a trailing slash
-  // Lead list: paste the Apps Script web-app URL here to save requests to the "lookbook interest" sheet.
+  // Web-app URL of the B2B Apps Script (kept outside this repo). Must match the one in /trade.
   // While it is empty, the form opens the visitor's email app with the details filled in, so no request is lost.
-  var LEAD_ENDPOINT = "";
+  var B2B_ENDPOINT = "https://script.google.com/macros/s/AKfycbyfPtkZIZBJ741iuyKcNCEbNCkkgS9k0hMQa_6xqsHrnzy7mErNx97VEh7-Fl-dub_z1w/exec";
   var CONTACT_EMAIL = "info@safar-lee.com";
 
   // Show the catalog only once the PDF exists next to this page.
@@ -102,19 +116,30 @@
     if (!form.checkValidity()) { form.reportValidity(); return; }
     var el = form.elements;
     var data = {
+      action: "lead",
       name: el["name"].value.trim(), company: el["company"].value.trim(), country: el["country"].value.trim(),
-      email: el["email"].value.trim(), interest: el["interest"].value.trim(),
-      source: new URLSearchParams(location.search).get("src") || "", date: new Date().toISOString()
+      email: el["email"].value.trim(), businessType: el["businessType"].value, phone: el["phone"].value.trim(),
+      interest: el["interest"].value.trim(), website: el["website"].value,
+      source: new URLSearchParams(location.search).get("src") || ""
     };
-    if (LEAD_ENDPOINT) {
+    if (B2B_ENDPOINT) {
+      var button = form.querySelector("button");
+      button.disabled = true;
       note.textContent = "Sending…";
-      fetch(LEAD_ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) })
-        .then(function (r) { if (!r.ok) { throw new Error("send failed"); } note.textContent = "Thank you. We will email you the trade price list."; form.reset(); })
-        .catch(function () { note.textContent = "Could not send. Please email " + CONTACT_EMAIL + "."; });
+      fetch(B2B_ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          button.disabled = false;
+          if (!d.ok) { note.textContent = d.error || ("Could not send. Please email " + CONTACT_EMAIL + "."); return; }
+          note.textContent = "Thank you. We will confirm your request and email your personal link to the trade prices.";
+          form.reset();
+        })
+        .catch(function () { button.disabled = false; note.textContent = "Could not send. Please email " + CONTACT_EMAIL + "."; });
       return;
     }
     var body = "Name: " + data.name + "\nCompany: " + data.company + "\nCountry: " + data.country +
-               "\nEmail: " + data.email + "\nInterested in: " + data.interest + (data.source ? "\nSource: " + data.source : "");
+               "\nEmail: " + data.email + "\nBusiness: " + data.businessType + "\nPhone: " + data.phone +
+               "\nInterested in: " + data.interest + (data.source ? "\nSource: " + data.source : "");
     location.href = "mailto:" + CONTACT_EMAIL + "?subject=" + encodeURIComponent("Trade price list request — " + data.company) +
                     "&body=" + encodeURIComponent(body);
     note.textContent = "Your email app should open with the request ready. Press send to finish.";
