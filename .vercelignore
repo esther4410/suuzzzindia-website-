@@ -1,0 +1,15 @@
+# Files that stay in the repo but must not be served on safarlee.in.
+# The site is static: Vercel publishes every file that is not listed here.
+
+# Backend code (pasted into Google Apps Script by hand, never loaded by the pages)
+*.gs
+*.gs.bak-*
+*.bak
+*.bak-*
+
+# Internal notes and plans
+CLAUDE.md
+docs/
+
+# OS clutter
+.DS_Store
