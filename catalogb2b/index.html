@@ -21,6 +21,37 @@
   .btn { display: inline-block; min-height: 48px; padding: 13px 26px; border: 0; border-radius: 999px; background: var(--plum); color: #FFFFFF; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
   .center { text-align: center; }
   #viewer { display: none; margin-top: 20px; width: 100%; height: 72vh; border: 1px solid var(--rule); border-radius: 12px; }
+  /* Flip viewer: one page (phone) or one spread (desktop) per swipe */
+  #book { margin-top: 20px; }
+  #strip { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+           scrollbar-width: none; border: 1px solid var(--rule); border-radius: 12px; background: #FFFFFF; outline-offset: 3px; }
+  #strip::-webkit-scrollbar { display: none; }
+  #strip figure { flex: 0 0 100%; margin: 0; scroll-snap-align: center; scroll-snap-stop: always; background: #FFFFFF; }
+  #strip img { display: block; width: 100%; height: auto; aspect-ratio: 595.28 / 841.89; }
+  #strip.spreads img { aspect-ratio: 1190.55 / 841.89; }
+  .bookbar { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 12px; color: var(--deep); font-size: 14px; }
+  .bookbar button { width: 48px; height: 48px; border: 1.5px solid var(--plum); border-radius: 50%; background: #FFFFFF; color: var(--plum); font: inherit; font-size: 22px; line-height: 1; cursor: pointer; }
+  .bookbar button:disabled { opacity: .3; cursor: default; }
+  .bookbar #count { min-width: 76px; text-align: center; font-variant-numeric: tabular-nums; }
+  .stage { position: relative; }
+  /* Full-screen toggle sits inside the catalog frame */
+  #full { position: absolute; top: 10px; right: 10px; z-index: 2; width: 48px; height: 48px; padding: 0; border: 0; border-radius: 12px;
+          background: rgba(31, 20, 40, .6); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  #full svg { width: 24px; height: 24px; }
+  #full .i-close, #book.expanded #full .i-open { display: none; }
+  #book.expanded #full .i-close { display: block; }
+  @media (max-width: 719px) {   /* phones: pages run edge to edge so text is as large as possible */
+    #book { margin-left: -20px; margin-right: -20px; }
+    #strip { border-left: 0; border-right: 0; border-radius: 0; }
+  }
+  /* Full screen: the viewer fills the whole window, on phones too */
+  #book.expanded { position: fixed; inset: 0; z-index: 50; margin: 0; background: #FFFFFF; display: flex; flex-direction: column; }
+  #book.expanded .stage { flex: 1; min-height: 0; }
+  #book.expanded #strip { height: 100%; border: 0; border-radius: 0; }
+  #book.expanded #strip figure { display: flex; align-items: center; justify-content: center; }
+  #book.expanded #strip img { width: 100%; height: 100%; object-fit: contain; aspect-ratio: auto; }
+  #book.expanded .bookbar { margin: 0; padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); }
+  #book.expanded .hint { display: none; }
   #soon { padding: 36px 20px; border-radius: 12px; background: var(--lilac); color: var(--deep); text-align: center; }
   .card { padding: 26px 20px; border-radius: 12px; background: var(--lilac); }
   .card h2 { margin: 0 0 6px; font-size: 22px; font-weight: 500; color: var(--plum); text-align: center; }
@@ -31,6 +62,9 @@
   input, textarea, select { width: 100%; min-height: 48px; padding: 12px 14px; border: 1.5px solid var(--rule); border-radius: 10px; background: #FFFFFF; color: var(--ink); font: inherit; font-size: 16px; }
   textarea { min-height: 84px; resize: vertical; }
   input:focus, textarea:focus, select:focus { outline: 2px solid var(--plum); outline-offset: 1px; border-color: var(--plum); }
+  .opt { margin: 8px 0 0; padding: 18px 16px 16px; border: 1.5px dashed var(--rule); border-radius: 12px; display: grid; gap: 14px; min-width: 0; }
+  .opt legend { padding: 0 8px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+  .optnote { margin: -6px 0 0; font-size: 13px; color: var(--deep); }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   #formNote { margin: 0; min-height: 22px; font-size: 14px; color: var(--plum); text-align: center; }
   footer { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--deep); text-align: center; }
@@ -48,10 +82,26 @@
     <p class="lead">European design, crafted in India. Trays, tableware, candles, cushions, textiles and bags for your shop.</p>
   </header>
 
-  <!-- Catalog: replace  catalogb2b/SafarLee_Lookbook_B2B_open.pdf  with a new file of the same name to update it. -->
+  <!-- Catalog: replace  catalogb2b/SafarLee_Lookbook_B2B_open.pdf  with a new file of the same name,
+       then regenerate the page images in  catalogb2b/pages/  (they are what the flip viewer shows). -->
   <section>
     <div id="soon">The catalog is being finalised and will appear here shortly.</div>
-    <div id="open" class="center" hidden>
+    <div id="book" hidden>
+      <div class="stage">
+        <div id="strip" tabindex="0" role="region" aria-label="Catalog pages. Swipe or use the arrow keys to turn pages."></div>
+        <button id="full" type="button" aria-label="Full screen" title="Full screen">
+          <svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+          <svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
+        </button>
+      </div>
+      <div class="bookbar">
+        <button id="prev" type="button" aria-label="Previous page">&#8249;</button>
+        <span id="count" aria-live="polite"></span>
+        <button id="next" type="button" aria-label="Next page">&#8250;</button>
+      </div>
+      <p class="hint">Swipe or use the arrows to turn the pages.</p>
+    </div>
+    <div id="open" class="center" hidden style="margin-top:18px">
       <a class="btn" href="/catalogb2b/SafarLee_Lookbook_B2B_open.pdf" target="_blank" rel="noopener">Open the catalog (PDF)</a>
     </div>
     <iframe id="viewer" title="Safar Lee trade catalog"></iframe>
@@ -63,7 +113,22 @@
     <form id="leadForm" novalidate>
       <label>Name <input name="name" type="text" autocomplete="name" required></label>
       <label>Company <input name="company" type="text" autocomplete="organization" required></label>
-      <label>Country <input name="country" type="text" autocomplete="country-name" required></label>
+      <label>Region
+        <select name="country" required>
+          <option value="">Please choose</option>
+          <option>India</option>
+          <option>Asia (outside India)</option>
+          <option>Middle East</option>
+          <option>Europe</option>
+          <option>United Kingdom</option>
+          <option>United States</option>
+          <option>Canada</option>
+          <option>Latin America</option>
+          <option>Australia / New Zealand</option>
+          <option>Africa</option>
+          <option>Other</option>
+        </select>
+      </label>
       <label>Business email <input name="email" type="email" autocomplete="email" inputmode="email" required></label>
       <label>Type of business
         <select name="businessType" required>
@@ -76,8 +141,12 @@
           <option>Other</option>
         </select>
       </label>
-      <label>Phone or WhatsApp <span>(optional)</span> <input name="phone" type="tel" autocomplete="tel"></label>
-      <label>What are you interested in? <span>(optional)</span> <textarea name="interest"></textarea></label>
+      <fieldset class="opt">
+        <legend>Optional</legend>
+        <p class="optnote">You can leave these empty.</p>
+        <label>Phone or WhatsApp <input name="phone" type="tel" autocomplete="tel"></label>
+        <label>What are you interested in? <textarea name="interest"></textarea></label>
+      </fieldset>
       <label class="hp" aria-hidden="true">Website <input name="website" type="text" tabindex="-1" autocomplete="off"></label>
       <button class="btn" type="submit">Send request</button>
       <p id="formNote" role="status"></p>
@@ -97,18 +166,115 @@
   var B2B_ENDPOINT = "https://script.google.com/macros/s/AKfycbyfPtkZIZBJ741iuyKcNCEbNCkkgS9k0hMQa_6xqsHrnzy7mErNx97VEh7-Fl-dub_z1w/exec";
   var CONTACT_EMAIL = "info@safar-lee.com";
 
-  // Show the catalog only once the PDF exists next to this page.
-  fetch(CATALOG_PDF, { method: "HEAD" }).then(function (r) {
-    var type = r.headers.get("content-type") || "";
-    if (!r.ok || type.indexOf("pdf") === -1) { return; }
-    document.getElementById("soon").hidden = true;
-    document.getElementById("open").hidden = false;
-    if (window.matchMedia("(min-width: 720px)").matches) {
-      var v = document.getElementById("viewer");
-      v.src = CATALOG_PDF;
-      v.style.display = "block";
+  var CATALOG_PAGES = "/catalogb2b/pages/";   // page images + manifest.json made from the PDF
+
+  // Fallback (no page images): the browser's own PDF viewer on wide screens, the button everywhere.
+  function showPdfOnly() {
+    fetch(CATALOG_PDF, { method: "HEAD" }).then(function (r) {
+      var type = r.headers.get("content-type") || "";
+      if (!r.ok || type.indexOf("pdf") === -1) { return; }
+      document.getElementById("soon").hidden = true;
+      document.getElementById("open").hidden = false;
+      if (window.matchMedia("(min-width: 720px)").matches) {
+        var v = document.getElementById("viewer");
+        v.src = CATALOG_PDF;
+        v.style.display = "block";
+      }
+    }).catch(function () {});
+  }
+
+  // Flip viewer: spreads on wide screens, single pages on phones. Images load as they come near.
+  function startBook(m) {
+    var book = document.getElementById("book"), strip = document.getElementById("strip"),
+        prev = document.getElementById("prev"), next = document.getElementById("next"),
+        count = document.getElementById("count"), full = document.getElementById("full"),
+        wide = window.matchMedia("(min-width: 720px)"), total = 0;
+    function two(n) { return (n < 10 ? "0" : "") + n; }
+    function build() {
+      var spreads = wide.matches, i, fig, img;
+      total = spreads ? m.spreads : m.spreads * 2;
+      strip.className = spreads ? "spreads" : "";
+      strip.innerHTML = "";
+      for (i = 1; i <= total; i++) {
+        fig = document.createElement("figure");
+        img = document.createElement("img");
+        img.alt = "Catalog page " + i + " of " + total;
+        img.decoding = "async";
+        img.setAttribute("data-src", CATALOG_PAGES + (spreads ? "s-" : "p-") + two(i) + ".jpg?v=" + m.version);
+        fig.appendChild(img);
+        strip.appendChild(fig);
+      }
+      strip.scrollLeft = 0;
+      update();
     }
-  }).catch(function () {});
+    function index() { return Math.round(strip.scrollLeft / Math.max(1, strip.clientWidth)); }
+    function go(i) { strip.scrollTo({ left: Math.max(0, Math.min(total - 1, i)) * strip.clientWidth, behavior: "smooth" }); }
+    // Fetch only the page in view and its neighbours, so the first page appears fast on slow networks.
+    function load(i) {
+      var imgs = strip.getElementsByTagName("img"), k, im;
+      for (k = Math.max(0, i - 1); k <= Math.min(total - 1, i + 2); k++) {
+        im = imgs[k];
+        if (im && !im.getAttribute("src")) { im.src = im.getAttribute("data-src"); }
+      }
+    }
+    function update() {
+      var i = index();
+      load(i);
+      count.textContent = (i + 1) + " / " + total;
+      prev.disabled = i <= 0;
+      next.disabled = i >= total - 1;
+    }
+    var ticking = false;
+    strip.addEventListener("scroll", function () {
+      if (ticking) { return; }
+      ticking = true;
+      requestAnimationFrame(function () { ticking = false; update(); });
+    });
+    prev.addEventListener("click", function () { go(index() - 1); });
+    next.addEventListener("click", function () { go(index() + 1); });
+    strip.addEventListener("keydown", function (ev) {
+      if (ev.key === "ArrowRight") { ev.preventDefault(); go(index() + 1); }
+      if (ev.key === "ArrowLeft") { ev.preventDefault(); go(index() - 1); }
+    });
+    // Full screen: the viewer fills the window (phones included); real browser full screen where it is allowed.
+    function setExpanded(on) {
+      var i = index();
+      book.classList.toggle("expanded", on);
+      document.documentElement.style.overflow = on ? "hidden" : "";
+      full.setAttribute("aria-label", on ? "Exit full screen" : "Full screen");
+      full.title = on ? "Exit full screen" : "Full screen";
+      setTimeout(function () {
+        strip.style.scrollBehavior = "auto";
+        strip.scrollLeft = i * strip.clientWidth;
+        strip.style.scrollBehavior = "";
+        update();
+      }, 80);
+    }
+    full.addEventListener("click", function () {
+      var on = !book.classList.contains("expanded");
+      setExpanded(on);
+      if (on && book.requestFullscreen) { var q = book.requestFullscreen(); if (q && q.catch) { q.catch(function () {}); } }
+      if (!on && document.fullscreenElement) { document.exitFullscreen(); }
+    });
+    document.addEventListener("fullscreenchange", function () {
+      if (!document.fullscreenElement && book.classList.contains("expanded")) { setExpanded(false); }
+    });
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape" && book.classList.contains("expanded")) { setExpanded(false); }
+    });
+
+    if (wide.addEventListener) { wide.addEventListener("change", build); }
+    window.addEventListener("resize", function () { var i = index(); strip.scrollLeft = i * strip.clientWidth; });
+    build();
+    document.getElementById("soon").hidden = true;
+    book.hidden = false;
+    document.getElementById("open").hidden = false;
+  }
+
+  fetch(CATALOG_PAGES + "manifest.json", { cache: "no-cache" })
+    .then(function (r) { if (!r.ok) { throw new Error("no manifest"); } return r.json(); })
+    .then(function (m) { if (!m || !m.spreads) { throw new Error("empty manifest"); } startBook(m); })
+    .catch(showPdfOnly);
 
   var form = document.getElementById("leadForm"), note = document.getElementById("formNote");
   form.addEventListener("submit", function (ev) {
