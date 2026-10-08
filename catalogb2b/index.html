@@ -297,7 +297,8 @@
         .then(function (d) {
           button.disabled = false;
           if (!d.ok) { note.textContent = d.error || ("Could not send. Please email " + CONTACT_EMAIL + "."); return; }
-          note.textContent = "Thank you. We will confirm your request and email your personal link to the trade prices.";
+          note.textContent = "Thank you. We will confirm your request and email your personal link to the trade prices. " +
+            "If you do not see it, please check your spam folder. It comes from safarleewholesale@gmail.com.";
           form.reset();
         })
         .catch(function () { button.disabled = false; note.textContent = "Could not send. Please email " + CONTACT_EMAIL + "."; });
