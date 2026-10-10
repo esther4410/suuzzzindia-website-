@@ -228,7 +228,8 @@ if (_returnCode) {
   if (!cart.length) window.location.href = 'index.html';
 
   const sub      = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  const shipping = sub >= 2300 ? 0 : 80;
+  // Must match SHIPPING_FREE_THRESHOLD / SHIPPING_FEE in apps-script.gs (server sets the charged amount)
+  const shipping = sub >= 1499 ? 0 : 150;
   const total    = sub + shipping;
 
   document.getElementById('orderItems').innerHTML = cart.map(i =>

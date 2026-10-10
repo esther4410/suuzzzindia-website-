@@ -11,8 +11,8 @@ const PRODUCT_FOLDER_ID = '1DFOqdi4UxWgbWD4KZRzJaULbyK5XpWq2'; // Drive: 제품�
 
 const UPI_ID   = 'supplier@gpay';
 const UPI_NAME = 'Safar Lee';
-const SHIPPING_FREE_THRESHOLD = 2300;
-const SHIPPING_FEE = 80;
+const SHIPPING_FREE_THRESHOLD = 1499;
+const SHIPPING_FEE = 150;
 
 const WEBSITE_URL = 'https://safarlee.in';
 
