@@ -26,7 +26,13 @@
   #strip { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
            scrollbar-width: none; border: 1px solid var(--rule); border-radius: 12px; background: #FFFFFF; outline-offset: 3px; }
   #strip::-webkit-scrollbar { display: none; }
-  #strip figure { flex: 0 0 100%; margin: 0; scroll-snap-align: center; scroll-snap-stop: always; background: #FFFFFF; }
+  #strip figure { flex: 0 0 100%; margin: 0; scroll-snap-align: center; scroll-snap-stop: always; background: #FFFFFF; position: relative; }
+  /* Shown behind the page image until it has loaded, and when it could not be loaded. */
+  #strip figure::before { content: "Loading page\2026"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+                          padding: 24px; text-align: center; font-size: 14px; letter-spacing: .04em; color: #8A7C96; }
+  #strip figure.ready::before { content: none; }
+  #strip figure.failed::before { content: "This page did not load. Tap to try again."; color: #644678; font-weight: 600; cursor: pointer; }
+  #strip figure:not(.ready) img { visibility: hidden; }
   #strip img { display: block; width: 100%; height: auto; aspect-ratio: 595.28 / 841.89; }
   #strip.spreads img { aspect-ratio: 1190.55 / 841.89; }
   .bookbar { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 12px; color: var(--deep); font-size: 14px; }
@@ -201,20 +207,51 @@
         img.alt = "Catalog page " + i + " of " + total;
         img.decoding = "async";
         img.setAttribute("data-src", CATALOG_PAGES + (spreads ? "s-" : "p-") + two(i) + ".jpg?v=" + m.version);
+        img.addEventListener("load", loaded);
+        img.addEventListener("error", failed);
+        fig.addEventListener("click", retap);
         fig.appendChild(img);
         strip.appendChild(fig);
       }
       strip.scrollLeft = 0;
       update();
     }
+    // A page image that fails (weak or crowded network) is fetched again by itself, a few times, before asking for a tap.
+    var MAX_TRIES = 4;
+    function request(im) {
+      var n = (im._tries = (im._tries || 0) + 1);
+      im.parentNode.classList.remove("failed");
+      im.src = im.getAttribute("data-src") + (n > 1 ? "&r=" + n : "");
+    }
+    function loaded(ev) {
+      ev.target.parentNode.classList.add("ready");
+      ev.target.parentNode.classList.remove("failed");
+      update();                                   // the page in view is in: now fetch its neighbours
+    }
+    function failed(ev) {
+      var im = ev.target;
+      if ((im._tries || 0) >= MAX_TRIES) { im.parentNode.classList.add("failed"); return; }
+      setTimeout(function () { request(im); }, 1200 * (im._tries || 1));
+    }
+    function retap(ev) {
+      var fig = ev.currentTarget, im = fig.getElementsByTagName("img")[0];
+      if (fig.classList.contains("failed")) { im._tries = 0; request(im); }
+    }
+    window.addEventListener("online", function () {   // connection is back: retry everything that gave up
+      var figs = strip.getElementsByClassName("failed"), k;
+      for (k = figs.length - 1; k >= 0; k--) { var im = figs[k].getElementsByTagName("img")[0]; im._tries = 0; request(im); }
+    });
     function index() { return Math.round(strip.scrollLeft / Math.max(1, strip.clientWidth)); }
     function go(i) { strip.scrollTo({ left: Math.max(0, Math.min(total - 1, i)) * strip.clientWidth, behavior: "smooth" }); }
     // Fetch only the page in view and its neighbours, so the first page appears fast on slow networks.
+    // The page in view goes first and alone, so it gets the whole connection; neighbours follow once it is in.
     function load(i) {
-      var imgs = strip.getElementsByTagName("img"), k, im;
+      var imgs = strip.getElementsByTagName("img"), k, im, cur = imgs[i];
+      if (cur && !cur.getAttribute("src")) { request(cur); }
+      if (cur && !cur.parentNode.classList.contains("ready")) { return; }
       for (k = Math.max(0, i - 1); k <= Math.min(total - 1, i + 2); k++) {
         im = imgs[k];
-        if (im && !im.getAttribute("src")) { im.src = im.getAttribute("data-src"); }
+        if (im && !im.getAttribute("src")) { request(im); }
       }
     }
     function update() {
