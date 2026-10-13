@@ -115,7 +115,7 @@
 
   <section class="card" id="request">
     <h2>Get trade prices</h2>
-    <p>Orders start from 20 pieces. Leave your business details. Once we confirm your request, we email you a personal link to the full trade price list.</p>
+    <p>Orders start from 20 pieces (minimum 4 per article). Leave your business details to get the full trade price list and order form. We also email you your personal link.</p>
     <form id="leadForm" novalidate>
       <label>Name <input name="name" type="text" autocomplete="name" required></label>
       <label>Company <input name="company" type="text" autocomplete="organization" required></label>
@@ -334,6 +334,11 @@
         .then(function (d) {
           button.disabled = false;
           if (!d.ok) { note.textContent = d.error || ("Could not send. Please email " + CONTACT_EMAIL + "."); return; }
+          if (d.k) {                                // instant access is on: go straight to the price files (the link is emailed too)
+            note.textContent = "Thank you. Opening your trade prices…";
+            location.href = "/trade?k=" + encodeURIComponent(d.k);
+            return;
+          }
           note.textContent = "Thank you. We will confirm your request and email your personal link to the trade prices. " +
             "If you do not see it, please check your spam folder. It comes from safarleewholesale@gmail.com.";
           form.reset();
