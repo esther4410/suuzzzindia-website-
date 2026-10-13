@@ -80,7 +80,7 @@
   function getFile(which, button) {
     var label = button.textContent;
     button.disabled = true;
-    $("status").textContent = "Preparing your file. This can take a few seconds…";
+    $("status").textContent = "Preparing your file. Depending on your network, this may take a little while. Please wait a moment and keep this page open.";
     call({ action: "file", k: token, which: which }).then(function (d) {
       if (!d.ok) { throw new Error("no file"); }
       var bytes = atob(d.data), buf = new Uint8Array(bytes.length);
