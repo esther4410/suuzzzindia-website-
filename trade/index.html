@@ -107,7 +107,10 @@
       if (!d.ok) { deny(); return; }
       $("title").textContent = "Welcome, " + String(d.name).split(" ")[0];
       $("lead").textContent = "Trade lookbook for " + d.company + ". Your access is valid until " +
-        new Date(d.expires).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) + ".";
+        new Date(d.expires).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) + "." +
+        (new URLSearchParams(location.search).get("sent") === "1"      // just came from the catalog form
+          ? " We have also emailed this link to you, so you can come back to it any time. If you cannot find it, please check your spam folder."
+          : "");
       $("ok").hidden = false;
       $("btnPdf").addEventListener("click", function () { getFile("pdf", $("btnPdf")); });
       if (d.hasOrderForm) {

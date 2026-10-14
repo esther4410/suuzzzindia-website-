@@ -346,7 +346,7 @@
           if (!d.ok) { note.textContent = d.error || ("Could not send. Please email " + CONTACT_EMAIL + "."); return; }
           if (d.k) {                                // instant access is on: go straight to the price files (the link is emailed too)
             note.textContent = "Thank you. Opening your trade prices…";
-            location.href = "/trade?k=" + encodeURIComponent(d.k);
+            location.href = "/trade?k=" + encodeURIComponent(d.k) + "&sent=1";   // sent=1: the price page says the link was emailed too
             return;
           }
           note.textContent = "Thank you. We will confirm your request and email your personal link to the trade prices. " +
