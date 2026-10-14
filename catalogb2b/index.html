@@ -77,6 +77,19 @@
   footer a { color: var(--plum); }
   @media (min-width: 720px) { h1 { font-size: 38px; } }
 </style>
+<!-- Meta Pixel (same pixel as the main site). Not added to /trade: its address carries the buyer's private link key. -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','2510037666102813');
+fbq('track','PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel -->
 </head>
 <body>
 <div class="wrap">
@@ -344,9 +357,13 @@
         .then(function (d) {
           button.disabled = false;
           if (!d.ok) { note.textContent = d.error || ("Could not send. Please email " + CONTACT_EMAIL + "."); return; }
+          // Meta Pixel: count the request as a lead (no personal details are sent)
+          if (window.fbq) { fbq("track", "Lead", { content_name: "Trade catalog request", content_category: data.businessType }); }
           if (d.k) {                                // instant access is on: go straight to the price files (the link is emailed too)
             note.textContent = "Thank you. Opening your trade prices…";
-            location.href = "/trade?k=" + encodeURIComponent(d.k) + "&sent=1";   // sent=1: the price page says the link was emailed too
+            setTimeout(function () {                // a moment for the pixel event to leave before the page changes
+              location.href = "/trade?k=" + encodeURIComponent(d.k) + "&sent=1";   // sent=1: the price page says the link was emailed too
+            }, 500);
             return;
           }
           note.textContent = "Thank you. We will confirm your request and email your personal link to the trade prices. " +
