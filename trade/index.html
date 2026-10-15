@@ -42,7 +42,8 @@
   <section class="card" id="ok" hidden>
     <div class="actions">
       <button class="btn" id="btnPdf" type="button">Open the trade lookbook (PDF)</button>
-      <button class="btn ghost" id="btnForm" type="button" hidden>Download the order form (Excel)</button>
+      <button class="btn ghost" id="btnForm" type="button" hidden>Download the order form · INR ₹ (Excel)</button>
+      <button class="btn ghost" id="btnFormUsd" type="button" hidden>Download the order form · USD $ (Excel)</button>
     </div>
     <p class="small" id="status" role="status"></p>
     <p class="small"><b>Confidential.</b> These trade prices are for your company only. Please do not share this link or the files.</p>
@@ -116,6 +117,10 @@
       if (d.hasOrderForm) {
         $("btnForm").hidden = false;
         $("btnForm").addEventListener("click", function () { getFile("orderform", $("btnForm")); });
+      }
+      if (d.hasOrderFormUsd) {                                          // shown once the USD file is set up in the backend
+        $("btnFormUsd").hidden = false;
+        $("btnFormUsd").addEventListener("click", function () { getFile("orderform_usd", $("btnFormUsd")); });
       }
     }).catch(deny);
   }
