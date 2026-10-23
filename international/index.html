@@ -6,63 +6,126 @@
 <meta name="robots" content="noindex">
 <title>Safar Lee — International</title>
 <link rel="icon" href="/favicon.svg">
-<link rel="stylesheet" href="https://use.typekit.net/tnv1bkt.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root { --plum: #644678; --deep: #4A3C58; --ink: #1F1428; --gold: #8A6516; --goldbright: #D2A54C; --lilac: #F4EEF7; --rule: #E4D8EF; --muted: #8A7C96; }
+  :root { --purple: #644678; --purple-deep: #4A3060; --yellow: #D2A54C; --gold-ink: #8A6516; --bg: #FBF8F3; --cream: #F3ECDF;
+          --lilac: #F4EEF7; --ink: #1F1428; --text: #4A3C58; --muted: #8B7E96; --line: #ECE5EE; }
   * { box-sizing: border-box; }
-  body { margin: 0; background: #FFFFFF; color: var(--ink); font-family: "sofia-pro", "Sofia Pro", system-ui, -apple-system, sans-serif; line-height: 1.5; }
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 32px 16px 56px; }
-  header { text-align: center; padding-bottom: 24px; border-bottom: 1px solid var(--rule); }
-  header img { width: 150px; height: auto; }
-  .kicker { margin: 12px 0 0; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
-  h1 { margin: 6px 0 0; font-size: 30px; font-weight: 500; color: var(--plum); }
-  .lead { margin: 10px auto 0; max-width: 560px; color: var(--deep); }
-  h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; color: var(--plum); }
-  section { margin-top: 28px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Montserrat', system-ui, sans-serif; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  img { display: block; max-width: 100%; height: auto; } /* height:auto lets aspect-ratio win over the height attribute */
+  a { color: inherit; }
+  .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+  .eyebrow { margin: 0; font-size: 11px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-ink); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 26px; border: 1.5px solid var(--purple); border-radius: 999px;
+         background: var(--purple); color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; letter-spacing: .02em; text-decoration: none; cursor: pointer; transition: background .2s, color .2s; }
+  .btn:hover { background: var(--purple-deep); border-color: var(--purple-deep); }
+  .btn.outline { background: transparent; color: var(--purple); }
+  .btn.outline:hover { background: var(--purple); color: #FFFFFF; }
 
-  /* India-only price notice: the one thing every international visitor must read */
-  .notice { display: flex; gap: 14px; align-items: flex-start; padding: 18px 20px; border: 1.5px solid var(--goldbright); border-radius: 12px; background: #FBF6EA; }
-  .notice .tag { flex: 0 0 auto; padding: 3px 10px; border-radius: 999px; background: var(--goldbright); color: #3A2A08; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-  .notice p { margin: 0; color: var(--ink); }
-  .notice strong { color: var(--plum); }
+  /* Top bar: way back to the India store */
+  .topbar { background: var(--purple-deep); color: #FFFFFF; font-size: 12px; font-weight: 500; letter-spacing: .03em; text-align: center; padding: 9px 16px; }
+  .topbar button { padding: 0; border: 0; background: none; color: var(--yellow); font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .topbar button:hover { color: #FFFFFF; }
 
-  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .card { display: flex; flex-direction: column; padding: 22px; border: 1px solid var(--rule); border-radius: 12px; background: #FFFFFF; }
-  .card .kicker { margin: 0 0 4px; }
-  .card p { margin: 0 0 18px; color: var(--deep); }
-  .card .btn { margin-top: auto; align-self: flex-start; }
-  .btn { display: inline-block; min-height: 48px; padding: 13px 26px; border: 0; border-radius: 999px; background: var(--plum); color: #FFFFFF; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
-  .btn.ghost { background: #FFFFFF; color: var(--plum); border: 1.5px solid var(--plum); padding: 11.5px 24.5px; }
+  /* Header */
+  .site-header { background: #FFFFFF; border-bottom: 1px solid var(--line); }
+  .site-header .container { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+  .site-header img { width: 112px; height: auto; }
+  .site-header nav { display: flex; gap: 26px; font-size: 13px; font-weight: 600; }
+  .site-header nav a { text-decoration: none; color: var(--text); }
+  .site-header nav a:hover { color: var(--purple); }
+
+  /* Hero */
+  .hero { padding: 56px 0 64px; }
+  .hero .container { display: grid; grid-template-columns: 1.05fr .95fr; gap: 56px; align-items: center; }
+  .pill { display: inline-block; padding: 6px 14px; border: 1px solid var(--yellow); border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--gold-ink); }
+  .hero h1 { margin: 18px 0 0; font-size: 46px; line-height: 1.12; font-weight: 700; letter-spacing: -.01em; color: var(--purple-deep); }
+  .hero h1 em { font-style: normal; color: var(--yellow); }
+  .hero .sub { margin: 18px 0 0; max-width: 470px; font-size: 16px; color: var(--text); }
+  .hero .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+  .hero figure { margin: 0; position: relative; }
+  .hero figure img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: center 30%; border-radius: 20px; }
+  .hero figure figcaption { position: absolute; left: -22px; bottom: 32px; padding: 14px 18px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 10px 30px rgba(74, 48, 96, .14);
+                            font-size: 12px; font-weight: 600; color: var(--text); }
+  .hero figure figcaption b { display: block; font-size: 14px; color: var(--purple-deep); }
+
+  /* India-only price notice */
+  .price-note { background: var(--cream); border-top: 1px solid #E6D9BF; border-bottom: 1px solid #E6D9BF; }
+  .price-note .container { display: flex; align-items: center; gap: 18px; padding-top: 20px; padding-bottom: 20px; }
+  .price-note .icon { flex: 0 0 44px; height: 44px; border-radius: 50%; background: var(--yellow); color: var(--purple-deep); display: grid; place-items: center; font-size: 20px; font-weight: 800; }
+  .price-note p { margin: 0; font-size: 14px; color: var(--text); }
+  .price-note strong { color: var(--purple-deep); }
+
+  /* Ways to shop */
+  .section { padding: 72px 0; }
+  .section-head { text-align: center; margin-bottom: 36px; }
+  .section-head h2 { margin: 8px 0 0; font-size: 30px; font-weight: 700; color: var(--purple-deep); }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .tile { display: flex; flex-direction: column; overflow: hidden; border-radius: 20px; background: #FFFFFF; box-shadow: 0 1px 0 var(--line), 0 12px 32px rgba(74, 48, 96, .07); }
+  .tile img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+  .tile .body { display: flex; flex-direction: column; flex: 1; padding: 26px 28px 30px; }
+  .tile h3 { margin: 8px 0 10px; font-size: 22px; font-weight: 700; color: var(--purple-deep); }
+  .tile p { margin: 0 0 22px; font-size: 14px; color: var(--text); }
+  .tile ul { margin: 0 0 24px; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); }
+  .tile li::before { content: "\2713"; margin-right: 8px; color: var(--yellow); font-weight: 800; }
+  .tile .btn { margin-top: auto; align-self: flex-start; }
 
   /* Store finder */
-  .finder { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: center; padding: 22px; border: 1px solid var(--rule); border-radius: 12px; background: var(--lilac); }
-  .finder .kicker { margin: 0; }
-  .globe { position: relative; width: 100%; max-width: 440px; margin: 0 auto; aspect-ratio: 1; }
+  .finder { background: var(--lilac); }
+  .finder .container { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .finder h2 { margin: 8px 0 6px; font-size: 30px; font-weight: 700; color: var(--purple-deep); }
+  .finder .lead { margin: 0; font-size: 14px; color: var(--text); }
+  .globe { position: relative; width: 100%; max-width: 460px; margin: 0 auto; aspect-ratio: 1; }
   .globe canvas { width: 100%; height: 100%; cursor: grab; touch-action: pan-y; contain: layout paint size; opacity: 0; transition: opacity .8s ease; }
   .globe canvas.on { opacity: 1; }
   .globe canvas:active { cursor: grabbing; }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 18px; padding: 0; list-style: none; }
-  .chips button { min-height: 40px; padding: 8px 14px; border: 1.5px solid var(--rule); border-radius: 999px; background: #FFFFFF; color: var(--deep); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
-  .chips button[aria-pressed="true"] { border-color: var(--plum); background: var(--plum); color: #FFFFFF; }
-  .chips button:focus-visible { outline: 2px solid var(--plum); outline-offset: 2px; }
-  #result { min-height: 96px; padding: 16px; border-radius: 10px; background: #FFFFFF; }
-  #result .hint, #result .none { margin: 0; color: var(--muted); }
-  #result .none { color: var(--deep); font-weight: 600; }
-  #result a.first { display: inline-block; margin-top: 8px; color: var(--plum); font-weight: 700; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 18px; padding: 0; list-style: none; }
+  .chips button { min-height: 40px; padding: 8px 16px; border: 1.5px solid #E4D8EF; border-radius: 999px; background: #FFFFFF; color: var(--text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .chips button:hover { border-color: var(--purple); }
+  .chips button[aria-pressed="true"] { border-color: var(--purple); background: var(--purple); color: #FFFFFF; }
+  .chips button:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
+  #result { min-height: 92px; padding: 18px 20px; border-radius: 14px; background: #FFFFFF; font-size: 14px; }
+  #result .hint { margin: 0; color: var(--muted); }
+  #result .none { margin: 0; color: var(--purple-deep); font-weight: 700; }
+  #result a.first { display: inline-block; margin-top: 6px; color: var(--purple); font-weight: 700; }
   #result ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
-  #result li .store { display: block; color: var(--plum); font-weight: 700; }
-  #result li span { color: var(--muted); font-size: 14px; }
+  #result li .store { display: block; color: var(--purple); font-weight: 700; }
+  #result li span { color: var(--muted); font-size: 13px; }
 
-  footer { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--rule); text-align: center; font-size: 14px; color: var(--muted); }
-  footer button { padding: 0; border: 0; background: none; color: var(--plum); font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; }
-  footer .small { margin: 6px 0 0; font-size: 12px; }
+  /* Footer */
+  .site-footer { background: var(--purple-deep); color: #E9DFF0; padding: 44px 0 36px; font-size: 13px; }
+  .site-footer .container { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; }
+  .site-footer img { width: 104px; height: auto; }
+  .site-footer nav { display: flex; flex-wrap: wrap; gap: 22px; font-weight: 600; }
+  .site-footer nav a, .site-footer nav button { padding: 0; border: 0; background: none; color: #E9DFF0; font: inherit; text-decoration: none; cursor: pointer; }
+  .site-footer nav a:hover, .site-footer nav button:hover { color: var(--yellow); }
+  .site-footer .fine { flex-basis: 100%; margin: 6px 0 0; font-size: 12px; color: #B9A9C6; }
 
-  @media (max-width: 720px) {
-    h1 { font-size: 26px; }
-    .cards, .finder { grid-template-columns: 1fr; }
-    .finder { padding: 16px; }
+  @media (max-width: 900px) {
+    .hero { padding: 32px 0 44px; }
+    .hero .container, .finder .container { grid-template-columns: 1fr; gap: 32px; }
+    .hero h1 { font-size: 34px; }
+    .hero figure { max-width: 460px; }
+    .hero figure figcaption { left: 12px; bottom: 12px; }
+    .tiles { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 0 16px; }
+    .topbar { font-size: 11px; padding: 8px 12px; }
+    .site-header .container { height: 60px; }
+    .site-header img { width: 96px; }
+    .site-header nav a.hide-sm { display: none; }
+    .hero h1 { font-size: 30px; }
+    .hero .sub { font-size: 15px; }
+    .hero figure img { aspect-ratio: 4 / 3; }
+    .hero .ctas .btn { flex: 1 1 100%; }
+    .price-note .container { align-items: flex-start; gap: 14px; }
+    .price-note .icon { flex-basis: 36px; height: 36px; font-size: 17px; }
+    .section { padding: 52px 0; }
+    .section-head h2, .finder h2 { font-size: 24px; }
+    .tile .body { padding: 22px 20px 24px; }
     .globe { max-width: 320px; }
-    .notice { flex-direction: column; gap: 10px; }
   }
 </style>
 <!-- Meta Pixel (same pixel as the main site) -->
@@ -80,52 +143,102 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
 <!-- End Meta Pixel -->
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <a href="/catalogb2b"><img src="/wordmark-purple.svg" alt="Safar Lee"></a>
-    <p class="kicker">International</p>
-    <h1>Visiting from outside India?</h1>
-    <p class="lead">Our online store sells and delivers within India only. Here is how to get Safar Lee where you are.</p>
-  </header>
+<div class="topbar">
+  Shopping from India? <button type="button" class="to-india">Continue to the India store &rarr;</button>
+</div>
 
-  <section class="notice" role="note" aria-label="Pricing notice">
-    <span class="tag">Please note</span>
-    <p><strong>All prices on safarlee.in are India retail prices in INR, valid only for delivery within India.</strong>
+<header class="site-header">
+  <div class="container">
+    <img src="/wordmark-purple.svg" alt="Safar Lee">
+    <nav>
+      <a href="/catalogb2b" class="hide-sm">Trade catalog</a>
+      <a href="https://www.instagram.com/safarlee.in/" target="_blank" rel="noopener">Instagram</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div>
+      <span class="pill">European design &times; Indian craft</span>
+      <h1>Safar Lee,<br><em>wherever you are.</em></h1>
+      <p class="sub">Our online store delivers within India. Shopping from abroad? Order as a business at trade prices, or ask us for a personal quote with international shipping.</p>
+      <div class="ctas">
+        <a class="btn" href="/catalogb2b#request">Get trade prices</a>
+        <a class="btn outline" href="https://www.instagram.com/safarlee.in/" target="_blank" rel="noopener">Order from abroad</a>
+      </div>
+    </div>
+    <figure>
+      <img src="/international/hero.jpg" alt="Safar Lee embroidered tote and pouches" width="900" height="1125">
+      <figcaption><b>Handcrafted in India</b>Shipped to trade partners worldwide</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="price-note" role="note" aria-label="Pricing notice">
+  <div class="container">
+    <span class="icon" aria-hidden="true">&#8377;</span>
+    <p><strong>Prices on safarlee.in are India retail prices in INR, for delivery within India only.</strong>
       They do not apply to international orders. International retail and trade prices are different and are quoted separately.</p>
-  </section>
+  </div>
+</section>
 
-  <section class="cards">
-    <div class="card">
-      <p class="kicker">B2B International</p>
-      <h2>For shops, hotels and distributors</h2>
-      <p>We supply trade customers worldwide. Trade prices are separate from the prices on this website. Register your business and we email you the trade price list for your region.</p>
-      <a class="btn" href="/catalogb2b#request">Get trade prices</a>
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Shop from abroad</p>
+      <h2>Two ways to get Safar Lee</h2>
     </div>
-    <div class="card">
-      <p class="kicker">Retail International</p>
-      <h2>For personal orders</h2>
-      <p>Online orders ship within India only, so the store prices do not apply abroad. For delivery outside India, message us on Instagram and we send you a quote with international pricing and shipping.</p>
-      <a class="btn ghost" href="https://www.instagram.com/safarlee.in/" target="_blank" rel="noopener">Message @safarlee.in</a>
+    <div class="tiles">
+      <article class="tile">
+        <img src="/international/trade.jpg" alt="Embroidered Safar Lee pouches" width="900" height="562" loading="lazy">
+        <div class="body">
+          <p class="eyebrow">B2B International</p>
+          <h3>For shops, hotels &amp; distributors</h3>
+          <p>Stock Safar Lee in your store. Trade prices are separate from the prices on this website; register your business and we email you the trade price list for your region.</p>
+          <ul><li>Worldwide shipping for trade</li><li>Ready-to-ship collection</li></ul>
+          <a class="btn" href="/catalogb2b#request">Get trade prices</a>
+        </div>
+      </article>
+      <article class="tile">
+        <img src="/international/retail.jpg" alt="Safar Lee cushions at home" width="900" height="562" loading="lazy">
+        <div class="body">
+          <p class="eyebrow">Retail International</p>
+          <h3>For personal orders</h3>
+          <p>Store prices apply within India only. For delivery to your country, message us on Instagram and we send you a quote with international pricing and shipping.</p>
+          <ul><li>Personal quote in a reply</li><li>International shipping on request</li></ul>
+          <a class="btn outline" href="https://www.instagram.com/safarlee.in/" target="_blank" rel="noopener">Message @safarlee.in</a>
+        </div>
+      </article>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="finder" aria-labelledby="finderTitle">
+<section class="section finder" aria-labelledby="finderTitle">
+  <div class="container">
     <div class="globe"><canvas id="globe" aria-hidden="true"></canvas></div>
     <div>
-      <p class="kicker">Find a store near you</p>
-      <h2 id="finderTitle" style="margin-top:4px">Safar Lee stockists</h2>
+      <p class="eyebrow">Find a store near you</p>
+      <h2 id="finderTitle">Safar Lee stockists</h2>
+      <p class="lead">Choose your region to see where Safar Lee is sold.</p>
       <ul class="chips" id="chips"></ul>
       <div id="result" role="status"><p class="hint">Choose a region to see stores near you.</p></div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer>
-    Shipping to an address in India? <button type="button" id="toIndia">Continue to the India store</button>
-    <p class="small">India prices and delivery within India only.</p>
-  </footer>
-
-</div>
+<footer class="site-footer">
+  <div class="container">
+    <img src="/wordmark.svg" alt="Safar Lee">
+    <nav>
+      <button type="button" class="to-india">India store</button>
+      <a href="/catalogb2b">Trade catalog</a>
+      <a href="https://www.instagram.com/safarlee.in/" target="_blank" rel="noopener">Instagram</a>
+    </nav>
+    <p class="fine">Prices on safarlee.in are India retail prices in INR, for delivery within India only.</p>
+  </div>
+</footer>
 
 <script type="module">
   // Region names match the Region list of the trade form on /catalogb2b.
@@ -142,10 +255,12 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
     { name: "Africa",                  lat: 4,   lng: 21 }
   ];
 
-  // "Continue to the India store": skip this page for 30 days.
-  document.getElementById("toIndia").addEventListener("click", function () {
-    document.cookie = "sl_india=1; max-age=2592000; path=/; samesite=lax; secure";
-    location.href = "/";
+  // "Continue to the India store" (top bar and footer): skip this page for 30 days.
+  document.querySelectorAll(".to-india").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.cookie = "sl_india=1; max-age=2592000; path=/; samesite=lax; secure";
+      location.href = "/";
+    });
   });
 
   // Store list lives in /stockists.json: [{ "name", "city", "country", "region", "lat", "lng", "url" }]
