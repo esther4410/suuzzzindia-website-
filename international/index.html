@@ -260,10 +260,11 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
     { name: "Africa",                  lat: 4,   lng: 21 }
   ];
 
-  // "Continue to the India store" (top bar and footer): skip this page for 30 days.
+  // "Continue to the India store" (top bar and footer): skip this page until the browser is closed
+  // (session cookie: no max-age).
   document.querySelectorAll(".to-india").forEach(function (b) {
     b.addEventListener("click", function () {
-      document.cookie = "sl_india=1; max-age=2592000; path=/; samesite=lax; secure";
+      document.cookie = "sl_india=1; path=/; samesite=lax; secure";
       location.href = "/";
     });
   });

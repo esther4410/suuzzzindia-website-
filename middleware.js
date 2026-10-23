@@ -17,7 +17,7 @@ export default function middleware(request) {
 
   const ua = request.headers.get("user-agent") || "";
   const cookie = request.headers.get("cookie") || "";
-  // Set by "Continue to the India store" on /international, kept for 30 days.
+  // Set by "Continue to the India store" on /international, kept until the browser is closed.
   const choseIndia = /(?:^|;\s*)sl_india=1/.test(cookie);
 
   // Unknown country counts as India, so a real customer is never sent away.
