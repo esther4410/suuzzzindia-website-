@@ -337,6 +337,9 @@ src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></
   }
 
   var form = document.getElementById("leadForm"), note = document.getElementById("formNote");
+  // /international links here with ?region=Europe etc.: preselect that region.
+  var askedRegion = new URLSearchParams(location.search).get("region");
+  if (askedRegion) Array.prototype.forEach.call(form.elements.country.options, function (o) { if (o.value === askedRegion) form.elements.country.value = askedRegion; });
   form.addEventListener("submit", function (ev) {
     ev.preventDefault();
     if (!form.checkValidity()) { form.reportValidity(); return; }

@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Safar Lee — International</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="https://use.typekit.net/tnv1bkt.css">
+<style>
+  :root { --plum: #644678; --deep: #4A3C58; --ink: #1F1428; --gold: #8A6516; --goldbright: #D2A54C; --lilac: #F4EEF7; --rule: #E4D8EF; --muted: #8A7C96; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FFFFFF; color: var(--ink); font-family: "sofia-pro", "Sofia Pro", system-ui, -apple-system, sans-serif; line-height: 1.5; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 32px 16px 56px; }
+  header { text-align: center; padding-bottom: 24px; border-bottom: 1px solid var(--rule); }
+  header img { width: 150px; height: auto; }
+  .kicker { margin: 12px 0 0; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
+  h1 { margin: 6px 0 0; font-size: 30px; font-weight: 500; color: var(--plum); }
+  .lead { margin: 10px auto 0; max-width: 560px; color: var(--deep); }
+  h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; color: var(--plum); }
+  section { margin-top: 28px; }
+
+  /* India-only price notice: the one thing every international visitor must read */
+  .notice { display: flex; gap: 14px; align-items: flex-start; padding: 18px 20px; border: 1.5px solid var(--goldbright); border-radius: 12px; background: #FBF6EA; }
+  .notice .tag { flex: 0 0 auto; padding: 3px 10px; border-radius: 999px; background: var(--goldbright); color: #3A2A08; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .notice p { margin: 0; color: var(--ink); }
+  .notice strong { color: var(--plum); }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .card { display: flex; flex-direction: column; padding: 22px; border: 1px solid var(--rule); border-radius: 12px; background: #FFFFFF; }
+  .card .kicker { margin: 0 0 4px; }
+  .card p { margin: 0 0 18px; color: var(--deep); }
+  .card .btn { margin-top: auto; align-self: flex-start; }
+  .btn { display: inline-block; min-height: 48px; padding: 13px 26px; border: 0; border-radius: 999px; background: var(--plum); color: #FFFFFF; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
+  .btn.ghost { background: #FFFFFF; color: var(--plum); border: 1.5px solid var(--plum); padding: 11.5px 24.5px; }
+
+  /* Store finder */
+  .finder { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: center; padding: 22px; border: 1px solid var(--rule); border-radius: 12px; background: var(--lilac); }
+  .finder .kicker { margin: 0; }
+  .globe { position: relative; width: 100%; max-width: 440px; margin: 0 auto; aspect-ratio: 1; }
+  .globe canvas { width: 100%; height: 100%; cursor: grab; touch-action: pan-y; contain: layout paint size; opacity: 0; transition: opacity .8s ease; }
+  .globe canvas.on { opacity: 1; }
+  .globe canvas:active { cursor: grabbing; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 18px; padding: 0; list-style: none; }
+  .chips button { min-height: 40px; padding: 8px 14px; border: 1.5px solid var(--rule); border-radius: 999px; background: #FFFFFF; color: var(--deep); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .chips button[aria-pressed="true"] { border-color: var(--plum); background: var(--plum); color: #FFFFFF; }
+  .chips button:focus-visible { outline: 2px solid var(--plum); outline-offset: 2px; }
+  #result { min-height: 96px; padding: 16px; border-radius: 10px; background: #FFFFFF; }
+  #result .hint, #result .none { margin: 0; color: var(--muted); }
+  #result .none { color: var(--deep); font-weight: 600; }
+  #result a.first { display: inline-block; margin-top: 8px; color: var(--plum); font-weight: 700; }
+  #result ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+  #result li .store { display: block; color: var(--plum); font-weight: 700; }
+  #result li span { color: var(--muted); font-size: 14px; }
+
+  footer { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--rule); text-align: center; font-size: 14px; color: var(--muted); }
+  footer button { padding: 0; border: 0; background: none; color: var(--plum); font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; }
+  footer .small { margin: 6px 0 0; font-size: 12px; }
+
+  @media (max-width: 720px) {
+    h1 { font-size: 26px; }
+    .cards, .finder { grid-template-columns: 1fr; }
+    .finder { padding: 16px; }
+    .globe { max-width: 320px; }
+    .notice { flex-direction: column; gap: 10px; }
+  }
+</style>
+<!-- Meta Pixel (same pixel as the main site) -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','2510037666102813');
+fbq('track','PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=2510037666102813&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel -->
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <a href="/catalogb2b"><img src="/wordmark-purple.svg" alt="Safar Lee"></a>
+    <p class="kicker">International</p>
+    <h1>Visiting from outside India?</h1>
+    <p class="lead">Our online store sells and delivers within India only. Here is how to get Safar Lee where you are.</p>
+  </header>
+
+  <section class="notice" role="note" aria-label="Pricing notice">
+    <span class="tag">Please note</span>
+    <p><strong>All prices on safarlee.in are India retail prices in INR, valid only for delivery within India.</strong>
+      They do not apply to international orders. International retail and trade prices are different and are quoted separately.</p>
+  </section>
+
+  <section class="cards">
+    <div class="card">
+      <p class="kicker">B2B International</p>
+      <h2>For shops, hotels and distributors</h2>
+      <p>We supply trade customers worldwide. Trade prices are separate from the prices on this website. Register your business and we email you the trade price list for your region.</p>
+      <a class="btn" href="/catalogb2b#request">Get trade prices</a>
+    </div>
+    <div class="card">
+      <p class="kicker">Retail International</p>
+      <h2>For personal orders</h2>
+      <p>Online orders ship within India only, so the store prices do not apply abroad. For delivery outside India, message us on Instagram and we send you a quote with international pricing and shipping.</p>
+      <a class="btn ghost" href="https://www.instagram.com/safarlee.in/" target="_blank" rel="noopener">Message @safarlee.in</a>
+    </div>
+  </section>
+
+  <section class="finder" aria-labelledby="finderTitle">
+    <div class="globe"><canvas id="globe" aria-hidden="true"></canvas></div>
+    <div>
+      <p class="kicker">Find a store near you</p>
+      <h2 id="finderTitle" style="margin-top:4px">Safar Lee stockists</h2>
+      <ul class="chips" id="chips"></ul>
+      <div id="result" role="status"><p class="hint">Choose a region to see stores near you.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    Shipping to an address in India? <button type="button" id="toIndia">Continue to the India store</button>
+    <p class="small">India prices and delivery within India only.</p>
+  </footer>
+
+</div>
+
+<script type="module">
+  // Region names match the Region list of the trade form on /catalogb2b.
+  // lat/lng is where the globe turns to when the region is chosen.
+  var REGIONS = [
+    { name: "Asia (outside India)",    lat: 22,  lng: 108 },
+    { name: "Middle East",             lat: 25,  lng: 48 },
+    { name: "Europe",                  lat: 49,  lng: 12 },
+    { name: "United Kingdom",          lat: 54,  lng: -2 },
+    { name: "United States",           lat: 39,  lng: -97 },
+    { name: "Canada",                  lat: 56,  lng: -100 },
+    { name: "Latin America",           lat: -12, lng: -60 },
+    { name: "Australia / New Zealand", lat: -28, lng: 147 },
+    { name: "Africa",                  lat: 4,   lng: 21 }
+  ];
+
+  // "Continue to the India store": skip this page for 30 days.
+  document.getElementById("toIndia").addEventListener("click", function () {
+    document.cookie = "sl_india=1; max-age=2592000; path=/; samesite=lax; secure";
+    location.href = "/";
+  });
+
+  // Store list lives in /stockists.json: [{ "name", "city", "country", "region", "lat", "lng", "url" }]
+  var stockists = [];
+  try {
+    var res = await fetch("/stockists.json", { cache: "no-cache" });
+    if (res.ok) stockists = await res.json();
+  } catch (e) { /* no list yet: every region shows "Currently not available" */ }
+
+  var chips = document.getElementById("chips"), result = document.getElementById("result");
+  var target = null; // [phi, theta] the globe is turning to
+  var markers = [];
+
+  REGIONS.forEach(function (r) {
+    var li = document.createElement("li"), b = document.createElement("button");
+    b.type = "button"; b.textContent = r.name; b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () { pick(r, b); });
+    li.appendChild(b); chips.appendChild(li);
+  });
+
+  function pick(r, btn) {
+    chips.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === btn)); });
+    target = toAngles(r.lat, r.lng);
+    var here = stockists.filter(function (s) { return s.region === r.name; });
+    result.textContent = "";
+    if (!here.length) {
+      var p = document.createElement("p"); p.className = "none";
+      p.textContent = "Currently not available in " + r.name + ".";
+      var a = document.createElement("a"); a.className = "first";
+      a.href = "/catalogb2b?region=" + encodeURIComponent(r.name) + "#request";
+      a.textContent = "Become our first stockist here →";
+      result.appendChild(p); result.appendChild(a);
+    } else {
+      var ul = document.createElement("ul");
+      here.forEach(function (s) {
+        var li = document.createElement("li"), nameEl = document.createElement(s.url ? "a" : "b");
+        nameEl.className = "store"; nameEl.textContent = s.name;
+        if (s.url) { nameEl.href = s.url; nameEl.target = "_blank"; nameEl.rel = "noopener"; }
+        var place = document.createElement("span"); place.textContent = [s.city, s.country].filter(Boolean).join(", ");
+        li.appendChild(nameEl); li.appendChild(place); ul.appendChild(li);
+      });
+      result.appendChild(ul);
+    }
+    markers = here.filter(function (s) { return typeof s.lat === "number" && typeof s.lng === "number"; })
+                  .map(function (s) { return { location: [s.lat, s.lng], size: 0.07 }; });
+  }
+
+  // ---- Globe ----
+  function toAngles(lat, lng) { return [Math.PI - ((lng * Math.PI) / 180 - Math.PI / 2), (lat * Math.PI) / 180]; }
+
+  var canvas = document.getElementById("globe");
+  var phi = toAngles(20, 78)[0], theta = 0.3; // start facing India
+  var drag = null, width = 0;
+
+  canvas.addEventListener("pointerdown", function (e) { drag = { x: e.clientX, phi: phi }; target = null; canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener("pointermove", function (e) { if (drag) phi = drag.phi + (e.clientX - drag.x) / 150; });
+  canvas.addEventListener("pointerup", function () { drag = null; });
+  canvas.addEventListener("pointercancel", function () { drag = null; });
+
+  function resize() { width = canvas.offsetWidth; }
+  window.addEventListener("resize", resize); resize();
+
+  try {
+    var createGlobe = (await import("https://cdn.jsdelivr.net/npm/cobe@0.6.5/+esm")).default;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    createGlobe(canvas, {
+      devicePixelRatio: dpr, width: width * dpr, height: width * dpr,
+      phi: phi, theta: theta, dark: 0, diffuse: 1.2, scale: 1,
+      // mapBaseBrightness must be set: without it cobe draws a solid black disc.
+      // In light mode (dark: 0) the base has to stay white or the globe also goes black.
+      mapSamples: 16000, mapBrightness: 6, mapBaseBrightness: 0,
+      baseColor: [1, 1, 1], markerColor: [0.82, 0.65, 0.30], glowColor: [0.92, 0.86, 0.95],
+      markers: [],
+      onRender: function (state) {
+        if (target) {
+          // Ease toward the chosen region along the shortest way round.
+          var d = ((target[0] - phi) % (2 * Math.PI) + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
+          phi += d * 0.08; theta += (target[1] - theta) * 0.08;
+        } else if (!drag) {
+          phi += 0.003;
+        }
+        state.phi = phi; state.theta = theta; state.markers = markers;
+        state.width = width * dpr; state.height = width * dpr;
+      }
+    });
+    canvas.classList.add("on");
+  } catch (e) {
+    canvas.parentNode.style.display = "none"; // globe is decoration; the region list still works
+  }
+</script>
+</body>
+</html>
